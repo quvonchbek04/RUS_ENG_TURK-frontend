@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #ffffff;
+  --paper-soft: #f4f4f3;
+  --panel: #ffffff;
+  --ink: #141413;
+  --ink-soft: #6b6b68;
+  --pine: #141413;
+  --pine-bright: #2b2b28;
+  --gold: #d97757;
+  --gold-soft: #fbe4da;
+  --brick: #c0392b;
+  --line: #e5e5e2;
+  --success-bg: #eaf6ec;
+  --error-bg: #fbeae8;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: 'Fraunces', ui-serif, Georgia, serif;
+  font-optical-sizing: auto;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* Perforated ticket edge */
+.ticket-edge {
+  position: relative;
+}
+.ticket-edge::before,
+.ticket-edge::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: var(--paper);
+  border-radius: 999px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.ticket-edge::before { left: -9px; }
+.ticket-edge::after { right: -9px; }
+
+.dash-rail {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--line) 0,
+    var(--line) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  width: 2px;
+}
+
+.dash-rail-h {
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--line) 0,
+    var(--line) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  height: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+::selection {
+  background: var(--gold-soft);
+  color: var(--ink);
+}
+
+* { scrollbar-width: thin; scrollbar-color: var(--gold) var(--paper-soft); }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--paper-soft); border-radius: 999px; }
+::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 999px; border: 2px solid var(--paper-soft); }
+::-webkit-scrollbar-thumb:hover { background: var(--pine); }
+
+/* Ichki panel/oynalarda scroll aniq ko'rinishi uchun (scrollbar joyi oldindan band qilinadi, tarkib "sakramaydi") */
+.scroll-panel {
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+/* TTS o'quvchi — so'z bo'yicha ajratib ko'rsatish */
+.tts-word {
+  transition: background-color 0.15s ease, color 0.15s ease;
+  border-radius: 4px;
+  padding: 0 1px;
+}
+.tts-word.read {
+  color: var(--ink-soft);
+}
+.tts-word.current {
+  background: var(--gold-soft);
+  color: var(--ink);
+  font-weight: 600;
+}

@@ -1,0 +1,23 @@
+project_id = "til-sayohati"
+
+[api]
+enabled = true
+port = 54321
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+site_url = "http://localhost:5173"
+additional_redirect_urls = ["http://localhost:5173"]
+# Username-asosida ishlash uchun email tasdiqlash o'chirilgan (email sun'iy,
+# "username@til-sayohati.local" ko'rinishida yaratiladi — h aqiqiy pochta emas).
+enable_confirmations = false
+
+[edge_runtime]
+enabled = true
