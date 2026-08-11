@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.env
+.env.local
+.DS_Store
+*.log
+
+# Supabase CLI lokal ishlatilganda yaratadigan vaqtinchalik fayllar
+supabase/.branches
+supabase/.temp
+
+# Eski, ishlatilmaydigan backend
+_deprecated_express_backend/backend/node_modules/
+_deprecated_express_backend/backend/.env
+_deprecated_express_backend/backend/data/app.db*
