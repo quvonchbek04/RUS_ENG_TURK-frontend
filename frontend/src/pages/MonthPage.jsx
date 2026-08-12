@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Layout from '../components/Layout.jsx';
 import SpeakButton from '../components/SpeakButton.jsx';
+import AiTaskWidget from '../components/AiTaskWidget.jsx';
 import { api } from '../lib/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { getQuizPct, getQuizResult, getReviewFlags, isMonthDone, isQuizPassed, isAdminRole, STEP_KEYS } from '../lib/lessonProgress.js';
@@ -191,6 +192,11 @@ export default function MonthPage() {
           {!reviewFlags.grammar && (
             <NextStepButton onClick={() => advanceToNext('grammar')} label="Grammatikani o'rgandim, keyingisi →" />
           )}
+          <AiTaskWidget
+            type="text"
+            content={`${month.grammar.title}\n${month.grammar.text}\n${(month.grammar.examples || []).map((ex) => ex.join(' — ')).join('\n')}`}
+            lang={lang}
+          />
         </div>
       );
     }
@@ -286,6 +292,11 @@ export default function MonthPage() {
           {!reviewFlags.dialog && (
             <NextStepButton onClick={() => advanceToNext('dialog')} label="Dialogni ko'rib chiqdim, keyingisi →" />
           )}
+          <AiTaskWidget
+            type="dialog"
+            content={month.dialog.lines.map(([speaker, line, tr]) => `${speaker}: ${line} (${tr})`).join('\n')}
+            lang={lang}
+          />
         </div>
       );
     }
