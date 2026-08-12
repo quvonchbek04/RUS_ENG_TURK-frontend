@@ -1,20 +1,35 @@
 import { useState } from 'react';
 import { api } from '../lib/api.js';
+import { useAuth } from '../context/AuthContext.jsx';
 
 // type: 'text' | 'dialog'   content: matn yoki dialog qatorlaridan yig'ilgan matn   lang: 'ru' | 'en' | 'tr'
 export default function AiTaskWidget({ type, content, lang }) {
+  const { updateProgress } = useAuth();
   const [task, setTask] = useState(null);
   const [answer, setAnswer] = useState('');
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState('');
+  const [attempts, setAttempts] = useState(0);
+
+  function recordStat(isCorrect) {
+    updateProgress((prev) => {
+      const aiStats = { ...(prev.aiStats || {}) };
+      const langStats = { ...(aiStats[lang] || { attempts: 0, correct: 0 }) };
+      langStats.attempts += 1;
+      if (isCorrect) langStats.correct += 1;
+      aiStats[lang] = langStats;
+      return { ...prev, aiStats };
+    });
+  }
 
   async function requestTask() {
     setLoading(true);
     setError('');
     setFeedback(null);
     setAnswer('');
+    setAttempts(0);
     try {
       const res = await api.aiTask({ type, content, lang });
       setTask(res);
@@ -32,11 +47,19 @@ export default function AiTaskWidget({ type, content, lang }) {
     try {
       const res = await api.aiCheck({ context: content, question: task?.question, answer, lang });
       setFeedback(res);
+      setAttempts((a) => a + 1);
+      recordStat(Boolean(res.correct));
     } catch (e) {
       setError(e.message || 'Javobni tekshirishda xatolik yuz berdi');
     } finally {
       setChecking(false);
     }
+  }
+
+  function tryAgain() {
+    // Xato bo'lganda, xuddi shu vazifaga qaytadan javob yozish imkoni.
+    setFeedback(null);
+    setAnswer('');
   }
 
   if (!task) {
@@ -100,18 +123,57 @@ export default function AiTaskWidget({ type, content, lang }) {
       {feedback && (
         <div>
           <div
-            className="rounded-lg p-3 text-sm mb-3"
-            style={{ background: 'var(--success-bg)', color: 'var(--ink)' }}
+            className="rounded-lg p-3 text-sm mb-2 flex items-start gap-2"
+            style={
+              feedback.correct
+                ? { background: 'var(--success-bg)', color: 'var(--ink)' }
+                : { background: 'var(--error-bg)', color: 'var(--ink)' }
+            }
           >
-            {feedback.feedback}
+            <span className="shrink-0">{feedback.correct ? '✅' : '❌'}</span>
+            <span>{feedback.feedback}</span>
           </div>
-          <button
-            onClick={requestTask}
-            className="font-mono text-xs uppercase tracking-widest px-4 py-2.5 rounded-xl cursor-pointer font-semibold"
-            style={{ background: 'var(--gold)', color: 'var(--panel)' }}
-          >
-            🔁 Yana bir vazifa
-          </button>
+
+          {!feedback.correct && feedback.corrected && (
+            <div
+              className="rounded-lg p-3 text-sm mb-3"
+              style={{ background: 'var(--paper-soft)', color: 'var(--ink)' }}
+            >
+              <div className="font-mono text-[10px] uppercase tracking-widest mb-1" style={{ color: 'var(--pine)' }}>
+                To'g'ri variant
+              </div>
+              {feedback.corrected}
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-2 mt-3">
+            {!feedback.correct && (
+              <button
+                onClick={tryAgain}
+                className="font-mono text-xs uppercase tracking-widest px-4 py-2.5 rounded-xl cursor-pointer font-semibold"
+                style={{ background: 'var(--brick)', color: 'var(--paper)' }}
+              >
+                ✏️ Qayta urinish
+              </button>
+            )}
+            <button
+              onClick={requestTask}
+              className="font-mono text-xs uppercase tracking-widest px-4 py-2.5 rounded-xl cursor-pointer font-semibold"
+              style={
+                feedback.correct
+                  ? { background: 'var(--gold)', color: 'var(--panel)' }
+                  : { background: 'var(--panel)', color: 'var(--ink-soft)', border: '1px solid var(--line)' }
+              }
+            >
+              🔁 {feedback.correct ? 'Yana bir vazifa' : 'Boshqa vazifaga o\'tish'}
+            </button>
+          </div>
+
+          {attempts > 1 && (
+            <div className="mt-2 font-mono text-[10px] uppercase tracking-widest" style={{ color: 'var(--ink-soft)' }}>
+              Bu vazifada {attempts} marta urinildi
+            </div>
+          )}
         </div>
       )}
 

@@ -62,6 +62,15 @@ export function isMonthUnlocked(progress, lang, flatMonths, index, isAdmin = fal
   return isMonthDone(progress, lang, prev.id);
 }
 
+/** Barcha tillar bo'yicha AI ustoz mashqlarining umumiy urinish/to'g'ri sonini yig'adi. */
+export function sumAiStats(progress) {
+  const aiStats = progress.aiStats || {};
+  return Object.values(aiStats).reduce(
+    (acc, s) => ({ attempts: acc.attempts + (s.attempts || 0), correct: acc.correct + (s.correct || 0) }),
+    { attempts: 0, correct: 0 }
+  );
+}
+
 /** Progress obyektidagi reviewFlags/testResults asosida, kontentsiz, umumiy tugatilgan oylar sonini hisoblaydi. */
 export function countCompletedMonths(progress) {
   let count = 0;

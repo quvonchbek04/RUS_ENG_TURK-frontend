@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Layout from '../components/Layout.jsx';
 import { api } from '../lib/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
-import { countCompletedMonths } from '../lib/lessonProgress.js';
+import { countCompletedMonths, sumAiStats } from '../lib/lessonProgress.js';
 
 export default function Dashboard() {
   const { user, progress } = useAuth();
@@ -15,6 +15,8 @@ export default function Dashboard() {
   }, []);
 
   const completedTotal = countCompletedMonths(progress);
+  const aiStats = sumAiStats(progress);
+  const aiAccuracy = aiStats.attempts > 0 ? Math.round((aiStats.correct / aiStats.attempts) * 100) : null;
 
   return (
     <Layout>
@@ -34,6 +36,9 @@ export default function Dashboard() {
         <div className="flex items-center gap-4 mb-10 flex-wrap">
           <StatChip label="Tugatilgan oylar" value={completedTotal} />
           <StatChip label="Yo'nalishlar" value="3" />
+          {aiAccuracy !== null && (
+            <StatChip label={`🤖 AI ustoz aniqligi (${aiStats.attempts} urinish)`} value={`${aiAccuracy}%`} />
+          )}
           <Link
             to="/library"
             className="rounded-xl border px-4 py-2.5 flex items-center gap-2 font-mono text-xs uppercase tracking-widest transition-colors"
