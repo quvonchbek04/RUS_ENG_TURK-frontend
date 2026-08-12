@@ -5,7 +5,8 @@
 // orqali (service-role kalit bilan) bajariladi.
 //
 // So'rov formati: POST { action: "create-admin" | "delete-admin" |
-//                          "get-ai-settings" | "save-ai-settings", ...payload }
+//                          "get-ai-settings" | "save-ai-settings" |
+//                          "list-api-keys" | "add-api-key" | "delete-api-key", ...payload }
 // Header: Authorization: Bearer <foydalanuvchining supabase session tokeni>
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -80,32 +81,67 @@ Deno.serve(async (req) => {
     if (action === "get-ai-settings") {
       if (!["admin", "superadmin"].includes(callerRole)) return json({ error: "Bu amal uchun ruxsatingiz yo'q" }, 403);
       const { data: providerRow } = await admin.from("settings").select("value").eq("key", "ai_provider").single();
-      const { data: keyRow } = await admin.from("secure_settings").select("value").eq("key", "gemini_api_key").single();
+      const { count } = await admin.from("secure_api_keys").select("*", { count: "exact", head: true }).eq("provider", "gemini");
       const configuredProvider = (providerRow?.value || "mock").toLowerCase();
-      const hasKey = Boolean(keyRow?.value);
-      const provider = configuredProvider === "gemini" && hasKey ? "gemini" : "mock";
-      return json({ provider, hasKey, configuredProvider });
+      const keyCount = count || 0;
+      const provider = configuredProvider === "gemini" && keyCount > 0 ? "gemini" : "mock";
+      return json({ provider, hasKey: keyCount > 0, keyCount, configuredProvider });
     }
 
-    // ---------- AI sozlamalarini saqlash (faqat superadmin) ----------
+    // ---------- AI provayderini saqlash (faqat superadmin) ----------
     if (action === "save-ai-settings") {
       if (callerRole !== "superadmin") return json({ error: "Bu amal uchun ruxsatingiz yo'q" }, 403);
-      const { geminiApiKey, provider } = body;
+      const { provider } = body;
       if (provider && !["mock", "gemini"].includes(String(provider).toLowerCase())) {
         return json({ error: "Noto'g'ri provayder qiymati" }, 400);
-      }
-      if (typeof geminiApiKey === "string") {
-        await admin.from("secure_settings").update({ value: geminiApiKey.trim() }).eq("key", "gemini_api_key");
       }
       if (provider) {
         await admin.from("settings").update({ value: String(provider).toLowerCase() }).eq("key", "ai_provider");
       }
       const { data: providerRow } = await admin.from("settings").select("value").eq("key", "ai_provider").single();
-      const { data: keyRow } = await admin.from("secure_settings").select("value").eq("key", "gemini_api_key").single();
+      const { count } = await admin.from("secure_api_keys").select("*", { count: "exact", head: true }).eq("provider", "gemini");
       const configuredProvider = (providerRow?.value || "mock").toLowerCase();
-      const hasKey = Boolean(keyRow?.value);
-      const activeProvider = configuredProvider === "gemini" && hasKey ? "gemini" : "mock";
-      return json({ provider: activeProvider, hasKey, configuredProvider });
+      const keyCount = count || 0;
+      const activeProvider = configuredProvider === "gemini" && keyCount > 0 ? "gemini" : "mock";
+      return json({ provider: activeProvider, hasKey: keyCount > 0, keyCount, configuredProvider });
+    }
+
+    // ---------- Gemini kalitlari ro'yxati (maskalangan holda, admin+superadmin) ----------
+    if (action === "list-api-keys") {
+      if (!["admin", "superadmin"].includes(callerRole)) return json({ error: "Bu amal uchun ruxsatingiz yo'q" }, 403);
+      const { data: rows } = await admin
+        .from("secure_api_keys")
+        .select("id, label, api_key, created_at")
+        .eq("provider", "gemini")
+        .order("id", { ascending: false });
+      const masked = (rows || []).map((r) => ({
+        id: r.id,
+        label: r.label || "Nomsiz kalit",
+        maskedKey: r.api_key.length > 8 ? `${r.api_key.slice(0, 4)}\u2022\u2022\u2022\u2022\u2022\u2022${r.api_key.slice(-4)}` : "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
+        createdAt: r.created_at,
+      }));
+      return json({ apiKeys: masked });
+    }
+
+    // ---------- Yangi Gemini kaliti qo'shish (faqat superadmin) ----------
+    if (action === "add-api-key") {
+      if (callerRole !== "superadmin") return json({ error: "Bu amal uchun ruxsatingiz yo'q" }, 403);
+      const apiKey = String(body.apiKey || "").trim();
+      const label = String(body.label || "").trim() || null;
+      if (apiKey.length < 10) return json({ error: "API kalit noto'g'ri ko'rinmoqda" }, 400);
+      const { error } = await admin.from("secure_api_keys").insert({ provider: "gemini", api_key: apiKey, label });
+      if (error) return json({ error: error.message }, 400);
+      return json({ ok: true });
+    }
+
+    // ---------- Gemini kalitini o'chirish (faqat superadmin) ----------
+    if (action === "delete-api-key") {
+      if (callerRole !== "superadmin") return json({ error: "Bu amal uchun ruxsatingiz yo'q" }, 403);
+      const id = body.id;
+      if (!id) return json({ error: "id kerak" }, 400);
+      const { error } = await admin.from("secure_api_keys").delete().eq("id", id);
+      if (error) return json({ error: error.message }, 400);
+      return json({ ok: true });
     }
 
     return json({ error: "Noma'lum amal (action)" }, 400);

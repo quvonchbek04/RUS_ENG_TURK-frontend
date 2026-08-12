@@ -111,11 +111,50 @@ npm run dev
 
 ### 6) (Ixtiyoriy) Gemini AI'ni yoqish
 
-Admin panel → **AI sozlamalari** bo'limida Gemini API kalitingizni
-(https://aistudio.google.com/apikey) kiritib, provayderni "gemini" ga
-o'zgartiring. Kalit **hech qachon** frontendga chiqmaydi — u faqat
-`secure_settings` jadvalida saqlanadi va faqat Edge Function (service-role)
+1. Agar loyihani birinchi marta o'rnatayotgan bo'lsangiz, SQL Editor'da
+   `supabase/migrations/0001_init.sql`, so'ng **`0002_gemini_multi_keys.sql`**
+   faylini ham ishga tushiring (ko'p API kalit uchun kerakli jadval).
+2. Edge Function'larni qayta deploy qiling (kod yangilangan bo'lsa har doim
+   shart):
+   ```bash
+   supabase functions deploy ai
+   supabase functions deploy admin
+   ```
+3. Admin panel → **AI (Gemini) sozlamalari** bo'limida bir yoki bir nechta
+   Gemini API kalitini (https://aistudio.google.com/apikey) qo'shing va
+   provayderni "Gemini" ga o'zgartiring.
+
+**Ko'p kalit qo'llab-quvvatlanadi:** bir nechta Google hisobidan olingan
+bepul API kalitni bir vaqtning o'zida qo'shishingiz mumkin — har bir so'rov
+kalitlar orasida tasodifiy taqsimlanadi, biror kalit limitga (429) uchrasa
+avtomatik keyingi kalitga o'tiladi. Bu bepul tarifning past limitini
+(daqiqasiga/kuniga cheklangan so'rov) bir nechta kalit bilan ko'paytirish
+imkonini beradi. Kalitlar **hech qachon** frontendga chiqmaydi — ular faqat
+`secure_api_keys` jadvalida saqlanadi va faqat Edge Function (service-role)
 orqali o'qiladi.
+
+### 7) Telefonga o'rnatiladigan ilova (PWA / APK)
+
+Sayt endi **PWA (Progressive Web App)** sifatida sozlangan — hech qanday
+qo'shimcha deploy shart emas, Netlify'dagi build avtomatik shu imkoniyatni
+beradi.
+
+**Android/iPhone'da to'g'ridan-to'g'ri o'rnatish (eng oson yo'l):**
+- Android: Chrome'da saytni oching → yuqori o'ng burchakdagi ⋮ menyu →
+  **"Ilovani o'rnatish"** / "Add to Home screen".
+- iPhone: Safari'da saytni oching → pastdagi ulashish tugmasi → **"Add to
+  Home Screen"**.
+
+Bu — brauzerdan alohida, o'z ikonkasi bilan to'liq ekranli ilova sifatida
+ishlaydi, xuddi native ilova kabi, va **xuddi shu Supabase serveriga**
+ulanadi (alohida sozlash shart emas).
+
+**Haqiqiy `.apk` fayl kerak bo'lsa (masalan Play Store'ga yuklash uchun):**
+Loyihani mahalliy kompyuterda Android SDK bilan qurish shart emas —
+[PWABuilder.com](https://www.pwabuilder.com) saytiga kiring, Netlify
+manzilingizni (`https://sizning-saytingiz.netlify.app`) kiriting va u
+avtomatik sizning `manifest.webmanifest` faylingizni o'qib, tayyor `.apk`
+yoki `.aab` faylni yaratib beradi (Android bo'limi → "Package for stores").
 
 ---
 
@@ -133,10 +172,10 @@ orqali o'qiladi.
 - Barcha jadvallarda **Row Level Security (RLS)** yoqilgan — foydalanuvchi
   faqat o'z progressini, hamma esa kutubxona/lug'atlarni o'qiy oladi, faqat
   admin/superadmin yoza oladi.
-- `secure_settings` jadvaliga (Gemini kaliti saqlanadigan joy) **hech qanday**
-  RLS siyosati yozilmagan — bu ataylab shunday, chunki policy yo'q = RLS uni
-  klientdan butunlay yopib qo'yadi. Faqat Edge Function ichidagi
-  `service_role` kaliti RLS'ni chetlab o'tadi.
+- `secure_settings` va **`secure_api_keys`** jadvallariga (Gemini kalitlari
+  saqlanadigan joy) **hech qanday** RLS siyosati yozilmagan — bu ataylab
+  shunday, chunki policy yo'q = RLS ularni klientdan butunlay yopib qo'yadi.
+  Faqat Edge Function ichidagi `service_role` kaliti RLS'ni chetlab o'tadi.
 - Admin yaratish/o'chirish va AI sozlamalarini o'zgartirish — bularning
   barchasi Edge Function ichida, so'rov yuborgan foydalanuvchining haqiqiy
   rolini **bazadan qayta tekshirib** (JWT'dagi eski ma'lumotga ishonmasdan)

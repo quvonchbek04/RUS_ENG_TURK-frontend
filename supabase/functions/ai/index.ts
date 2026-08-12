@@ -1,7 +1,9 @@
 // Edge Function: /functions/v1/ai
-// Har qanday tizimga kirgan foydalanuvchi chaqira oladi. Gemini API kalitini
-// hech qachon klientga chiqarmaydi — kalit secure_settings jadvalida saqlanadi
-// va faqat shu funksiya ichida (service-role orqali) o'qiladi.
+// Har qanday tizimga kirgan foydalanuvchi chaqira oladi. Gemini API kalitlarini
+// hech qachon klientga chiqarmaydi — kalitlar secure_api_keys jadvalida
+// saqlanadi va faqat shu funksiya ichida (service-role orqali) o'qiladi.
+// Bir nechta kalit qo'shilgan bo'lsa, so'rovlar ular orasida navbat bilan
+// taqsimlanadi (limitga uchraganda avtomatik keyingi kalitga o'tiladi).
 //
 // So'rov formati: POST { action: "status" } |
 //                       { action: "task", type: "text"|"dialog", content, lang } |
@@ -19,11 +21,11 @@ const LANG_NAMES: Record<string, string> = { ru: "rus tili", en: "ingliz tili", 
 
 async function getAiConfig(admin: ReturnType<typeof createClient>) {
   const { data: providerRow } = await admin.from("settings").select("value").eq("key", "ai_provider").single();
-  const { data: keyRow } = await admin.from("secure_settings").select("value").eq("key", "gemini_api_key").single();
+  const { data: keyRows } = await admin.from("secure_api_keys").select("api_key").eq("provider", "gemini");
   const configuredProvider = (providerRow?.value || "mock").toLowerCase();
-  const apiKey = keyRow?.value || "";
-  const provider = configuredProvider === "gemini" && apiKey ? "gemini" : "mock";
-  return { provider, configuredProvider, hasKey: Boolean(apiKey), apiKey };
+  const keys = (keyRows || []).map((r) => r.api_key).filter(Boolean);
+  const provider = configuredProvider === "gemini" && keys.length > 0 ? "gemini" : "mock";
+  return { provider, configuredProvider, hasKey: keys.length > 0, keyCount: keys.length, keys };
 }
 
 function pickSentence(text: string): string {
@@ -81,6 +83,24 @@ async function callGemini(apiKey: string, prompt: string): Promise<string> {
   return text.trim();
 }
 
+// Bir nechta kalit mavjud bo'lsa, ular tasodifiy tartibda sinaladi — shu orqali
+// so'rovlar kalitlar orasida taqsimlanadi. Biror kalit limitga (429) yoki boshqa
+// xatoga uchrasa, avtomatik keyingi kalitga o'tiladi; barchasi ishlamasa xato
+// yuqoriga uzatiladi (chaqiruvchi joyda mock rejimiga tushiladi).
+async function callGeminiWithKeys(keys: string[], prompt: string): Promise<string> {
+  const order = [...keys].sort(() => Math.random() - 0.5);
+  let lastErr: unknown = null;
+  for (const key of order) {
+    try {
+      return await callGemini(key, prompt);
+    } catch (e) {
+      lastErr = e;
+      console.error("Gemini kaliti ishlamadi (limit yoki xato), keyingisiga o'tildi:", e);
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error("Hech qanday Gemini kaliti javob bermadi");
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "Faqat POST so'rovlar qabul qilinadi" }, 405);
@@ -99,7 +119,7 @@ Deno.serve(async (req) => {
 
     if (action === "status") {
       const cfg = await getAiConfig(admin);
-      return json({ provider: cfg.provider, hasKey: cfg.hasKey, configuredProvider: cfg.configuredProvider });
+      return json({ provider: cfg.provider, hasKey: cfg.hasKey, keyCount: cfg.keyCount, configuredProvider: cfg.configuredProvider });
     }
 
     if (action === "task") {
@@ -112,7 +132,7 @@ Deno.serve(async (req) => {
           const excerpt = String(content).slice(0, 2500);
           const kind = type === "dialog" ? "dialog" : "matn";
           const prompt = `Sen ${langName}ni o'rganayotgan o'zbek tilida so'zlashuvchi talaba uchun til o'qituvchisisan. Quyidagi ${kind} asosida talabaga bitta qisqa, aniq va bajarilishi mumkin bo'lgan vazifani O'ZBEK TILIDA yoz. Faqat vazifa matnini qaytar, boshqa hech narsa yozma.\n\n${kind === "dialog" ? "Dialog" : "Matn"}:\n"""${excerpt}"""`;
-          const question = await callGemini(cfg.apiKey, prompt);
+          const question = await callGeminiWithKeys(cfg.keys, prompt);
           return json({ question: question || mockTask(type, content, lang).question, hint: 'Javobingizni pastdagi maydonga yozing va "Javobni tekshirish" tugmasini bosing.' });
         } catch (e) {
           console.error("Gemini xatosi, mock rejimiga o'tildi:", e);
@@ -129,7 +149,7 @@ Deno.serve(async (req) => {
         try {
           const langName = LANG_NAMES[lang] || lang;
           const prompt = `Sen ${langName}ni o'rganayotgan o'zbek tilida so'zlashuvchi talabaning javobini tekshiruvchi mehribon til o'qituvchisisan.\n\nAsl matn/dialog (qisqartirilgan):\n"""${String(context || "").slice(0, 1500)}"""\n\nVazifa: "${question}"\n\nTalabaning javobi: "${answer}"\n\nJavobni baholab, O'ZBEK TILIDA 2-4 gapdan iborat qisqa, iliq va foydali fikr-mulohaza (feedback) yoz — xatolar bo'lsa muloyimlik bilan tuzatib ko'rsat, yaxshi tomonlarini ham aytib o't. Faqat fikr-mulohaza matnini qaytar.`;
-          const feedback = await callGemini(cfg.apiKey, prompt);
+          const feedback = await callGeminiWithKeys(cfg.keys, prompt);
           return json({ correct: true, feedback: feedback || mockCheck(answer).feedback });
         } catch (e) {
           console.error("Gemini xatosi, mock rejimiga o'tildi:", e);
