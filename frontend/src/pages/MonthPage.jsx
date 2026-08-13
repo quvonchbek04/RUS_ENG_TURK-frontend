@@ -25,27 +25,9 @@ const STEPS = [
 // Har bir mashqni saytning o'zida bajarish uchun: foydalanuvchi javobini yozadi,
 // so'ng "Javobni ko'rsatish" tugmasi bilan to'g'ri javobni solishtirib ko'radi.
 // Yozilgan javob progress ichida saqlanadi (sahifani yangilasa ham yo'qolmaydi).
-function ExerciseItem({ index, question, answer, savedValue, lang, onSave }) {
+function ExerciseItem({ index, question, answer, savedValue, onSave }) {
   const [value, setValue] = useState(savedValue || '');
   const [revealed, setRevealed] = useState(false);
-  const [aiFeedback, setAiFeedback] = useState(null);
-  const [aiChecking, setAiChecking] = useState(false);
-  const [aiError, setAiError] = useState('');
-
-  async function checkWithAi() {
-    if (!value.trim()) return;
-    setAiChecking(true);
-    setAiError('');
-    setAiFeedback(null);
-    try {
-      const res = await api.aiCheck({ context: question, question, answer: value, lang, referenceAnswer: answer });
-      setAiFeedback(res);
-    } catch (e) {
-      setAiError(e.message || 'Tekshirishda xatolik yuz berdi');
-    } finally {
-      setAiChecking(false);
-    }
-  }
 
   return (
     <li className="rounded-xl border p-3.5" style={{ borderColor: 'var(--line)', background: 'var(--paper)' }}>
@@ -57,10 +39,7 @@ function ExerciseItem({ index, question, answer, savedValue, lang, onSave }) {
       </div>
       <textarea
         value={value}
-        onChange={(e) => {
-          setValue(e.target.value);
-          setAiFeedback(null);
-        }}
+        onChange={(e) => setValue(e.target.value)}
         onBlur={() => onSave(value)}
         placeholder="Javobingizni shu yerga yozing…"
         rows={2}
@@ -68,15 +47,6 @@ function ExerciseItem({ index, question, answer, savedValue, lang, onSave }) {
         style={{ marginLeft: '1.75rem', width: 'calc(100% - 1.75rem)', borderColor: 'var(--line)', background: 'var(--paper-soft)', color: 'var(--ink)' }}
       />
       <div style={{ marginLeft: '1.75rem' }} className="flex flex-wrap items-start gap-2">
-        <button
-          type="button"
-          onClick={checkWithAi}
-          disabled={aiChecking || !value.trim()}
-          className="font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-lg cursor-pointer disabled:opacity-60"
-          style={{ background: 'var(--gold)', color: 'var(--panel)' }}
-        >
-          {aiChecking ? '🤖 Tekshirilmoqda…' : '🤖 AI ustoz bilan tekshirish'}
-        </button>
         <button
           type="button"
           onClick={() => setRevealed((v) => !v)}
@@ -91,31 +61,6 @@ function ExerciseItem({ index, question, answer, savedValue, lang, onSave }) {
           </div>
         )}
       </div>
-
-      {aiFeedback && (
-        <div style={{ marginLeft: '1.75rem' }} className="mt-2">
-          <div
-            className="rounded-lg p-2.5 text-sm flex items-start gap-2"
-            style={aiFeedback.correct ? { background: 'var(--success-bg)', color: 'var(--ink)' } : { background: 'var(--error-bg)', color: 'var(--ink)' }}
-          >
-            <span className="shrink-0">{aiFeedback.correct ? '✅' : '❌'}</span>
-            <span>{aiFeedback.feedback}</span>
-          </div>
-          {!aiFeedback.correct && aiFeedback.corrected && (
-            <div className="rounded-lg p-2.5 text-sm mt-1.5" style={{ background: 'var(--paper-soft)', color: 'var(--ink)' }}>
-              <div className="font-mono text-[10px] uppercase tracking-widest mb-1" style={{ color: 'var(--pine)' }}>
-                Taklif etilgan variant
-              </div>
-              {aiFeedback.corrected}
-            </div>
-          )}
-        </div>
-      )}
-      {aiError && (
-        <div style={{ marginLeft: '1.75rem' }} className="mt-2 text-sm px-3 py-2 rounded-lg inline-block" style={{ background: 'var(--error-bg)', color: 'var(--brick)' }}>
-          {aiError}
-        </div>
-      )}
     </li>
   );
 }
@@ -244,14 +189,14 @@ export default function MonthPage() {
               ))}
             </div>
           )}
-          {!reviewFlags.grammar && (
-            <NextStepButton onClick={() => advanceToNext('grammar')} label="Grammatikani o'rgandim, keyingisi →" />
-          )}
           <AiTaskWidget
             type="text"
             content={`${month.grammar.title}\n${month.grammar.text}\n${(month.grammar.examples || []).map((ex) => ex.join(' — ')).join('\n')}`}
             lang={lang}
           />
+          {!reviewFlags.grammar && (
+            <NextStepButton onClick={() => advanceToNext('grammar')} label="Grammatikani o'rgandim, keyingisi →" />
+          )}
         </div>
       );
     }
@@ -344,14 +289,14 @@ export default function MonthPage() {
               </div>
             ))}
           </div>
+          <AiTaskWidget
+            type="dialog"
+            content={`${month.dialog.title}\n${month.dialog.lines.map(([s, l, tr]) => `${s}: ${l} (${tr})`).join('\n')}`}
+            lang={lang}
+          />
           {!reviewFlags.dialog && (
             <NextStepButton onClick={() => advanceToNext('dialog')} label="Dialogni ko'rib chiqdim, keyingisi →" />
           )}
-          <AiTaskWidget
-            type="dialog"
-            content={month.dialog.lines.map(([speaker, line, tr]) => `${speaker}: ${line} (${tr})`).join('\n')}
-            lang={lang}
-          />
         </div>
       );
     }
@@ -379,7 +324,6 @@ export default function MonthPage() {
                 question={ex}
                 answer={month.answers?.[i]}
                 savedValue={savedAnswers[i]}
-                lang={lang}
                 onSave={(text) => saveAnswer(i, text)}
               />
             ))}

@@ -1,7 +1,9 @@
 // Edge Function: /functions/v1/ai
-// Har qanday tizimga kirgan foydalanuvchi chaqira oladi. Gemini API kalitini
-// hech qachon klientga chiqarmaydi — kalit secure_settings jadvalida saqlanadi
-// va faqat shu funksiya ichida (service-role orqali) o'qiladi.
+// Har qanday tizimga kirgan foydalanuvchi chaqira oladi. Gemini API kalit(lar)ini
+// hech qachon klientga chiqarmaydi — kalitlar api_keys jadvalida saqlanadi va
+// faqat shu funksiya ichida (service-role orqali) o'qiladi. Bir nechta kalit
+// qo'shilgan bo'lsa, bitta kalit limitga tegib qolganda (429/403/kvota xatosi)
+// avtomatik ravishda keyingi faol kalitga o'tiladi (callGeminiWithRotation).
 //
 // So'rov formati: POST { action: "status" } |
 //                       { action: "task", type: "text"|"dialog", content, lang } |
@@ -17,13 +19,70 @@ const GEMINI_MODEL = Deno.env.get("GEMINI_MODEL") || "gemini-2.0-flash";
 
 const LANG_NAMES: Record<string, string> = { ru: "rus tili", en: "ingliz tili", tr: "turk tili" };
 
+type ApiKeyRow = {
+  id: number;
+  key_value: string;
+  failure_count: number;
+};
+
 async function getAiConfig(admin: ReturnType<typeof createClient>) {
   const { data: providerRow } = await admin.from("settings").select("value").eq("key", "ai_provider").single();
-  const { data: keyRow } = await admin.from("secure_settings").select("value").eq("key", "gemini_api_key").single();
+  const { data: keys } = await admin
+    .from("api_keys")
+    .select("id, key_value, failure_count")
+    .eq("provider", "gemini")
+    .eq("is_active", true)
+    .order("failure_count", { ascending: true })
+    .order("last_used_at", { ascending: true, nullsFirst: true });
+
   const configuredProvider = (providerRow?.value || "mock").toLowerCase();
-  const apiKey = keyRow?.value || "";
-  const provider = configuredProvider === "gemini" && apiKey ? "gemini" : "mock";
-  return { provider, configuredProvider, hasKey: Boolean(apiKey), apiKey };
+  const activeKeys: ApiKeyRow[] = keys || [];
+  const provider = configuredProvider === "gemini" && activeKeys.length > 0 ? "gemini" : "mock";
+  return { provider, configuredProvider, hasKey: activeKeys.length > 0, activeKeys };
+}
+
+/** Bitta kalit "limitga tegdi / yaroqsiz" xatosini bersa, ro'yxatdagi keyingi
+ *  kalit bilan qayta urinadi. Barcha kalitlar tugasa, xatoni yuqoriga uzatadi. */
+async function callGeminiWithRotation(
+  admin: ReturnType<typeof createClient>,
+  activeKeys: ApiKeyRow[],
+  prompt: string,
+  jsonMode = false
+): Promise<string> {
+  let lastError: unknown = null;
+  for (const key of activeKeys) {
+    try {
+      const result = await callGemini(key.key_value, prompt, jsonMode);
+      // Muvaffaqiyatli chaqiruv — statistikani yangilaymiz (xato hisoblagichini nolga tushiramiz)
+      admin
+        .from("api_keys")
+        .update({ last_used_at: new Date().toISOString(), failure_count: 0, last_error: null })
+        .eq("id", key.id)
+        .then(() => {});
+      return result;
+    } catch (e) {
+      lastError = e;
+      const message = String((e as Error)?.message || e);
+      // Limit/kvota/ruxsatsizlik xatolari bo'lsa — shu kalitni "charchagan" deb belgilab, keyingisiga o'tamiz
+      const isQuotaOrAuthError = /429|403|401|quota|rate.?limit|permission|invalid.?api.?key/i.test(message);
+      admin
+        .from("api_keys")
+        .update({
+          failure_count: (key.failure_count || 0) + 1,
+          last_error: message.slice(0, 300),
+          last_used_at: new Date().toISOString(),
+          // 5 martadan ko'p xato bergan (yoki aniq kvota xatosi bergan) kalitni avtomatik o'chiramiz,
+          // shunda u keyingi so'rovlarda ro'yxatdan chetlanadi va admin buni panelda ko'rib qayta yoqishi mumkin.
+          is_active: isQuotaOrAuthError && key.failure_count >= 4 ? false : true,
+        })
+        .eq("id", key.id)
+        .then(() => {});
+      console.warn(`Gemini kalit #${key.id} muvaffaqiyatsiz, keyingisiga o'tilmoqda:`, message);
+      // quota bo'lmagan (masalan vaqtinchalik tarmoq) xatolarda ham keyingi kalitni sinab ko'ramiz — zarari yo'q
+      continue;
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error(String(lastError || "Gemini so'rovi muvaffaqiyatsiz"));
 }
 
 function pickSentence(text: string): string {
@@ -133,7 +192,7 @@ Deno.serve(async (req) => {
           const excerpt = String(content).slice(0, 2500);
           const kind = type === "dialog" ? "dialog" : "matn";
           const prompt = `Sen ${langName}ni o'rganayotgan o'zbek tilida so'zlashuvchi talaba uchun til o'qituvchisisan. Quyidagi ${kind} asosida talabaga bitta qisqa, aniq va bajarilishi mumkin bo'lgan vazifani O'ZBEK TILIDA yoz. Faqat vazifa matnini qaytar, boshqa hech narsa yozma.\n\n${kind === "dialog" ? "Dialog" : "Matn"}:\n"""${excerpt}"""`;
-          const question = await callGemini(cfg.apiKey, prompt);
+          const question = await callGeminiWithRotation(admin, cfg.activeKeys, prompt);
           return json({ question: question || mockTask(type, content, lang).question, hint: 'Javobingizni pastdagi maydonga yozing va "Javobni tekshirish" tugmasini bosing.' });
         } catch (e) {
           console.error("Gemini xatosi, mock rejimiga o'tildi:", e);
@@ -150,7 +209,7 @@ Deno.serve(async (req) => {
         try {
           const langName = LANG_NAMES[lang] || lang;
           const prompt = `Sen ${langName}ni o'rganayotgan o'zbek tilida so'zlashuvchi talabaning shaxsiy AI ustozisan — mehribon, aniq va talabchan.\n\nAsl matn/dialog (qisqartirilgan):\n"""${String(context || "").slice(0, 1500)}"""\n\nVazifa: "${question}"\n\nTalabaning javobi: "${answer}"\n\nJavobni diqqat bilan tekshir: u vazifaga mos keladimi, grammatik va mazmun jihatdan to'g'rimi (kichik imlo xatolari yoki ravon bo'lmagan ifoda "noto'g'ri" hisoblanmaydi, lekin mazmun yoki grammatikadagi jiddiy xato "noto'g'ri" hisoblanadi).\n\nFAQAT quyidagi JSON formatida javob qaytar, boshqa hech qanday matn, izoh yoki markdown belgisi qo'shma:\n{"correct": true yoki false, "feedback": "O'ZBEK TILIDA 2-4 gapdan iborat iliq, aniq fikr-mulohaza — nima to'g'ri, nima xato ekanini tushuntir", "corrected": "agar xato bo'lsa, javobning to'g'irlangan/yaxshilangan varianti (${langName}da), aks holda null"}`;
-          const raw = await callGemini(cfg.apiKey, prompt, true);
+          const raw = await callGeminiWithRotation(admin, cfg.activeKeys, prompt, true);
           const parsed = extractJson(raw);
           if (parsed && typeof parsed.feedback === "string") {
             return json({

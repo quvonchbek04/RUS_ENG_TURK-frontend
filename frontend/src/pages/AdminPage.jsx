@@ -19,10 +19,18 @@ export default function AdminPage() {
   const [formError, setFormError] = useState('');
   const [creating, setCreating] = useState(false);
   const [aiStatus, setAiStatus] = useState(null);
-  const [aiForm, setAiForm] = useState({ geminiApiKey: '', provider: 'mock' });
+  const [aiForm, setAiForm] = useState({ provider: 'mock' });
   const [savingAi, setSavingAi] = useState(false);
   const [aiFormMsg, setAiFormMsg] = useState(null);
   const [stats, setStats] = useState(null);
+  const [apiKeys, setApiKeys] = useState(null);
+  const [keyForm, setKeyForm] = useState({ label: '', keyValue: '' });
+  const [addingKey, setAddingKey] = useState(false);
+  const [keyFormMsg, setKeyFormMsg] = useState(null);
+
+  function refreshApiKeys() {
+    api.listApiKeys().then((r) => setApiKeys(r.keys)).catch(() => {});
+  }
 
   function refresh() {
     api.listAdminUsers().then((r) => setUsers(r.users)).catch((e) => setError(e.message));
@@ -38,6 +46,7 @@ export default function AdminPage() {
       setAiForm((f) => ({ ...f, provider: s.configuredProvider === 'gemini' ? 'gemini' : 'mock' }));
     }).catch(() => {});
   }, []);
+  useEffect(refreshApiKeys, []);
 
   async function onSaveAiSettings(e) {
     e.preventDefault();
@@ -46,15 +55,52 @@ export default function AdminPage() {
     try {
       const s = await api.saveAiSettings(aiForm);
       setAiStatus(s);
-      setAiForm((f) => ({ ...f, geminiApiKey: '' }));
       setAiFormMsg({
         ok: true,
-        text: s.provider === 'gemini' ? '✅ Saqlandi — Gemini AI endi faol.' : "✅ Saqlandi (hozircha mock rejimida, kalit yo'q yoki provayder mock qilib qo'yildi).",
+        text: s.provider === 'gemini' ? '✅ Saqlandi — Gemini AI endi faol.' : "✅ Saqlandi (hozircha mock rejimida, faol kalit yo'q yoki provayder mock qilib qo'yildi).",
       });
     } catch (err) {
       setAiFormMsg({ ok: false, text: err.message });
     } finally {
       setSavingAi(false);
+    }
+  }
+
+  async function onAddApiKey(e) {
+    e.preventDefault();
+    setAddingKey(true);
+    setKeyFormMsg(null);
+    try {
+      await api.addApiKey({ provider: 'gemini', label: keyForm.label || undefined, keyValue: keyForm.keyValue });
+      setKeyForm({ label: '', keyValue: '' });
+      setKeyFormMsg({ ok: true, text: '✅ Kalit qo\'shildi.' });
+      refreshApiKeys();
+      api.aiStatus().then(setAiStatus).catch(() => {});
+    } catch (err) {
+      setKeyFormMsg({ ok: false, text: err.message });
+    } finally {
+      setAddingKey(false);
+    }
+  }
+
+  async function onToggleApiKey(key) {
+    setApiKeys((prev) => prev.map((k) => (k.id === key.id ? { ...k, isActive: !k.isActive } : k)));
+    try {
+      await api.toggleApiKey(key.id, !key.isActive);
+      api.aiStatus().then(setAiStatus).catch(() => {});
+    } catch {
+      refreshApiKeys();
+    }
+  }
+
+  async function onDeleteApiKey(key) {
+    if (!confirm(`"${key.label || key.maskedKey}" kalitini o'chirasizmi?`)) return;
+    setApiKeys((prev) => prev.filter((k) => k.id !== key.id));
+    try {
+      await api.deleteApiKey(key.id);
+      api.aiStatus().then(setAiStatus).catch(() => {});
+    } catch {
+      refreshApiKeys();
     }
   }
 
@@ -221,8 +267,8 @@ export default function AdminPage() {
                 </div>
                 <div className="font-mono text-[11px] mt-0.5" style={{ color: 'var(--ink-soft)' }}>
                   {aiStatus.provider === 'gemini'
-                    ? '✅ Gemini AI faol — matn/dialog vazifalari va javob tekshiruvi haqiqiy AI orqali ishlamoqda.'
-                    : "🟡 Hozircha \"mock\" rejimida ishlayapti — API kalit kiritilmagan yoki o'chirilgan."}
+                    ? `✅ Gemini AI faol — ${aiStatus.activeKeyCount ?? apiKeys?.filter((k) => k.isActive).length ?? ''} ta faol kalit bilan ishlamoqda. Bitta kalit limitga tegib qolsa, tizim avtomatik keyingisiga o'tadi.`
+                    : "🟡 Hozircha \"mock\" rejimida ishlayapti — faol API kalit yo'q yoki provayder mock qilib qo'yilgan."}
                 </div>
               </div>
               <span
@@ -237,24 +283,16 @@ export default function AdminPage() {
             </div>
 
             {isSuperAdmin ? (
-              <form onSubmit={onSaveAiSettings} className="mt-4 pt-4 border-t" style={{ borderColor: 'var(--line)' }}>
-                <label className="block font-mono text-[10px] uppercase tracking-widest mb-1.5" style={{ color: 'var(--ink-soft)' }}>
-                  Gemini API kalit
-                </label>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  <input
-                    value={aiForm.geminiApiKey}
-                    onChange={(e) => setAiForm((f) => ({ ...f, geminiApiKey: e.target.value }))}
-                    placeholder={aiStatus.hasKey ? '•••••••••••••••••••• (kalit saqlangan, o\'zgartirish uchun yangisini yozing)' : 'AIzaSy... kalitni shu yerga joylashtiring'}
-                    type="text"
-                    autoComplete="off"
-                    className="flex-1 min-w-[240px] px-3 py-2.5 rounded-lg border outline-none font-mono text-xs"
-                    style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
-                  />
+              <>
+                {/* Provayder tanlash */}
+                <form onSubmit={onSaveAiSettings} className="mt-4 pt-4 border-t flex flex-wrap items-center gap-2" style={{ borderColor: 'var(--line)' }}>
+                  <label className="font-mono text-[10px] uppercase tracking-widest" style={{ color: 'var(--ink-soft)' }}>
+                    Provayder:
+                  </label>
                   <select
                     value={aiForm.provider}
                     onChange={(e) => setAiForm((f) => ({ ...f, provider: e.target.value }))}
-                    className="px-3 py-2.5 rounded-lg border outline-none font-mono text-xs"
+                    className="px-3 py-2 rounded-lg border outline-none font-mono text-xs"
                     style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
                   >
                     <option value="mock">Mock (AI o'chiq)</option>
@@ -263,28 +301,129 @@ export default function AdminPage() {
                   <button
                     type="submit"
                     disabled={savingAi}
-                    className="font-mono text-xs uppercase tracking-widest px-4 py-2.5 rounded-xl cursor-pointer font-semibold disabled:opacity-60"
+                    className="font-mono text-xs uppercase tracking-widest px-4 py-2 rounded-xl cursor-pointer font-semibold disabled:opacity-60"
                     style={{ background: 'var(--pine)', color: 'var(--paper)' }}
                   >
                     {savingAi ? 'Saqlanmoqda…' : 'Saqlash'}
                   </button>
-                </div>
-                {aiFormMsg && (
-                  <div className="font-mono text-[11px]" style={{ color: aiFormMsg.ok ? 'var(--pine)' : 'var(--brick)' }}>
-                    {aiFormMsg.text}
+                  {aiFormMsg && (
+                    <div className="w-full font-mono text-[11px]" style={{ color: aiFormMsg.ok ? 'var(--pine)' : 'var(--brick)' }}>
+                      {aiFormMsg.text}
+                    </div>
+                  )}
+                </form>
+
+                {/* Kalitlar ro'yxati */}
+                <div className="mt-5 pt-4 border-t" style={{ borderColor: 'var(--line)' }}>
+                  <div className="font-mono text-[10px] uppercase tracking-widest mb-2.5" style={{ color: 'var(--ink-soft)' }}>
+                    Gemini API kalitlar {apiKeys ? `(${apiKeys.length})` : ''}
                   </div>
-                )}
-                <p className="font-mono text-[10px] mt-2" style={{ color: 'var(--ink-soft)' }}>
-                  Bepul kalitni{' '}
-                  <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" className="underline">
-                    aistudio.google.com/apikey
-                  </a>{' '}
-                  saytidan olishingiz mumkin. Kalit backend bazasida saqlanadi, serverni qayta ishga tushirish shart emas.
-                </p>
-              </form>
+                  {!apiKeys && <div className="font-mono text-xs" style={{ color: 'var(--ink-soft)' }}>Yuklanmoqda…</div>}
+                  {apiKeys?.length === 0 && (
+                    <div className="font-mono text-xs" style={{ color: 'var(--ink-soft)' }}>
+                      Hali kalit qo'shilmagan.
+                    </div>
+                  )}
+                  {apiKeys?.length > 0 && (
+                    <div className="space-y-2 mb-3">
+                      {apiKeys.map((k) => (
+                        <div
+                          key={k.id}
+                          className="flex flex-wrap items-center gap-2 px-3 py-2.5 rounded-lg border"
+                          style={{ borderColor: 'var(--line)', background: 'var(--paper)' }}
+                        >
+                          <span
+                            className="w-2 h-2 rounded-full shrink-0"
+                            style={{ background: k.isActive ? 'var(--pine)' : 'var(--ink-soft)' }}
+                            title={k.isActive ? 'Faol' : "O'chiq"}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-semibold truncate" style={{ color: 'var(--ink)' }}>
+                              {k.label || 'Nomsiz kalit'}
+                            </div>
+                            <div className="font-mono text-[11px]" style={{ color: 'var(--ink-soft)' }}>
+                              {k.maskedKey}
+                              {k.failureCount > 0 && (
+                                <span style={{ color: 'var(--brick)' }}> · {k.failureCount} marta xato</span>
+                              )}
+                            </div>
+                            {k.lastError && (
+                              <div className="font-mono text-[10px] mt-0.5 truncate" style={{ color: 'var(--brick)' }} title={k.lastError}>
+                                {k.lastError}
+                              </div>
+                            )}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => onToggleApiKey(k)}
+                            className="font-mono text-[10px] uppercase tracking-widest px-2.5 py-1.5 rounded-lg cursor-pointer shrink-0"
+                            style={{
+                              background: k.isActive ? 'var(--gold-soft)' : 'var(--success-bg)',
+                              color: k.isActive ? 'var(--gold)' : 'var(--pine)',
+                            }}
+                          >
+                            {k.isActive ? "O'chirish" : 'Yoqish'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onDeleteApiKey(k)}
+                            className="font-mono text-[10px] uppercase tracking-widest px-2.5 py-1.5 rounded-lg cursor-pointer shrink-0"
+                            style={{ background: 'var(--error-bg)', color: 'var(--brick)' }}
+                          >
+                            🗑
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Yangi kalit qo'shish */}
+                  <form onSubmit={onAddApiKey} className="flex flex-wrap gap-2">
+                    <input
+                      value={keyForm.label}
+                      onChange={(e) => setKeyForm((f) => ({ ...f, label: e.target.value }))}
+                      placeholder="Nomi (ixtiyoriy, masalan: 2-kalit)"
+                      className="w-40 px-3 py-2.5 rounded-lg border outline-none font-mono text-xs"
+                      style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
+                    />
+                    <input
+                      value={keyForm.keyValue}
+                      onChange={(e) => setKeyForm((f) => ({ ...f, keyValue: e.target.value }))}
+                      placeholder="AIzaSy... yangi kalitni shu yerga joylashtiring"
+                      type="text"
+                      autoComplete="off"
+                      required
+                      className="flex-1 min-w-[240px] px-3 py-2.5 rounded-lg border outline-none font-mono text-xs"
+                      style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
+                    />
+                    <button
+                      type="submit"
+                      disabled={addingKey || !keyForm.keyValue.trim()}
+                      className="font-mono text-xs uppercase tracking-widest px-4 py-2.5 rounded-xl cursor-pointer font-semibold disabled:opacity-60"
+                      style={{ background: 'var(--pine)', color: 'var(--paper)' }}
+                    >
+                      {addingKey ? 'Qo\'shilmoqda…' : '+ Kalit qo\'shish'}
+                    </button>
+                  </form>
+                  {keyFormMsg && (
+                    <div className="mt-2 font-mono text-[11px]" style={{ color: keyFormMsg.ok ? 'var(--pine)' : 'var(--brick)' }}>
+                      {keyFormMsg.text}
+                    </div>
+                  )}
+                  <p className="font-mono text-[10px] mt-2.5" style={{ color: 'var(--ink-soft)' }}>
+                    Bepul kalitlarni{' '}
+                    <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" className="underline">
+                      aistudio.google.com/apikey
+                    </a>{' '}
+                    saytidan olishingiz mumkin. Bir nechta kalit qo'shsangiz, biri kunlik/daqiqalik limitga
+                    tegib qolganda tizim avtomatik keyingisiga o'tadi — shu orqali bepul limitni "kengaytirish"
+                    mumkin. Kalitlar Supabase bazasida xavfsiz saqlanadi, hech qachon brauzerga chiqmaydi.
+                  </p>
+                </div>
+              </>
             ) : (
               <p className="mt-3 pt-3 border-t font-mono text-[11px]" style={{ borderColor: 'var(--line)', color: 'var(--ink-soft)' }}>
-                API kalitni faqat super admin o'zgartira oladi.
+                AI sozlamalari va API kalitlarni faqat super admin o'zgartira oladi.
               </p>
             )}
           </div>

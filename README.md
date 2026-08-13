@@ -15,7 +15,8 @@ til-sayohati/
 │   └── .env.example
 ├── supabase/
 │   ├── migrations/0001_init.sql Baza sxemasi + RLS siyosatlari + trigger
-│   ├── functions/admin/         Edge Function: admin yaratish/o'chirish, AI sozlamalari
+│   ├── migrations/0002_multi_api_keys.sql  Bir nechta AI API kalitini qo'llab-quvvatlash
+│   ├── functions/admin/         Edge Function: admin yaratish/o'chirish, AI sozlamalari va API kalitlar
 │   ├── functions/ai/            Edge Function: AI vazifa/tekshirish (Gemini yoki mock)
 │   └── config.toml              Lokal Supabase CLI konfiguratsiyasi (ixtiyoriy)
 └── _deprecated_express_backend/ Eski Express backend — ENDI ISHLATILMAYDI, faqat ma'lumotnoma
@@ -54,6 +55,12 @@ o'zgartirish shart bo'lmadi.
 **SQL Editor** bo'limini oching va `supabase/migrations/0001_init.sql` faylining
 **butun matnini** ko'chirib, ishga tushiring (bir marta yetarli). Bu jadvallar,
 RLS siyosatlari va trigger'larni yaratadi.
+
+Shundan so'ng **`supabase/migrations/0002_multi_api_keys.sql`** faylini ham xuddi
+shu tarzda ishga tushiring — bu bir nechta AI API kalitini saqlash imkonini
+beruvchi `api_keys` jadvalini qo'shadi (agar avval bitta Gemini kalit
+saqlagan bo'lsangiz, u avtomatik shu yangi jadvalga ko'chiriladi, yo'qolib
+qolmaydi).
 
 ### 3) Edge Functions'ni deploy qiling
 
@@ -111,11 +118,30 @@ npm run dev
 
 ### 6) (Ixtiyoriy) Gemini AI'ni yoqish
 
-Admin panel → **AI sozlamalari** bo'limida Gemini API kalitingizni
-(https://aistudio.google.com/apikey) kiritib, provayderni "gemini" ga
-o'zgartiring. Kalit **hech qachon** frontendga chiqmaydi — u faqat
-`secure_settings` jadvalida saqlanadi va faqat Edge Function (service-role)
-orqali o'qiladi.
+Admin panel → **AI sozlamalari** bo'limida:
+1. Provayderni **"Gemini (AI yoqilgan)"** ga o'zgartirib, "Saqlash"ni bosing.
+2. Pastdagi **"+ Kalit qo'shish"** formasi orqali Gemini API kalitingizni
+   (https://aistudio.google.com/apikey — bepul) kiriting.
+
+**Bir nechta kalit qo'shish mumkin** — masalan bir nechta Google akkauntdan
+olingan bepul kalitlarni qo'shsangiz, tizim ulardan birini ishlatadi va
+agar u kunlik/daqiqalik limitga (quota) tegib qolsa, **avtomatik ravishda**
+keyingi faol kalitga o'tadi. Har bir kalit qancha marta xato bergani va
+oxirgi xatosi admin panelida ko'rinadi; xohlagan vaqtda kalitni vaqtincha
+o'chirib qo'yish yoki butunlay o'chirish mumkin.
+
+API kalit(lar) **hech qachon** frontendga chiqmaydi — ular faqat
+`api_keys` jadvalida (RLS orqali klientdan butunlay yopiq) saqlanadi va
+faqat Edge Function (service-role) orqali o'qiladi.
+
+**AI-ustoz endi quyidagi barcha joylarda ishlaydi:**
+- 📖 Darslar (har bir oyning "Grammatika" va "Dialog" bosqichlarida)
+- 📐 Grammatika sahifasi
+- 🎧 Dialoglar sahifasi
+- 📕 Kutubxona (yuklangan kitob/matnlar)
+
+Har birida AI foydalanuvchiga o'sha mavzu bo'yicha shaxsiy vazifa beradi va
+javobini tekshirib, fikr-mulohaza (feedback) qaytaradi.
 
 ---
 

@@ -5,7 +5,9 @@
 // orqali (service-role kalit bilan) bajariladi.
 //
 // So'rov formati: POST { action: "create-admin" | "delete-admin" |
-//                          "get-ai-settings" | "save-ai-settings", ...payload }
+//                          "get-ai-settings" | "save-ai-settings" |
+//                          "list-api-keys" | "add-api-key" | "toggle-api-key" |
+//                          "delete-api-key", ...payload }
 // Header: Authorization: Bearer <foydalanuvchining supabase session tokeni>
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -80,32 +82,94 @@ Deno.serve(async (req) => {
     if (action === "get-ai-settings") {
       if (!["admin", "superadmin"].includes(callerRole)) return json({ error: "Bu amal uchun ruxsatingiz yo'q" }, 403);
       const { data: providerRow } = await admin.from("settings").select("value").eq("key", "ai_provider").single();
-      const { data: keyRow } = await admin.from("secure_settings").select("value").eq("key", "gemini_api_key").single();
+      const { count: activeKeyCount } = await admin
+        .from("api_keys")
+        .select("*", { count: "exact", head: true })
+        .eq("provider", "gemini")
+        .eq("is_active", true);
       const configuredProvider = (providerRow?.value || "mock").toLowerCase();
-      const hasKey = Boolean(keyRow?.value);
+      const hasKey = (activeKeyCount || 0) > 0;
       const provider = configuredProvider === "gemini" && hasKey ? "gemini" : "mock";
-      return json({ provider, hasKey, configuredProvider });
+      return json({ provider, hasKey, configuredProvider, activeKeyCount: activeKeyCount || 0 });
     }
 
-    // ---------- AI sozlamalarini saqlash (faqat superadmin) ----------
+    // ---------- AI provayderini saqlash (faqat superadmin) ----------
     if (action === "save-ai-settings") {
       if (callerRole !== "superadmin") return json({ error: "Bu amal uchun ruxsatingiz yo'q" }, 403);
-      const { geminiApiKey, provider } = body;
+      const { provider } = body;
       if (provider && !["mock", "gemini"].includes(String(provider).toLowerCase())) {
         return json({ error: "Noto'g'ri provayder qiymati" }, 400);
-      }
-      if (typeof geminiApiKey === "string") {
-        await admin.from("secure_settings").update({ value: geminiApiKey.trim() }).eq("key", "gemini_api_key");
       }
       if (provider) {
         await admin.from("settings").update({ value: String(provider).toLowerCase() }).eq("key", "ai_provider");
       }
       const { data: providerRow } = await admin.from("settings").select("value").eq("key", "ai_provider").single();
-      const { data: keyRow } = await admin.from("secure_settings").select("value").eq("key", "gemini_api_key").single();
+      const { count: activeKeyCount } = await admin
+        .from("api_keys")
+        .select("*", { count: "exact", head: true })
+        .eq("provider", "gemini")
+        .eq("is_active", true);
       const configuredProvider = (providerRow?.value || "mock").toLowerCase();
-      const hasKey = Boolean(keyRow?.value);
+      const hasKey = (activeKeyCount || 0) > 0;
       const activeProvider = configuredProvider === "gemini" && hasKey ? "gemini" : "mock";
-      return json({ provider: activeProvider, hasKey, configuredProvider });
+      return json({ provider: activeProvider, hasKey, configuredProvider, activeKeyCount: activeKeyCount || 0 });
+    }
+
+    // ---------- API kalitlar ro'yxati (maskalangan holda, admin + superadmin) ----------
+    if (action === "list-api-keys") {
+      if (!["admin", "superadmin"].includes(callerRole)) return json({ error: "Bu amal uchun ruxsatingiz yo'q" }, 403);
+      const { data: keys, error } = await admin
+        .from("api_keys")
+        .select("id, provider, label, key_value, is_active, failure_count, last_used_at, last_error, created_at")
+        .order("created_at", { ascending: true });
+      if (error) return json({ error: error.message }, 400);
+      const masked = (keys || []).map((k) => ({
+        id: k.id,
+        provider: k.provider,
+        label: k.label,
+        maskedKey: k.key_value ? `${k.key_value.slice(0, 6)}••••${k.key_value.slice(-4)}` : "",
+        isActive: k.is_active,
+        failureCount: k.failure_count,
+        lastUsedAt: k.last_used_at,
+        lastError: k.last_error,
+        createdAt: k.created_at,
+      }));
+      return json({ keys: masked });
+    }
+
+    // ---------- Yangi API kalit qo'shish (faqat superadmin) ----------
+    if (action === "add-api-key") {
+      if (callerRole !== "superadmin") return json({ error: "Bu amal uchun ruxsatingiz yo'q" }, 403);
+      const keyValue = String(body.keyValue || "").trim();
+      const label = body.label ? String(body.label).trim().slice(0, 100) : null;
+      const provider = String(body.provider || "gemini").trim().toLowerCase();
+      if (!keyValue || keyValue.length < 10) {
+        return json({ error: "API kalit noto'g'ri ko'rinadi (juda qisqa)" }, 400);
+      }
+      const { error } = await admin.from("api_keys").insert({ provider, label, key_value: keyValue, is_active: true });
+      if (error) return json({ error: error.message }, 400);
+      return json({ ok: true });
+    }
+
+    // ---------- API kalitni yoqish/o'chirish (faqat superadmin) ----------
+    if (action === "toggle-api-key") {
+      if (callerRole !== "superadmin") return json({ error: "Bu amal uchun ruxsatingiz yo'q" }, 403);
+      const id = body.id;
+      const isActive = Boolean(body.isActive);
+      if (!id) return json({ error: "id kerak" }, 400);
+      const { error } = await admin.from("api_keys").update({ is_active: isActive, failure_count: 0, last_error: null }).eq("id", id);
+      if (error) return json({ error: error.message }, 400);
+      return json({ ok: true });
+    }
+
+    // ---------- API kalitni o'chirish (faqat superadmin) ----------
+    if (action === "delete-api-key") {
+      if (callerRole !== "superadmin") return json({ error: "Bu amal uchun ruxsatingiz yo'q" }, 403);
+      const id = body.id;
+      if (!id) return json({ error: "id kerak" }, 400);
+      const { error } = await admin.from("api_keys").delete().eq("id", id);
+      if (error) return json({ error: error.message }, 400);
+      return json({ ok: true });
     }
 
     return json({ error: "Noma'lum amal (action)" }, 400);

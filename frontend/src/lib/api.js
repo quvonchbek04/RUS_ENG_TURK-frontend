@@ -311,4 +311,8 @@ export const api = {
   aiCheck: (payload) => callFunction('ai', { action: 'check', ...payload }),
   getAiSettings: () => callFunction('admin', { action: 'get-ai-settings' }),
   saveAiSettings: (payload) => callFunction('admin', { action: 'save-ai-settings', ...payload }),
+  listApiKeys: () => callFunction('admin', { action: 'list-api-keys' }),
+  addApiKey: (payload) => callFunction('admin', { action: 'add-api-key', ...payload }),
+  toggleApiKey: (id, isActive) => callFunction('admin', { action: 'toggle-api-key', id, isActive }),
+  deleteApiKey: (id) => callFunction('admin', { action: 'delete-api-key', id }),
 };
