@@ -228,6 +228,12 @@ export default function MonthPage() {
             ))}
           </div>
 
+          <AiTaskWidget
+            type="text"
+            content={`Bu oyning so'zlari:\n${month.vocab.map(([w, , m]) => `${w} — ${m}`).join('\n')}`}
+            lang={lang}
+          />
+
           {!attempted ? (
             <div className="rounded-xl border p-4 text-center" style={{ borderColor: 'var(--gold)', background: 'var(--gold-soft)' }}>
               <div className="font-mono text-[11px] uppercase tracking-widest mb-2" style={{ color: 'var(--gold)' }}>
@@ -328,6 +334,11 @@ export default function MonthPage() {
               />
             ))}
           </ol>
+          <AiTaskWidget
+            type="text"
+            content={`Mashqlar:\n${(month.exercises || []).join('\n')}`}
+            lang={lang}
+          />
           {!reviewFlags.exercises && (
             <NextStepButton onClick={() => advanceToNext('exercises')} label="Mashqlarni bajardim, keyingisi →" />
           )}
@@ -368,6 +379,7 @@ export default function MonthPage() {
           >
             {month.teacher}
           </div>
+          <AiTaskWidget type="text" content={month.teacher || ''} lang={lang} />
           {!reviewFlags.teacher && (
             <NextStepButton onClick={() => advanceToNext('teacher')} label="O'qidim, testga o'tish →" />
           )}

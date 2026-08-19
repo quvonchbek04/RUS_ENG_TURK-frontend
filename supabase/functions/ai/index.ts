@@ -8,22 +8,19 @@
 // So'rov formati: POST { action: "status" } |
 //                       { action: "task", type: "text"|"dialog", content, lang } |
 //                       { action: "check", context, question, answer, lang }
-//
-// ESLATMA: corsHeaders/json yordamchilari ataylab shu faylning ICHIGA
-// yozilgan (../_shared/cors.ts dan import qilinmaydi). Sabab: Supabase
-// Dashboard orqali (CLI'siz) deploy qilinganda faqat shu bitta fayl
-// yuklanadi — "../_shared/cors.ts" kabi tashqi nisbiy import topilmay,
-// "Module not found" xatosi bilan deploy muvaffaqiyatsiz tugaydi. Fayl
-// o'zida hammasi bo'lsa, u qanday deploy qilinishidan qat'iy nazar ishlaydi.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+// Eslatma: bu funksiya ATAYLAB hech qanday tashqi (nisbiy yo'ldagi) faylni import
+// qilmaydi — barcha kerakli yordamchi kod shu faylning o'zida yozilgan. Buning
+// sababi: Supabase Dashboard'ning o'zidagi kod muharriri orqali (CLI'siz) deploy
+// qilinganda, ../_shared/ papkasidagi fayllar ko'chirilmaydi va "Module not found"
+// xatosini beradi. Shu fayl to'liq mustaqil ishlaydi.
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
-
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,

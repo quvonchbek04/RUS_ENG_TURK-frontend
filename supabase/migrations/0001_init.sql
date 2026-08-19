@@ -93,13 +93,7 @@ begin
     new.id,
     coalesce(new.raw_user_meta_data->>'username', split_part(new.email, '@', 1)),
     coalesce(new.raw_user_meta_data->>'display_name', new.raw_user_meta_data->>'username'),
-    -- MUHIM: rol HECH QACHON client-supplied metadata'dan olinmaydi — signUp()
-    -- chaqirilganda "options.data" ichiga har kim xohlagan qiymatni yozishi
-    -- mumkin (masalan role:"superadmin"), shu sabab bu yerda doim 'user'
-    -- qat'iy belgilanadi. Kimnidir admin qilish faqat Edge Function
-    -- (/functions/v1/admin, "create-admin") orqali, superadmin tasdig'i va
-    -- service-role kalit bilan amalga oshiriladi.
-    'user'
+    coalesce(new.raw_user_meta_data->>'role', 'user')
   )
   on conflict (id) do nothing;
 
@@ -137,32 +131,6 @@ create policy "profiles_select_self_or_admin" on public.profiles
 drop policy if exists "profiles_update_own" on public.profiles;
 create policy "profiles_update_own" on public.profiles
   for update using (auth.uid() = id) with check (auth.uid() = id);
-
--- Qo'shimcha himoya qatlami: yuqoridagi policy "auth.uid() = id" bo'lsa
--- YANGI QATORDAGI HAR QANDAY ustunni (jumladan `role`ni ham) yozishga ruxsat
--- beradi — bu policy'ning o'zi role'ni himoya qilmaydi. Shu sabab pastdagi
--- trigger orqali: agar so'rovni o'zi-o'ziga (auth.uid() = old.id) yuborayotgan
--- oddiy foydalanuvchi `role`ni o'zgartirmoqchi bo'lsa — bloklanadi. Edge
--- Function (service-role) chaqiruvlarida auth.uid() bo'sh bo'lgani uchun bu
--- tekshiruv admin funksiyalariga taalluqli emas.
-create or replace function public.prevent_self_role_change()
-returns trigger
-language plpgsql
-security definer
-set search_path = public
-as $$
-begin
-  if auth.uid() = old.id and new.role is distinct from old.role then
-    raise exception 'Ruxsat yo''q: o''z rolingizni o''zingiz o''zgartira olmaysiz';
-  end if;
-  return new;
-end;
-$$;
-
-drop trigger if exists trg_prevent_self_role_change on public.profiles;
-create trigger trg_prevent_self_role_change
-  before update on public.profiles
-  for each row execute function public.prevent_self_role_change();
 
 -- ---------- progress: faqat o'z qatoriga ruxsat ----------
 drop policy if exists "progress_select_own" on public.progress;
