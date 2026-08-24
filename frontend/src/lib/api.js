@@ -49,25 +49,30 @@ function throwIfError(error) {
   if (error) throw new Error(error.message || "Supabase so'rovida xatolik yuz berdi");
 }
 
-/** Superadmin/admin huquqi kerak bo'lgan amallar uchun Edge Function chaqiruvi. */
+/** Superadmin/admin huquqi kerak bo'lgan amallar uchun Edge Function chaqiruvi.
+ *
+ * MUHIM TUZATISH: avval bu yerda `error.context?.error` orqali aniq xato matnini
+ * olishga urinilar edi — lekin `error.context` aslida XOM Response obyekti
+ * (supabase-js shunday qaytaradi), unda to'g'ridan-to'g'ri `.error` maydoni
+ * bo'lmaydi. Shu sabab bu tekshiruv HAR DOIM `undefined` qaytarar va foydalanuvchi
+ * doim umumiy "Edge Function returned a non-2xx status code" xabarini ko'rar edi —
+ * asl sabab (masalan "Bu login band", "Ruxsat yo'q", yoki bazadagi aniq xato)
+ * butunlay yashirinib qolardi. Endi Response tanasini to'g'ri o'qib, undagi haqiqiy
+ * xato matnini chiqaramiz. */
 async function callFunction(name, body) {
   const { data, error } = await supabase.functions.invoke(name, { body });
   if (error) {
-    // supabase-js FunctionsHttpError'ning `context` maydoni aslida xom Response
-    // obyekti — undan `.json()` orqali funksiyaning o'zi qaytargan haqiqiy xato
-    // matnini ("Bu amal uchun ruxsatingiz yo'q", "relation ... does not exist"
-    // va h.k.) o'qib olamiz. Aks holda faqat umumiy "non-2xx status code"
-    // degan tushunarsiz xabar ko'rinib qolardi.
-    let message = error.message || "Server bilan bog'lanishda xato yuz berdi";
-    try {
-      if (error.context && typeof error.context.clone === 'function') {
-        const body = await error.context.clone().json();
-        if (body && body.error) message = body.error;
+    let serverMessage = null;
+    if (error.context && typeof error.context.json === 'function') {
+      try {
+        // Response klonlanadi, chunki ba'zi muhitlarda tanani faqat bir marta o'qish mumkin
+        const parsed = await error.context.clone().json();
+        serverMessage = parsed && parsed.error ? String(parsed.error) : null;
+      } catch (_) {
+        try { serverMessage = await error.context.clone().text(); } catch (_) { /* e'tiborsiz qoldiriladi */ }
       }
-    } catch {
-      // javob JSON emas edi — dastlabki (umumiy) xabar bilan davom etamiz
     }
-    throw new Error(message);
+    throw new Error(serverMessage || error.message || "Server bilan bog'lanishda xato yuz berdi");
   }
   if (data && data.error) throw new Error(data.error);
   return data;

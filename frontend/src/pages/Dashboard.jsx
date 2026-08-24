@@ -20,20 +20,20 @@ export default function Dashboard() {
 
   return (
     <Layout>
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-5 py-6 sm:py-10">
-        <div className="mb-6 sm:mb-10">
-          <div className="font-mono text-[10px] sm:text-xs tracking-[0.25em] uppercase mb-2" style={{ color: 'var(--gold)' }}>
+      <div className="max-w-[1440px] mx-auto px-5 py-10">
+        <div className="mb-10">
+          <div className="font-mono text-xs tracking-[0.25em] uppercase mb-2" style={{ color: 'var(--gold)' }}>
             Yo'lovchi paneli
           </div>
-          <h1 className="font-display text-2xl sm:text-4xl font-semibold" style={{ color: 'var(--ink)' }}>
+          <h1 className="font-display text-4xl font-semibold" style={{ color: 'var(--ink)' }}>
             Xush kelibsiz, {user?.displayName || user?.username}
           </h1>
-          <p className="mt-2 text-sm sm:text-base" style={{ color: 'var(--ink-soft)' }}>
+          <p className="mt-2" style={{ color: 'var(--ink-soft)' }}>
             Davom ettirmoqchi bo'lgan yo'nalishni tanlang. Har bir bekat — yangi dars oyi.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-4 mb-6 sm:mb-10 flex-wrap">
+        <div className="flex items-center gap-4 mb-10 flex-wrap">
           <StatChip label="Tugatilgan oylar" value={completedTotal} />
           <StatChip label="Yo'nalishlar" value="3" />
           {aiAccuracy !== null && (
@@ -41,7 +41,7 @@ export default function Dashboard() {
           )}
           <Link
             to="/library"
-            className="rounded-xl border px-3 sm:px-4 py-2 sm:py-2.5 flex items-center gap-2 font-mono text-[10px] sm:text-xs uppercase tracking-widest transition-colors"
+            className="rounded-xl border px-4 py-2.5 flex items-center gap-2 font-mono text-xs uppercase tracking-widest transition-colors"
             style={{ borderColor: 'var(--line)', background: 'var(--panel)', color: 'var(--pine)' }}
           >
             📚 Kutubxonam
@@ -54,36 +54,36 @@ export default function Dashboard() {
           </div>
         )}
 
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {langs &&
             Object.values(langs).map((lang) => (
               <Link
                 key={lang.key}
                 to={`/lang/${lang.key}`}
-                className="ticket-edge group block rounded-xl sm:rounded-2xl border p-3 sm:p-6 relative overflow-hidden transition-transform hover:-translate-y-1"
+                className="ticket-edge group block rounded-2xl border p-6 relative overflow-hidden transition-transform hover:-translate-y-1"
                 style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}
               >
-                <div className="flex items-start justify-between mb-2.5 sm:mb-6">
-                  <span className="text-2xl sm:text-4xl">{lang.flag}</span>
+                <div className="flex items-start justify-between mb-6">
+                  <span className="text-4xl">{lang.flag}</span>
                   <span
-                    className="hidden sm:inline-block font-mono text-[10px] uppercase tracking-widest px-2 py-1 rounded-full"
+                    className="font-mono text-[10px] uppercase tracking-widest px-2 py-1 rounded-full"
                     style={{ background: 'var(--gold-soft)', color: 'var(--ink)' }}
                   >
                     {lang.eyebrow}
                   </span>
                 </div>
-                <div className="font-display text-sm sm:text-2xl font-semibold mb-0.5 sm:mb-1 leading-tight" style={{ color: 'var(--ink)' }}>
+                <div className="font-display text-2xl font-semibold mb-1" style={{ color: 'var(--ink)' }}>
                   {lang.title}
                 </div>
-                <div className="hidden sm:block font-mono text-xs tracking-wide mb-6" style={{ color: 'var(--ink-soft)' }}>
+                <div className="font-mono text-xs tracking-wide mb-6" style={{ color: 'var(--ink-soft)' }}>
                   {lang.route}
                 </div>
-                <div className="dash-rail-h mb-2 sm:mb-3" />
+                <div className="dash-rail-h mb-3" />
                 <div
-                  className="font-mono text-[9px] sm:text-xs uppercase tracking-widest flex items-center gap-1 font-semibold"
+                  className="font-mono text-xs uppercase tracking-widest flex items-center gap-1 font-semibold"
                   style={{ color: 'var(--pine)' }}
                 >
-                  Boshlash
+                  Sayohatni boshlash
                   <span className="transition-transform group-hover:translate-x-1">→</span>
                 </div>
               </Link>
