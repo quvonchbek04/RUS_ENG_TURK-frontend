@@ -53,8 +53,21 @@ function throwIfError(error) {
 async function callFunction(name, body) {
   const { data, error } = await supabase.functions.invoke(name, { body });
   if (error) {
-    const ctxError = error.context?.error;
-    throw new Error(ctxError || error.message || "Server bilan bog'lanishda xato yuz berdi");
+    // supabase-js FunctionsHttpError'ning `context` maydoni aslida xom Response
+    // obyekti — undan `.json()` orqali funksiyaning o'zi qaytargan haqiqiy xato
+    // matnini ("Bu amal uchun ruxsatingiz yo'q", "relation ... does not exist"
+    // va h.k.) o'qib olamiz. Aks holda faqat umumiy "non-2xx status code"
+    // degan tushunarsiz xabar ko'rinib qolardi.
+    let message = error.message || "Server bilan bog'lanishda xato yuz berdi";
+    try {
+      if (error.context && typeof error.context.clone === 'function') {
+        const body = await error.context.clone().json();
+        if (body && body.error) message = body.error;
+      }
+    } catch {
+      // javob JSON emas edi — dastlabki (umumiy) xabar bilan davom etamiz
+    }
+    throw new Error(message);
   }
   if (data && data.error) throw new Error(data.error);
   return data;

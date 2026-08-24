@@ -67,59 +67,59 @@ export default function RoutePage() {
         </div>
 
         {/* Davom ettirish — tezkor amallar qatori */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-6 sm:mb-10">
           <button
             type="button"
             onClick={() => {
               setLessonsInitialModule(null);
               setLessonsOpen(true);
             }}
-            className="rounded-xl border p-3 flex items-center gap-3 text-left transition-colors cursor-pointer"
+            className="rounded-xl border p-2.5 sm:p-3 flex items-center gap-2 sm:gap-3 text-left transition-colors cursor-pointer"
             style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}
           >
-            <span className="w-9 h-9 rounded-lg flex items-center justify-center text-base shrink-0" style={{ background: 'var(--paper-soft)' }}>📘</span>
+            <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-sm sm:text-base shrink-0" style={{ background: 'var(--paper-soft)' }}>📘</span>
             <div className="min-w-0">
-              <div className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>Barcha darslar</div>
-              <div className="font-mono text-[11px] truncate" style={{ color: 'var(--ink-soft)' }}>4 bosqich · {flat.length} dars</div>
+              <div className="text-xs sm:text-sm font-semibold" style={{ color: 'var(--ink)' }}>Barcha darslar</div>
+              <div className="font-mono text-[10px] sm:text-[11px] truncate" style={{ color: 'var(--ink-soft)' }}>4 bosqich · {flat.length} dars</div>
             </div>
           </button>
           <Link
             to={`/lang/${lang}/month/${nextMonth.moduleId}/${nextMonth.id}`}
-            className="rounded-xl border p-3 flex items-center gap-3 transition-colors"
+            className="rounded-xl border p-2.5 sm:p-3 flex items-center gap-2 sm:gap-3 transition-colors"
             style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}
           >
-            <span className="w-9 h-9 rounded-lg flex items-center justify-center text-base shrink-0" style={{ background: 'var(--paper-soft)' }}>🎯</span>
+            <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-sm sm:text-base shrink-0" style={{ background: 'var(--paper-soft)' }}>🎯</span>
             <div className="min-w-0">
-              <div className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>Davom ettirish</div>
-              <div className="font-mono text-[11px] truncate" style={{ color: 'var(--ink-soft)' }}>{nextMonth.label} · {nextMonth.topic}</div>
+              <div className="text-xs sm:text-sm font-semibold" style={{ color: 'var(--ink)' }}>Davom ettirish</div>
+              <div className="font-mono text-[10px] sm:text-[11px] truncate" style={{ color: 'var(--ink-soft)' }}>{nextMonth.label} · {nextMonth.topic}</div>
             </div>
           </Link>
           <Link
             to={`/lang/${lang}/practice-full`}
-            className="rounded-xl border p-3 flex items-center gap-3 transition-colors"
+            className="rounded-xl border p-2.5 sm:p-3 flex items-center gap-2 sm:gap-3 transition-colors"
             style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}
           >
-            <span className="w-9 h-9 rounded-lg flex items-center justify-center text-base shrink-0" style={{ background: 'var(--paper-soft)' }}>🔀</span>
+            <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-sm sm:text-base shrink-0" style={{ background: 'var(--paper-soft)' }}>🔀</span>
             <div className="min-w-0">
-              <div className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>Lug'at mashqi</div>
-              <div className="font-mono text-[11px] truncate" style={{ color: 'var(--ink-soft)' }}>Kurs + to'liq lug'at</div>
+              <div className="text-xs sm:text-sm font-semibold" style={{ color: 'var(--ink)' }}>Lug'at mashqi</div>
+              <div className="font-mono text-[10px] sm:text-[11px] truncate" style={{ color: 'var(--ink-soft)' }}>Kurs + to'liq lug'at</div>
             </div>
           </Link>
           <Link
             to={`/lang/${lang}/dictionary`}
-            className="rounded-xl border p-3 flex items-center gap-3 transition-colors"
+            className="rounded-xl border p-2.5 sm:p-3 flex items-center gap-2 sm:gap-3 transition-colors"
             style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}
           >
-            <span className="w-9 h-9 rounded-lg flex items-center justify-center text-base shrink-0" style={{ background: 'var(--paper-soft)' }}>📖</span>
+            <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-sm sm:text-base shrink-0" style={{ background: 'var(--paper-soft)' }}>📖</span>
             <div className="min-w-0">
-              <div className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>To'liq lug'at</div>
-              <div className="font-mono text-[11px] truncate" style={{ color: 'var(--ink-soft)' }}>Qo'shimcha so'zlar ro'yxati</div>
+              <div className="text-xs sm:text-sm font-semibold" style={{ color: 'var(--ink)' }}>To'liq lug'at</div>
+              <div className="font-mono text-[10px] sm:text-[11px] truncate" style={{ color: 'var(--ink-soft)' }}>Qo'shimcha so'zlar ro'yxati</div>
             </div>
           </Link>
         </div>
 
         {/* Bosqichlar — ixcham progress ko'rinishi (to'liq ro'yxat "Barcha darslar" oynasida) */}
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-4">
           {data.modules.map((mod, idx) => {
             const monthsDoneInMod = mod.months.filter((m) => isMonthDone(progress, lang, m.id)).length;
             const pct = Math.round((monthsDoneInMod / mod.months.length) * 100);
@@ -131,21 +131,21 @@ export default function RoutePage() {
                   setLessonsInitialModule(mod.id);
                   setLessonsOpen(true);
                 }}
-                className="rounded-xl border p-4 text-left cursor-pointer transition-transform hover:-translate-y-0.5"
+                className="rounded-xl border p-3 sm:p-4 text-left cursor-pointer transition-transform hover:-translate-y-0.5"
                 style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}
               >
                 <div className="flex items-center justify-between mb-2">
                   <span
-                    className="w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs font-semibold shrink-0"
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-mono text-[11px] sm:text-xs font-semibold shrink-0"
                     style={{ background: 'var(--paper-soft)', color: 'var(--ink)' }}
                   >
                     {idx + 1}
                   </span>
-                  <span className="font-mono text-[11px]" style={{ color: 'var(--ink-soft)' }}>
+                  <span className="font-mono text-[10px] sm:text-[11px]" style={{ color: 'var(--ink-soft)' }}>
                     {monthsDoneInMod}/{mod.months.length} dars
                   </span>
                 </div>
-                <div className="font-display font-semibold mb-2" style={{ color: 'var(--ink)' }}>
+                <div className="font-display text-sm sm:text-base font-semibold mb-2 leading-snug" style={{ color: 'var(--ink)' }}>
                   {mod.title}
                 </div>
                 <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--paper-soft)' }}>
