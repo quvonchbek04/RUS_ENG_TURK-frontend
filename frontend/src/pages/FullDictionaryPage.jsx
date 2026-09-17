@@ -18,15 +18,15 @@ export default function FullDictionaryPage() {
 
   const totalWords = useMemo(() => {
     if (!data) return 0;
-    return (data.dictExtra || []).reduce((s, c) => s + c.words.length, 0);
+    return (data.dictExtra || []).reduce((s, c) => s + (c.words || []).length, 0);
   }, [data]);
 
   const filtered = useMemo(() => {
     if (!data) return [];
     const q = query.trim().toLowerCase();
-    if (!q) return data.dictExtra;
-    return data.dictExtra
-      .map((cat) => ({ ...cat, words: cat.words.filter((w) => w.some((cell) => String(cell).toLowerCase().includes(q))) }))
+    if (!q) return data.dictExtra || [];
+    return (data.dictExtra || [])
+      .map((cat) => ({ ...cat, words: (cat.words || []).filter((w) => w.some((cell) => String(cell).toLowerCase().includes(q))) }))
       .filter((cat) => cat.words.length > 0);
   }, [data, query]);
 
@@ -88,7 +88,7 @@ export default function FullDictionaryPage() {
                       {cat.cat}
                     </div>
                     <div className="font-mono text-[11px]" style={{ color: 'var(--ink-soft)' }}>
-                      {cat.level} · {cat.words.length} ta so'z
+                      {cat.level} · {(cat.words || []).length} ta so'z
                     </div>
                   </div>
                   <span className="font-mono text-xs shrink-0" style={{ color: 'var(--pine)' }}>
@@ -97,7 +97,7 @@ export default function FullDictionaryPage() {
                 </button>
                 {isOpen && (
                   <div className="px-4 pb-4 grid sm:grid-cols-2 gap-2 border-t pt-3" style={{ borderColor: 'var(--line)' }}>
-                    {cat.words.map(([word, translit, meaning], i) => (
+                    {(cat.words || []).map(([word, translit, meaning], i) => (
                       <div
                         key={i}
                         className="rounded-lg border p-2.5 flex items-center gap-2"

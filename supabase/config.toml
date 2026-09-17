@@ -3,9 +3,11 @@ project_id = "til-sayohati"
 [api]
 enabled = true
 port = 54321
+schemas = ["public", "graphql_public"]
 
 [db]
 port = 54322
+major_version = 15
 
 [studio]
 enabled = true
@@ -15,9 +17,32 @@ port = 54323
 enabled = true
 site_url = "http://localhost:5173"
 additional_redirect_urls = ["http://localhost:5173"]
-# Username-asosida ishlash uchun email tasdiqlash o'chirilgan (email sun'iy,
-# "username@til-sayohati.local" ko'rinishida yaratiladi — h aqiqiy pochta emas).
+# Supabase Auth'ning standart minimal parol uzunligi 6 — ilova ham shu qiymatga
+# moslashtirilgan (avval frontend 4 ta belgiga ruxsat berib, keyin Supabase
+# tushunarsiz inglizcha xato qaytarardi).
+minimum_password_length = 6
+
+[auth.email]
+enabled = true
+# MUHIM TUZATISH: avval bu sozlama `[auth]` bo'limida yozilgan edi — Supabase CLI
+# uni o'sha joyda umuman o'qimaydi, ya'ni sozlama hech qanday ta'sir qilmasdi.
+# To'g'ri joyi — `[auth.email]`.
+#
+# Ilova login/parol asosida ishlaydi va "username@til-sayohati.app" ko'rinishidagi
+# SUN'IY email yaratadi. Bunday manzilga hech qanday xat yetib bormaydi, shuning
+# uchun tasdiqlash MAJBURIY ravishda o'chirilgan bo'lishi kerak — aks holda
+# ro'yxatdan o'tgan hech kim tizimga kira olmaydi.
 enable_confirmations = false
+enable_signup = true
+double_confirm_changes = false
 
 [edge_runtime]
 enabled = true
+
+# Edge Function'lar foydalanuvchi sessiyasini o'zi tekshiradi (Authorization
+# header'idan), shuning uchun standart JWT tekshiruvi yoqilgan holda qoldiriladi.
+[functions.admin]
+verify_jwt = true
+
+[functions.ai]
+verify_jwt = true

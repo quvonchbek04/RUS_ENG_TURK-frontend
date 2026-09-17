@@ -444,15 +444,17 @@ export default function AdminPage() {
                 onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))}
                 placeholder="Login"
                 required
+                minLength={3}
                 className="px-3 py-2.5 rounded-lg border outline-none"
                 style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
               />
               <input
                 value={form.password}
                 onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                placeholder="Parol"
+                placeholder="Parol (kamida 6 belgi)"
                 type="password"
                 required
+                minLength={6}
                 className="px-3 py-2.5 rounded-lg border outline-none"
                 style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
               />

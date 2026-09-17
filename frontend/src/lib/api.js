@@ -1,4 +1,11 @@
-import { supabase } from './supabase.js';
+import { supabase, usernameToEmail } from './supabase.js';
+
+/** Supabase Auth standart sozlamasida parol kamida 6 belgi bo'lishi shart.
+ *  Avval bu yerda 4 yozilgan edi — natijada 4-5 belgili parol kiritgan
+ *  foydalanuvchi frontend tekshiruvidan o'tib ketib, Supabase'dan tushunarsiz
+ *  inglizcha "Password should be at least 6 characters" xatosini olardi. */
+export const MIN_PASSWORD_LENGTH = 6;
+export const MIN_USERNAME_LENGTH = 3;
 
 // ============================================================================
 // Bu fayl avvalgi Express-backend'dagi `api` obyektining ANIQ SHAKLINI saqlab
@@ -18,7 +25,21 @@ async function loadStaticContent() {
 }
 
 function publicProfile(p) {
+  // MUHIM: avval bu funksiya `p` null bo'lsa "Cannot read properties of null"
+  // bilan qulardi. Profil qatori hali yaratilmagan (trigger kechikkan) yoki RLS
+  // sababli ko'rinmagan holatlar bo'lishi mumkin — shuning uchun himoyalaymiz.
+  if (!p) return null;
   return { id: p.id, username: p.username, displayName: p.display_name, role: p.role, createdAt: p.created_at };
+}
+
+/** Profilni id bo'yicha o'qiydi. `.single()` EMAS, `.maybeSingle()` ishlatiladi:
+ *  `.single()` qator topilmasa PGRST116 xatosini qaytaradi va butun kirish
+ *  jarayonini "JSON object requested, multiple (or no) rows returned" degan
+ *  tushunarsiz xato bilan to'xtatib qo'yadi. */
+async function fetchProfile(userId) {
+  const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
+  throwIfError(error);
+  return data;
 }
 
 function publicBook(b) {
@@ -46,7 +67,39 @@ function publicVocabSet(v) {
 }
 
 function throwIfError(error) {
-  if (error) throw new Error(error.message || "Supabase so'rovida xatolik yuz berdi");
+  if (!error) return;
+  // RLS tomonidan bloklangan so'rovlar tushunarsiz kod bilan keladi — ularni
+  // foydalanuvchi tushunadigan o'zbekcha xabarga aylantiramiz.
+  const msg = String(error.message || '');
+  if (error.code === '42501' || /row-level security|permission denied/i.test(msg)) {
+    throw new Error("Bu amal uchun ruxsatingiz yo'q (faqat administratorlar bajara oladi)");
+  }
+  if (error.code === '42P01' || /does not exist|schema cache/i.test(msg)) {
+    throw new Error(
+      "Bazada kerakli jadval topilmadi. Supabase SQL Editor'da migratsiya fayllarini " +
+      "(0001 → 0002 → 0003 → 0004) ketma-ket ishga tushiring."
+    );
+  }
+  if (/Failed to fetch|NetworkError/i.test(msg)) {
+    throw new Error("Supabase bilan bog'lanib bo'lmadi. Internet aloqasi va .env dagi VITE_SUPABASE_URL ni tekshiring.");
+  }
+  throw new Error(msg || "Supabase so'rovida xatolik yuz berdi");
+}
+
+/** Supabase Auth ingliz tilidagi xatolarini o'zbekchaga o'giradi. */
+function translateAuthError(raw) {
+  const msg = String(raw || '');
+  if (/already registered|already exists|User already/i.test(msg)) return "Bu login allaqachon band";
+  if (/at least 6 characters|Password should be/i.test(msg)) return `Parol kamida ${MIN_PASSWORD_LENGTH} belgidan iborat bo'lishi kerak`;
+  if (/invalid.*email/i.test(msg)) return "Login noto'g'ri belgilardan iborat — faqat lotin harflari va raqamlardan foydalaning";
+  if (/rate limit|too many/i.test(msg)) return "Juda ko'p urinish bo'ldi. Bir necha daqiqadan so'ng qayta urinib ko'ring.";
+  if (/Database error saving new user/i.test(msg)) {
+    return "Bazada foydalanuvchi yaratib bo'lmadi. Migratsiyalar (0001–0004) to'liq ishga tushirilganini tekshiring.";
+  }
+  if (/Signups not allowed|signup is disabled/i.test(msg)) {
+    return "Yangi ro'yxatdan o'tish o'chirilgan. Supabase → Authentication → Sign In / Providers bo'limida \"Allow new users to sign up\" ni yoqing.";
+  }
+  return msg || "Ro'yxatdan o'tishda xatolik yuz berdi";
 }
 
 /** Superadmin/admin huquqi kerak bo'lgan amallar uchun Edge Function chaqiruvi.
@@ -72,6 +125,17 @@ async function callFunction(name, body) {
         try { serverMessage = await error.context.clone().text(); } catch (_) { /* e'tiborsiz qoldiriladi */ }
       }
     }
+    // Funksiya umuman deploy qilinmagan bo'lsa 404 keladi — buni ham aniq aytamiz.
+    if (!serverMessage && error.context && error.context.status === 404) {
+      throw new Error(
+        `"${name}" Edge Function topilmadi. Uni deploy qiling: supabase functions deploy ${name}`
+      );
+    }
+    if (!serverMessage && /Failed to (fetch|send)/i.test(String(error.message || ''))) {
+      throw new Error(
+        `"${name}" Edge Function'ga ulanib bo'lmadi. U deploy qilinganini va CORS sozlamalarini tekshiring.`
+      );
+    }
     throw new Error(serverMessage || error.message || "Server bilan bog'lanishda xato yuz berdi");
   }
   if (data && data.error) throw new Error(data.error);
@@ -82,28 +146,63 @@ export const api = {
   // ---------- AUTH ----------
   register: async ({ username, password, displayName }) => {
     const clean = String(username || '').trim();
-    if (clean.length < 3 || String(password || '').length < 4) {
-      throw new Error("Foydalanuvchi nomi kamida 3, parol kamida 4 belgidan iborat bo'lishi kerak");
+    if (clean.length < MIN_USERNAME_LENGTH) {
+      throw new Error(`Foydalanuvchi nomi kamida ${MIN_USERNAME_LENGTH} belgidan iborat bo'lishi kerak`);
     }
-    const email = `${clean.toLowerCase()}@til-sayohati.local`;
+    if (String(password || '').length < MIN_PASSWORD_LENGTH) {
+      throw new Error(`Parol kamida ${MIN_PASSWORD_LENGTH} belgidan iborat bo'lishi kerak`);
+    }
+    if (!/^[a-zA-Z0-9._-]+$/.test(clean)) {
+      throw new Error("Login faqat lotin harflari, raqamlar va . _ - belgilaridan iborat bo'lishi mumkin");
+    }
+
     const { data, error } = await supabase.auth.signUp({
-      email,
+      email: usernameToEmail(clean),
       password,
-      options: { data: { username: clean, display_name: displayName || clean } },
+      // Eslatma: bu yerga ATAYLAB `role` yozilmaydi — baza trigger'i ham uni
+      // e'tiborga olmaydi (0003 migratsiyasi), aks holda har kim o'zini
+      // superadmin qilib ro'yxatdan o'ta olardi.
+      options: { data: { username: clean, display_name: displayName?.trim() || clean } },
     });
-    if (error) {
-      const msg = /already|registered|exists/i.test(error.message) ? "Bu foydalanuvchi nomi band" : error.message;
-      throw new Error(msg);
+    if (error) throw new Error(translateAuthError(error.message));
+
+    // Agar Supabase loyihasida "Confirm email" YOQILGAN bo'lsa, signUp sessiya
+    // qaytarmaydi — foydalanuvchi hech qachon kira olmaydi (chunki elektron
+    // pochta sun'iy va unga xat yetib bormaydi). Avval bu holat jimgina
+    // qulardi; endi aniq, tushunarli xabar beramiz.
+    if (!data.session) {
+      throw new Error(
+        "Hisob yaratildi, lekin loyihada e'lektron pochtani tasdiqlash yoqilgan. " +
+        "Supabase Dashboard → Authentication → Sign In / Providers → Email bo'limida " +
+        "\"Confirm email\" sozlamasini o'chiring va qaytadan urinib ko'ring."
+      );
     }
-    const { data: profile } = await supabase.from('profiles').select('*').eq('id', data.user.id).single();
-    return { user: publicProfile(profile) };
+
+    const profile = await fetchProfile(data.user.id);
+    return {
+      user: publicProfile(profile) || {
+        id: data.user.id, username: clean, displayName: displayName || clean, role: 'user',
+      },
+    };
   },
 
   login: async ({ username, password }) => {
-    const email = `${String(username || '').trim().toLowerCase()}@til-sayohati.local`;
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw new Error("Login yoki parol noto'g'ri");
-    const { data: profile } = await supabase.from('profiles').select('*').eq('id', data.user.id).single();
+    const clean = String(username || '').trim();
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: usernameToEmail(clean),
+      password,
+    });
+    if (error) {
+      if (/email not confirmed/i.test(error.message)) {
+        throw new Error(
+          "Hisob tasdiqlanmagan. Supabase Dashboard → Authentication → Email bo'limida " +
+          "\"Confirm email\" sozlamasini o'chiring."
+        );
+      }
+      throw new Error("Login yoki parol noto'g'ri");
+    }
+    const profile = await fetchProfile(data.user.id);
+    if (!profile) throw new Error("Profil topilmadi. Bazada migratsiyalar to'liq ishga tushirilganini tekshiring.");
     return { user: publicProfile(profile) };
   },
 
@@ -114,8 +213,8 @@ export const api = {
   me: async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Kirish talab qilinadi');
-    const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-    throwIfError(error);
+    const profile = await fetchProfile(user.id);
+    if (!profile) throw new Error("Profil topilmadi. Bazada migratsiyalar to'liq ishga tushirilganini tekshiring.");
     return { user: publicProfile(profile) };
   },
 
@@ -134,16 +233,26 @@ export const api = {
 
     if (!LANG_DATA[lang]) throw new Error('Til topilmadi');
 
-    const { data: uploadedSets } = await supabase
+    // Yuklangan lug'at to'plamlari qo'shimcha kategoriya sifatida qo'shiladi.
+    // Bu so'rov muvaffaqiyatsiz bo'lsa ham (masalan tarmoq uzilsa) kurs kontenti
+    // ko'rinishda qolishi kerak — shuning uchun xato butun sahifani buzmaydi.
+    let uploadedCategories = [];
+    const { data: uploadedSets, error: setsError } = await supabase
       .from('vocab_sets')
       .select('title, words')
       .eq('lang', lang)
       .order('id', { ascending: false });
-    const uploadedCategories = (uploadedSets || []).map((row) => ({
-      cat: `📤 ${row.title}`,
-      level: 'custom',
-      words: row.words || [],
-    }));
+    if (setsError) {
+      console.warn("Yuklangan lug'at to'plamlarini olishda xato:", setsError.message);
+    } else {
+      uploadedCategories = (uploadedSets || [])
+        .filter((row) => Array.isArray(row.words) && row.words.length > 0)
+        .map((row) => ({
+          cat: `📤 ${row.title}`,
+          level: 'custom',
+          words: row.words,
+        }));
+    }
 
     return {
       meta: raw.LANGS[lang],
@@ -158,7 +267,11 @@ export const api = {
   getProgress: async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Kirish talab qilinadi');
-    const { data, error } = await supabase.from('progress').select('state, updated_at').eq('user_id', user.id).single();
+    // `.single()` EMAS: progress qatori hali yaratilmagan bo'lsa (masalan
+    // foydalanuvchi trigger qo'shilishidan oldin yaratilgan bo'lsa) `.single()`
+    // xato qaytarib, kirishni butunlay buzib qo'yardi.
+    const { data, error } = await supabase
+      .from('progress').select('state, updated_at').eq('user_id', user.id).maybeSingle();
     throwIfError(error);
     return { state: data?.state || {}, updatedAt: data?.updated_at };
   },
@@ -183,7 +296,9 @@ export const api = {
   createBook: async ({ title, lang, ext, contentText }) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Kirish talab qilinadi');
-    const { data: profile } = await supabase.from('profiles').select('username').eq('id', user.id).single();
+    const { data: profile } = await supabase.from('profiles').select('username').eq('id', user.id).maybeSingle();
+    if (!String(title || '').trim()) throw new Error("Sarlavha bo'sh bo'lmasligi kerak");
+    if (!String(contentText || '').trim()) throw new Error("Fayl matni bo'sh — boshqa fayl tanlang");
     const { data, error } = await supabase
       .from('books')
       .insert({
@@ -201,8 +316,13 @@ export const api = {
   },
 
   deleteBook: async (id) => {
-    const { error } = await supabase.from('books').delete().eq('id', id);
+    // MUHIM: RLS o'chirishga ruxsat bermasa, Postgres XATO qaytarmaydi — shunchaki
+    // 0 ta qator o'chadi. Avval bu holatda interfeys kitob o'chgandek ko'rsatib,
+    // sahifa yangilangach u qaytib chiqardi. `.select()` qo'shib, haqiqatan
+    // o'chganini tekshiramiz.
+    const { data, error } = await supabase.from('books').delete().eq('id', id).select('id');
     throwIfError(error);
+    if (!data || data.length === 0) throw new Error("O'chirib bo'lmadi — bu amal uchun ruxsatingiz yo'q");
     return { ok: true };
   },
 
@@ -225,7 +345,7 @@ export const api = {
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Kirish talab qilinadi');
-    const { data: profile } = await supabase.from('profiles').select('username').eq('id', user.id).single();
+    const { data: profile } = await supabase.from('profiles').select('username').eq('id', user.id).maybeSingle();
 
     const { data, error } = await supabase
       .from('vocab_sets')
@@ -244,8 +364,9 @@ export const api = {
   },
 
   deleteVocabSet: async (id) => {
-    const { error } = await supabase.from('vocab_sets').delete().eq('id', id);
+    const { data, error } = await supabase.from('vocab_sets').delete().eq('id', id).select('id');
     throwIfError(error);
+    if (!data || data.length === 0) throw new Error("O'chirib bo'lmadi — bu amal uchun ruxsatingiz yo'q");
     return { ok: true };
   },
 

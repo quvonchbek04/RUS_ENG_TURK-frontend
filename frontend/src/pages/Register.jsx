@@ -95,10 +95,10 @@ export default function Register() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={4}
+                minLength={6}
                 className="w-full px-4 py-3 rounded-xl border outline-none focus:shadow-[0_0_0_3px_var(--gold-soft)]"
                 style={{ borderColor: 'var(--line)', background: 'var(--panel)', color: 'var(--ink)' }}
-                placeholder="kamida 4 ta belgi"
+                placeholder="kamida 6 ta belgi"
               />
             </div>
 

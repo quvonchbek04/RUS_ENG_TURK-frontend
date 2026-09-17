@@ -33,6 +33,19 @@ til-sayohati/
 | Admin yaratish/o'chirish (`requireRole`) | `supabase/functions/admin` (service-role, superadmin tekshiruvi) |
 | `backend/data/content.json` (fayldan o'qiladi) | `frontend/public/content.json` (statik, bevosita frontenddan) |
 
+## 🩺 Nosozliklarni bartaraf etish
+
+| Muammo | Sabab va yechim |
+|---|---|
+| Sayt ochilganda **oq ekran** yoki "Supabase sozlanmagan" oynasi | `frontend/.env` yaratilmagan yoki to'ldirilmagan. `.env.example` dan nusxa oling va `npm run dev` ni **qayta ishga tushiring**. |
+| Ro'yxatdan o'tgach kira olmayapman | Supabase'da **"Confirm email"** yoqilgan. Yuqoridagi 2.1-qadamni bajaring. |
+| "Parol kamida 6 belgi…" | Supabase Auth minimal uzunligi 6. Uzunroq parol tanlang. |
+| "Bazada kerakli jadval topilmadi" | Migratsiyalar to'liq ishga tushirilmagan. 0001 → 0002 → 0003 → 0004 ni tartib bilan bajaring. |
+| "`admin` Edge Function topilmadi" | `supabase functions deploy admin` (va `ai`) bajarilmagan. |
+| Kitob/lug'at yuklay olmayapman | Faqat **admin/superadmin** yuklay oladi. Rolingizni SQL orqali tekshiring. |
+| Admin panelda "Saqlandi" deydi, lekin AI yoqilmaydi | `0004_fixes.sql` ishga tushirilmagan (avval `settings` qatori yo'q bo'lsa saqlash jimgina ishlamas edi) **yoki** faol Gemini kaliti qo'shilmagan. |
+| AI doim "mock rejimi" deydi | Provayder `gemini` qilinganini VA kamida bitta **faol** kalit borligini tekshiring. Kalitlar limitga tegsa avtomatik o'chib qolishi mumkin — admin panelda "xatolar soni" ustunini ko'ring. |
+
 **Muhim:** `frontend/src/lib/api.js` dagi `api` obyektining barcha metod nomlari
 va qaytaradigan natija shakli **avvalgidek saqlangan** — shuning uchun boshqa
 hech qanday sahifa yoki komponentni (Library, AdminPage, MonthPage va h.k.)
@@ -52,15 +65,32 @@ o'zgartirish shart bo'lmadi.
 
 ### 2) Bazani sozlang
 
-**SQL Editor** bo'limini oching va `supabase/migrations/0001_init.sql` faylining
-**butun matnini** ko'chirib, ishga tushiring (bir marta yetarli). Bu jadvallar,
-RLS siyosatlari va trigger'larni yaratadi.
+**SQL Editor** bo'limini oching va `supabase/migrations/` papkasidagi fayllarni
+**RAQAM TARTIBIDA, birma-bir** ishga tushiring. Har birining butun matnini
+ko'chirib qo'ying va "Run" bosing:
 
-Shundan so'ng **`supabase/migrations/0002_multi_api_keys.sql`** faylini ham xuddi
-shu tarzda ishga tushiring — bu bir nechta AI API kalitini saqlash imkonini
-beruvchi `api_keys` jadvalini qo'shadi (agar avval bitta Gemini kalit
-saqlagan bo'lsangiz, u avtomatik shu yangi jadvalga ko'chiriladi, yo'qolib
-qolmaydi).
+| # | Fayl | Nima qiladi |
+|---|---|---|
+| 1 | `0001_init.sql` | Jadvallar, RLS siyosatlari, trigger'lar |
+| 2 | `0002_multi_api_keys.sql` | Bir nechta AI API kaliti uchun `api_keys` jadvali |
+| 3 | `0003_security_fix_role_escalation.sql` | ⚠️ Xavfsizlik: o'zini admin qilib olish teshigini yopadi |
+| 4 | `0004_fixes.sql` | ⚠️ Tuzatishlar: RLS tezligi, trigger mustahkamligi, indekslar |
+
+**3 va 4-fayl SHART** — ularsiz loyiha xavfsiz emas va ba'zi funksiyalar
+(AI sozlamalarini saqlash, ko'p kalitli rejim) jimgina ishlamaydi. Bu fayllarni
+bir necha marta ishga tushirsangiz ham zarar yo'q — ular idempotent.
+
+### 2.1) ⚠️ E'lektron pochta tasdiqlashni O'CHIRING (eng ko'p uchraydigan xato)
+
+Ilova login/parol asosida ishlaydi va ichkarida `login@til-sayohati.app`
+ko'rinishidagi **sun'iy** email yaratadi. Bunday manzilga hech qanday xat
+yetib bormaydi. Agar tasdiqlash yoqilgan bo'lsa (Supabase'da **standart holatda
+YOQILGAN**), ro'yxatdan o'tgan hech kim tizimga kira olmaydi.
+
+**Authentication → Sign In / Providers → Email** bo'limiga kiring va:
+- **"Confirm email"** — ❌ o'chiring
+- **"Allow new users to sign up"** — ✅ yoqilgan bo'lsin
+- **"Minimum password length"** — 6 (standart qiymat; ilova ham shunga moslangan)
 
 ### 3) Edge Functions'ni deploy qiling
 
@@ -110,6 +140,7 @@ npm run dev
 
 1. Saytda **"Ro'yxatdan o'tish"** orqali login=`Quvonchbek`, parol=`admin123`
    bilan oddiy foydalanuvchi sifatida ro'yxatdan o'ting.
+   (Parol **kamida 6 belgi** bo'lishi shart — bu Supabase Auth talabi.)
 2. Supabase **SQL Editor**'da ishga tushiring:
    ```sql
    update public.profiles set role = 'superadmin' where username = 'Quvonchbek';

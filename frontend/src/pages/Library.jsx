@@ -76,7 +76,10 @@ export default function Library() {
     if (openVocabSet?.id === set.id) setOpenVocabSet(null);
     try {
       await api.deleteVocabSet(set.id);
-    } catch {
+    } catch (err) {
+      // Avval xato butunlay yutib yuborilardi va ro'yxat sabab ko'rsatilmasdan
+      // qayta chiqib qolardi — foydalanuvchi nima bo'lganini tushunmasdi.
+      setVocabError(err.message || "O'chirib bo'lmadi");
       refreshVocabSets();
     }
   }
@@ -126,7 +129,8 @@ export default function Library() {
     if (openBook?.id === book.id) setOpenBook(null);
     try {
       await api.deleteBook(book.id);
-    } catch {
+    } catch (err) {
+      setError(err.message || "O'chirib bo'lmadi");
       refresh();
     }
   }
@@ -359,7 +363,7 @@ export default function Library() {
                 <div className="font-mono text-[11px] flex items-center gap-2 flex-wrap" style={{ color: 'var(--ink-soft)' }}>
                   <span>{LANG_OPTIONS.find((l) => l.key === v.lang)?.label}</span>
                   <span>·</span>
-                  <span>{v.words.length} ta so'z</span>
+                  <span>{(v.words || []).length} ta so'z</span>
                   <span>·</span>
                   <span>{new Date(v.createdAt).toLocaleDateString('uz-UZ')}</span>
                   {v.uploadedBy && (
@@ -423,7 +427,7 @@ export default function Library() {
               </button>
             </div>
             <div className="grid gap-2.5">
-              {openVocabSet.words.map(([word, translit, meaning], i) => (
+              {(openVocabSet.words || []).map(([word, translit, meaning], i) => (
                 <div
                   key={i}
                   className="rounded-xl border p-3.5 flex items-start gap-3"

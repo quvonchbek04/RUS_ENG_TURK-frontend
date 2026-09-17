@@ -17,7 +17,11 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // ko'chirilmasligi mumkin ("Module not found" xatosi). Shu fayl to'liq mustaqil.
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  // `x-supabase-api-version` supabase-js'ning yangi versiyalari tomonidan
+  // yuboriladi — ro'yxatda bo'lmasa brauzer CORS preflight'ni rad etadi va
+  // funksiya "Failed to fetch" bilan ishlamay qoladi.
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-api-version",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 function json(body: unknown, status = 200): Response {
@@ -30,6 +34,22 @@ function json(body: unknown, status = 200): Response {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+/** AI sozlamalarini bir joyda o'qish — avval bu mantiq ikki marta nusxalangan
+ *  edi va ular orasida farq paydo bo'lish xavfi bor edi. */
+async function readAiSettings(admin: ReturnType<typeof createClient>) {
+  const { data: providerRow } = await admin
+    .from("settings").select("value").eq("key", "ai_provider").maybeSingle();
+  const { count: activeKeyCount } = await admin
+    .from("api_keys")
+    .select("*", { count: "exact", head: true })
+    .eq("provider", "gemini")
+    .eq("is_active", true);
+  const configuredProvider = String(providerRow?.value || "mock").toLowerCase();
+  const hasKey = (activeKeyCount || 0) > 0;
+  const provider = configuredProvider === "gemini" && hasKey ? "gemini" : "mock";
+  return { provider, hasKey, configuredProvider, activeKeyCount: activeKeyCount || 0 };
+}
 
 function publicUser(p: Record<string, unknown>) {
   return { id: p.id, username: p.username, displayName: p.display_name, role: p.role, createdAt: p.created_at };
@@ -48,8 +68,9 @@ Deno.serve(async (req) => {
     if (userErr || !user) return json({ error: "Kirish talab qilinadi" }, 401);
 
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
-    const { data: callerProfile } = await admin.from("profiles").select("role").eq("id", user.id).single();
-    const callerRole = callerProfile?.role || "user";
+    // `.single()` EMAS: profil qatori topilmasa `.single()` xato qaytaradi.
+    const { data: callerProfile } = await admin.from("profiles").select("role").eq("id", user.id).maybeSingle();
+    const callerRole = (callerProfile?.role as string) || "user";
 
     const body = await req.json().catch(() => ({}));
     const action = body.action;
@@ -60,10 +81,19 @@ Deno.serve(async (req) => {
       const username = String(body.username || "").trim();
       const password = String(body.password || "");
       const displayName = body.displayName ? String(body.displayName) : username;
-      if (username.length < 3 || password.length < 4) {
-        return json({ error: "Foydalanuvchi nomi kamida 3, parol kamida 4 belgidan iborat bo'lishi kerak" }, 400);
+      // Supabase Auth standart sozlamasida parol kamida 6 belgi bo'lishi shart.
+      // Avval bu yerda 4 yozilgan edi — 4-5 belgili parol kiritilganda funksiya
+      // tekshiruvdan o'tkazib yuborar, keyin Supabase inglizcha xato qaytarar edi.
+      if (username.length < 3) {
+        return json({ error: "Foydalanuvchi nomi kamida 3 belgidan iborat bo'lishi kerak" }, 400);
       }
-      const email = `${username.toLowerCase()}@til-sayohati.local`;
+      if (password.length < 6) {
+        return json({ error: "Parol kamida 6 belgidan iborat bo'lishi kerak" }, 400);
+      }
+      if (!/^[a-zA-Z0-9._-]+$/.test(username)) {
+        return json({ error: "Login faqat lotin harflari, raqamlar va . _ - belgilaridan iborat bo'lishi mumkin" }, 400);
+      }
+      const email = `${username.toLowerCase()}@til-sayohati.app`;
       const { data: created, error } = await admin.auth.admin.createUser({
         email,
         password,
@@ -74,17 +104,27 @@ Deno.serve(async (req) => {
         const msg = /already|registered|exists/i.test(error.message) ? "Bu foydalanuvchi nomi band" : error.message;
         return json({ error: msg }, 400);
       }
-      // Trigger 'user' bilan yaratadi — buni 'admin'ga ko'taramiz
-      await admin.from("profiles").update({ role: "admin" }).eq("id", created.user!.id);
-      const { data: prof } = await admin.from("profiles").select("*").eq("id", created.user!.id).single();
-      return json({ user: publicUser(prof!) });
+      // Trigger 'user' bilan yaratadi — buni 'admin'ga ko'taramiz.
+      // MUHIM: trigger username band bo'lsa unga raqam qo'shadi (0004), shuning
+      // uchun natijani bazadan qayta o'qib, HAQIQIY qiymatni qaytaramiz.
+      const { error: roleErr } = await admin.from("profiles").update({ role: "admin" }).eq("id", created.user!.id);
+      if (roleErr) {
+        // Rol berilmasa hisob "oddiy foydalanuvchi" bo'lib qolardi — buni
+        // jimgina o'tkazib yubormasdan, yaratilgan hisobni orqaga qaytaramiz.
+        await admin.auth.admin.deleteUser(created.user!.id);
+        return json({ error: `Admin roli berilmadi: ${roleErr.message}` }, 500);
+      }
+      const { data: prof } = await admin.from("profiles").select("*").eq("id", created.user!.id).maybeSingle();
+      if (!prof) return json({ error: "Hisob yaratildi, lekin profil topilmadi. Migratsiyalarni tekshiring." }, 500);
+      return json({ user: publicUser(prof) });
     }
 
     // ---------- Adminni o'chirish (faqat superadmin) ----------
     if (action === "delete-admin") {
       if (callerRole !== "superadmin") return json({ error: "Bu amal uchun ruxsatingiz yo'q" }, 403);
       const targetId = String(body.id || "");
-      const { data: target } = await admin.from("profiles").select("role").eq("id", targetId).single();
+      if (targetId === user.id) return json({ error: "O'z hisobingizni o'chira olmaysiz" }, 400);
+      const { data: target } = await admin.from("profiles").select("role").eq("id", targetId).maybeSingle();
       if (!target) return json({ error: "Foydalanuvchi topilmadi" }, 404);
       if (target.role === "superadmin") return json({ error: "Super adminni o'chirib bo'lmaydi" }, 400);
       const { error } = await admin.auth.admin.deleteUser(targetId);
@@ -95,16 +135,7 @@ Deno.serve(async (req) => {
     // ---------- AI sozlamalarini o'qish (admin + superadmin) ----------
     if (action === "get-ai-settings") {
       if (!["admin", "superadmin"].includes(callerRole)) return json({ error: "Bu amal uchun ruxsatingiz yo'q" }, 403);
-      const { data: providerRow } = await admin.from("settings").select("value").eq("key", "ai_provider").single();
-      const { count: activeKeyCount } = await admin
-        .from("api_keys")
-        .select("*", { count: "exact", head: true })
-        .eq("provider", "gemini")
-        .eq("is_active", true);
-      const configuredProvider = (providerRow?.value || "mock").toLowerCase();
-      const hasKey = (activeKeyCount || 0) > 0;
-      const provider = configuredProvider === "gemini" && hasKey ? "gemini" : "mock";
-      return json({ provider, hasKey, configuredProvider, activeKeyCount: activeKeyCount || 0 });
+      return json(await readAiSettings(admin));
     }
 
     // ---------- AI provayderini saqlash (faqat superadmin) ----------
@@ -115,18 +146,17 @@ Deno.serve(async (req) => {
         return json({ error: "Noto'g'ri provayder qiymati" }, 400);
       }
       if (provider) {
-        await admin.from("settings").update({ value: String(provider).toLowerCase() }).eq("key", "ai_provider");
+        // MUHIM: avval `update` ishlatilgan edi. Agar `settings` jadvalida
+        // `ai_provider` qatori bo'lmasa (masalan qo'lda o'chirilgan bo'lsa),
+        // `update` hech narsa o'zgartirmaydi va XATO HAM QAYTARMAYDI — admin
+        // panel "Saqlandi" deb ko'rsatar, lekin aslida hech narsa saqlanmasdi.
+        // `upsert` bu holatni butunlay yo'q qiladi.
+        const { error: upsertErr } = await admin
+          .from("settings")
+          .upsert({ key: "ai_provider", value: String(provider).toLowerCase() }, { onConflict: "key" });
+        if (upsertErr) return json({ error: `Saqlab bo'lmadi: ${upsertErr.message}` }, 500);
       }
-      const { data: providerRow } = await admin.from("settings").select("value").eq("key", "ai_provider").single();
-      const { count: activeKeyCount } = await admin
-        .from("api_keys")
-        .select("*", { count: "exact", head: true })
-        .eq("provider", "gemini")
-        .eq("is_active", true);
-      const configuredProvider = (providerRow?.value || "mock").toLowerCase();
-      const hasKey = (activeKeyCount || 0) > 0;
-      const activeProvider = configuredProvider === "gemini" && hasKey ? "gemini" : "mock";
-      return json({ provider: activeProvider, hasKey, configuredProvider, activeKeyCount: activeKeyCount || 0 });
+      return json(await readAiSettings(admin));
     }
 
     // ---------- API kalitlar ro'yxati (maskalangan holda, admin + superadmin) ----------
@@ -160,6 +190,13 @@ Deno.serve(async (req) => {
       if (!keyValue || keyValue.length < 10) {
         return json({ error: "API kalit noto'g'ri ko'rinadi (juda qisqa)" }, 400);
       }
+      // Bir xil kalitni ikki marta qo'shib yuborish — juda ko'p uchraydigan xato.
+      // Bunda "kalitlarni almashtirish" mexanizmi foyda bermaydi (ikkalasi ham
+      // bir vaqtda limitga tegadi), shuning uchun oldindan ogohlantiramiz.
+      const { data: existing } = await admin
+        .from("api_keys").select("id").eq("provider", provider).eq("key_value", keyValue).maybeSingle();
+      if (existing) return json({ error: "Bu kalit allaqachon qo'shilgan" }, 400);
+
       const { error } = await admin.from("api_keys").insert({ provider, label, key_value: keyValue, is_active: true });
       if (error) return json({ error: error.message }, 400);
       return json({ ok: true });
@@ -189,6 +226,6 @@ Deno.serve(async (req) => {
     return json({ error: "Noma'lum amal (action)" }, 400);
   } catch (e) {
     console.error(e);
-    return json({ error: String(e) }, 500);
+    return json({ error: (e as Error)?.message || String(e) }, 500);
   }
 });

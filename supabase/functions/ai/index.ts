@@ -18,7 +18,10 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // xatosini beradi. Shu fayl to'liq mustaqil ishlaydi.
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  // `x-supabase-api-version` supabase-js'ning yangi versiyalari tomonidan
+  // yuboriladi — ro'yxatda bo'lmasa brauzer CORS preflight'ni rad etadi.
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-api-version",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 function json(body: unknown, status = 200): Response {
@@ -42,7 +45,8 @@ type ApiKeyRow = {
 };
 
 async function getAiConfig(admin: ReturnType<typeof createClient>) {
-  const { data: providerRow } = await admin.from("settings").select("value").eq("key", "ai_provider").single();
+  // `.single()` EMAS — qator yo'q bo'lsa xato qaytaradi va AI butunlay ishlamay qoladi.
+  const { data: providerRow } = await admin.from("settings").select("value").eq("key", "ai_provider").maybeSingle();
   const { data: keys } = await admin
     .from("api_keys")
     .select("id, key_value, failure_count")
@@ -65,36 +69,44 @@ async function callGeminiWithRotation(
   prompt: string,
   jsonMode = false
 ): Promise<string> {
+  if (!activeKeys.length) throw new Error("Faol Gemini API kaliti yo'q");
+
   let lastError: unknown = null;
   for (const key of activeKeys) {
     try {
       const result = await callGemini(key.key_value, prompt, jsonMode);
-      // Muvaffaqiyatli chaqiruv — statistikani yangilaymiz (xato hisoblagichini nolga tushiramiz)
-      admin
+      // MUHIM TUZATISH: avval bu yozuvlar `.then(() => {})` bilan "kutilmasdan"
+      // yuborilar edi. Deno Edge Runtime javob qaytarilgach izolyatni darhol
+      // to'xtatishi mumkin — natijada statistika ham, kalitni o'chirish ham
+      // ko'pincha bazaga umuman yetib bormasdi, ya'ni admin panelidagi
+      // "xatolar soni" doim 0 ko'rinar va nosoz kalit hech qachon o'chmas edi.
+      // Endi `await` bilan — bu bir necha millisekund, lekin ishonchli.
+      await admin
         .from("api_keys")
         .update({ last_used_at: new Date().toISOString(), failure_count: 0, last_error: null })
-        .eq("id", key.id)
-        .then(() => {});
+        .eq("id", key.id);
       return result;
     } catch (e) {
       lastError = e;
       const message = String((e as Error)?.message || e);
       // Limit/kvota/ruxsatsizlik xatolari bo'lsa — shu kalitni "charchagan" deb belgilab, keyingisiga o'tamiz
       const isQuotaOrAuthError = /429|403|401|quota|rate.?limit|permission|invalid.?api.?key/i.test(message);
-      admin
+      const nextFailureCount = (key.failure_count || 0) + 1;
+      // Kalit noto'g'ri/bekor qilingan bo'lsa (401/403 yoki "invalid api key") uni
+      // darhol o'chiramiz — bunday kalit qayta urinishdan hech qachon tuzalmaydi.
+      const isPermanentlyBad = /401|403|invalid.?api.?key|API key not valid/i.test(message);
+      const shouldDeactivate = isPermanentlyBad || (isQuotaOrAuthError && nextFailureCount >= 5);
+      await admin
         .from("api_keys")
         .update({
-          failure_count: (key.failure_count || 0) + 1,
+          failure_count: nextFailureCount,
           last_error: message.slice(0, 300),
           last_used_at: new Date().toISOString(),
-          // 5 martadan ko'p xato bergan (yoki aniq kvota xatosi bergan) kalitni avtomatik o'chiramiz,
-          // shunda u keyingi so'rovlarda ro'yxatdan chetlanadi va admin buni panelda ko'rib qayta yoqishi mumkin.
-          is_active: isQuotaOrAuthError && key.failure_count >= 4 ? false : true,
+          is_active: !shouldDeactivate,
         })
-        .eq("id", key.id)
-        .then(() => {});
+        .eq("id", key.id);
       console.warn(`Gemini kalit #${key.id} muvaffaqiyatsiz, keyingisiga o'tilmoqda:`, message);
-      // quota bo'lmagan (masalan vaqtinchalik tarmoq) xatolarda ham keyingi kalitni sinab ko'ramiz — zarari yo'q
+      // quota bo'lmagan (masalan vaqtinchalik tarmoq) xatolarda ham keyingi kalitni sinab ko'ramiz
       continue;
     }
   }
@@ -163,17 +175,38 @@ async function callGemini(apiKey: string, prompt: string, jsonMode = false): Pro
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
   const body: Record<string, unknown> = { contents: [{ parts: [{ text: prompt }] }] };
   if (jsonMode) body.generationConfig = { responseMimeType: "application/json" };
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  // Timeout: Gemini javob bermay qolsa, Edge Function butun so'rov limitigacha
+  // osilib qolmasligi va keyingi kalitga o'tish imkoni bo'lishi uchun.
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25_000);
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+  } catch (e) {
+    if ((e as Error)?.name === "AbortError") throw new Error("Gemini javob bermadi (timeout)");
+    throw e;
+  } finally {
+    clearTimeout(timeout);
+  }
+
   if (!res.ok) {
     const errText = await res.text().catch(() => "");
     throw new Error(`Gemini so'rovi muvaffaqiyatsiz (${res.status}): ${errText.slice(0, 200)}`);
   }
   const data = await res.json();
+
+  // Xavfsizlik filtri javobni bloklagan bo'lsa `candidates` bo'sh keladi —
+  // avval bu holat bo'sh matn qaytarib, "mock" rejimiga sabab bo'lardi.
+  const blockReason = data?.promptFeedback?.blockReason;
+  if (blockReason) throw new Error(`Gemini so'rovni bloklandi (${blockReason})`);
+
   const text = data?.candidates?.[0]?.content?.parts?.map((p: { text: string }) => p.text).join("\n") || "";
+  if (!text.trim()) throw new Error("Gemini bo'sh javob qaytardi");
   return text.trim();
 }
 
@@ -201,6 +234,7 @@ Deno.serve(async (req) => {
     if (action === "task") {
       const { type, content, lang } = body;
       if (!content || !lang) return json({ error: "content va lang maydonlari kerak" }, 400);
+      if (!LANG_NAMES[String(lang)]) return json({ error: "Noma'lum til kodi" }, 400);
       const cfg = await getAiConfig(admin);
       if (cfg.provider === "gemini") {
         try {
@@ -246,6 +280,6 @@ Deno.serve(async (req) => {
     return json({ error: "Noma'lum amal (action)" }, 400);
   } catch (e) {
     console.error(e);
-    return json({ error: String(e) }, 500);
+    return json({ error: (e as Error)?.message || String(e) }, 500);
   }
 });
