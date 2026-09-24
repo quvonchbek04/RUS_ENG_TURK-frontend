@@ -18,12 +18,56 @@
 
 html {
   scroll-behavior: smooth;
+  /* Android'da matn hajmini foydalanuvchi tizim sozlamasiga ko'ra o'zgartirganda
+     landshaft rejimga o'tishda avtomatik kattalashtirishning oldini oladi. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html, body {
+  /* Layout'dagi biror joy tasodifan konteynerdan kengroq bo'lib qolsa (masalan
+     uzun URL yoki jadval), butun sahifa YONGA emas, faqat o'sha qism ichida
+     gorizontal skrolllansin — aks holda telefonda butun sahifa yon tomonga
+     "suzib" ketishi mumkin edi. */
+  overflow-x: hidden;
+  width: 100%;
 }
 
 body {
   background-color: var(--paper);
   color: var(--ink);
   font-family: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  /* Android Chrome'da tugma/havolani bosganda chiqadigan kulrang "yaltiroq"
+     dog'ni olib tashlaydi — o'rniga har bir elementning o'z hover/active
+     stilidan foydalaniladi. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Barcha bosiladigan elementlar: ikki marta bosishda kattalashtirish (double-tap
+   zoom) kechikishini yo'qotadi — Android'da tugmalar darhol javob beradi. */
+a, button, [role='button'], input, select, textarea, summary {
+  touch-action: manipulation;
+}
+
+/* Kiritish maydonlari kamida 16px shrift bilan — Android'ning o'zi bunda
+   avtomatik kattalashtirmaydi, lekin ba'zi WebView'lar (masalan ichki
+   ilova brauzerlari) buni hurmat qiladi, shu bilan birga o'qish osonlashadi. */
+input, select, textarea {
+  font-size: 16px;
+}
+@media (min-width: 640px) {
+  input, select, textarea {
+    font-size: inherit;
+  }
+}
+
+/* Android/iOS'da tirqishli ekranlar va tizim navigatsiya paneli ostida
+   kontent "kesilib" qolmasligi uchun xavfsiz zona (safe area) o'zgaruvchilari. */
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
 }
 
 .font-display {

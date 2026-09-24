@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { buildWordTimings, getVoicesFor, isSpeechSupported, langToBCP47 } from '../lib/tts.js';
+import { buildWordTimings, getVoicesFor, isSpeechSupported, langToBCP47, subscribeVoicesChanged } from '../lib/tts.js';
 
 function escapeHtml(str) {
   return (str || '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
@@ -31,7 +31,13 @@ export default function TtsReader({ text, lang, rate, voiceURI, onRateChange, on
   const rafRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [finished, setFinished] = useState(false);
-  const voices = useMemo(() => getVoicesFor(lang), [lang, isPlaying]);
+  // MUHIM (Android): ovozlar ro'yxati ilova ochilganda ko'pincha hali tayyor
+  // bo'lmaydi. `voicesTick` faqat `voiceschanged` hodisasi kelganda o'sadi va
+  // shu orqali quyidagi useMemo qayta hisoblanadi — aks holda tanlov doim
+  // bo'sh ko'rinib qolishi mumkin edi.
+  const [voicesTick, setVoicesTick] = useState(0);
+  useEffect(() => subscribeVoicesChanged(() => setVoicesTick((t) => t + 1)), []);
+  const voices = useMemo(() => getVoicesFor(lang), [lang, isPlaying, voicesTick]);
 
   const html = useMemo(() => buildWordSpansHtml(text || ''), [text]);
 

@@ -15,6 +15,38 @@ export function getVoicesFor(lang) {
   return all.filter((v) => v.lang && v.lang.toLowerCase().startsWith(prefix));
 }
 
+/**
+ * MUHIM (Android): `getVoices()` ko'pincha ilova ochilgan zahoti BO'SH massiv
+ * qaytaradi — ovozlar tizim tomonidan fon rejimida asinxron yuklanadi va
+ * tayyor bo'lgach `voiceschanged` hodisasi ishga tushadi. Avval bu hodisaga
+ * hech kim obuna bo'lmagandi — natijada ko'plab Android qurilmalarida
+ * "Standart ovoz" tanlovi doim BO'SH ko'rinar (ovoz mavjud bo'lsa ham),
+ * chunki komponent faqat bir marta, hali ovozlar tayyor bo'lmay turib
+ * hisoblab qo'yilgan edi.
+ *
+ * Bu funksiya callback'ni ovozlar ro'yxati o'zgarganda chaqiradi; qaytarilgan
+ * funksiyani chaqirib obunani bekor qilish mumkin.
+ */
+export function subscribeVoicesChanged(callback) {
+  if (!isSpeechSupported() || typeof window.speechSynthesis.addEventListener !== 'function') {
+    return () => {};
+  }
+  window.speechSynthesis.addEventListener('voiceschanged', callback);
+  return () => window.speechSynthesis.removeEventListener('voiceschanged', callback);
+}
+
+/**
+ * Berilgan til uchun tizimda umuman ovoz o'rnatilmaganini aniqlaydi (ba'zi
+ * arzon Android qurilmalarida rus/turk tili uchun til paketi yuklanmagan
+ * bo'lishi mumkin). Ovozlar hali yuklanmagan bo'lishi ham mumkinligi uchun
+ * bu faqat speechSynthesis "tayyor" bo'lgach (getVoices() umuman bo'sh
+ * bo'lmagandagina) chaqirilishi kerak.
+ */
+export function hasAnyVoice() {
+  if (!isSpeechSupported()) return true; // tekshirib bo'lmaydi — bloklamaymiz
+  return (window.speechSynthesis.getVoices() || []).length > 0;
+}
+
 /** Bitta so'z/gapni oddiy tarzda o'qiydi (talaffuz tugmalari uchun). */
 export function speakSimple(text, lang, { rate = 0.9, voiceURI } = {}) {
   if (!isSpeechSupported() || !text) return;

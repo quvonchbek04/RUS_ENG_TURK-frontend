@@ -223,11 +223,14 @@ export default function Library() {
           {books?.map((b) => (
             <div
               key={b.id}
-              className="rounded-xl border p-4 flex items-center gap-4"
+              // MUHIM: tor (Android) ekranlarda sarlavha + 3 ta tugma bitta qatorga
+              // sig'may, matn kesilib yoki tugmalar konteynerdan tashqariga chiqib
+              // ketardi. `flex-wrap` bilan endi tugmalar kerak bo'lsa pastga tushadi.
+              className="rounded-xl border p-4 flex flex-wrap items-center gap-3 sm:gap-4"
               style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}
             >
               <span className="text-2xl shrink-0">{FORMAT_ICON[b.ext] || '📄'}</span>
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-[140px]">
                 <div className="font-display font-semibold truncate" style={{ color: 'var(--ink)' }}>
                   {b.title}
                 </div>
@@ -352,11 +355,11 @@ export default function Library() {
           {vocabSets?.map((v) => (
             <div
               key={v.id}
-              className="rounded-xl border p-4 flex items-center gap-4"
+              className="rounded-xl border p-4 flex flex-wrap items-center gap-3 sm:gap-4"
               style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}
             >
               <span className="text-2xl shrink-0">📖</span>
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-[140px]">
                 <div className="font-display font-semibold truncate" style={{ color: 'var(--ink)' }}>
                   {v.title}
                 </div>

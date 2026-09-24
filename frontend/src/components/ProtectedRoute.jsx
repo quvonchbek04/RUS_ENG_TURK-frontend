@@ -5,7 +5,7 @@ export default function ProtectedRoute({ children }) {
   const { user, booting } = useAuth();
   if (booting) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--paper)' }}>
+      <div className="min-h-dvh flex items-center justify-center" style={{ background: 'var(--paper)' }}>
         <div className="font-mono text-sm tracking-widest uppercase" style={{ color: 'var(--ink-soft)' }}>
           Yuklanmoqda…
         </div>

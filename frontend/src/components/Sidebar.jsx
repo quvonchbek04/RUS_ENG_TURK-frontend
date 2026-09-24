@@ -98,12 +98,22 @@ export default function Sidebar() {
     return flat.find((m) => !isMonthDone(progress, lang, m.id)) || flat[flat.length - 1];
   })() : null;
 
-  function renderBody(collapsedOverride) {
+  // `safeArea`: faqat mobil overlay chaqirganda true — Android'da tirqishli
+  // ekranlar va pastki gesture-navigatsiya paneli tagida panel matni
+  // ko'rinmasdan qolmasligi uchun xavfsiz zona qo'shiladi. Desktop sticky
+  // panelda kerak emas (u allaqachon butun ekran balandligida).
+  function renderBody(collapsedOverride, safeArea = false) {
     const collapsedEff = collapsedOverride;
     return (
     <div
       className="h-full flex flex-col shrink-0 border-r transition-[width] duration-150"
-      style={{ borderColor: 'var(--line)', background: 'var(--paper-soft)', width: collapsedEff ? 64 : 240 }}
+      style={{
+        borderColor: 'var(--line)',
+        background: 'var(--paper-soft)',
+        width: collapsedEff ? 64 : 240,
+        paddingTop: safeArea ? 'var(--safe-top)' : undefined,
+        paddingBottom: safeArea ? 'var(--safe-bottom)' : undefined,
+      }}
     >
       {/* Logo / brend */}
       <div className={'flex items-center gap-2.5 px-3 py-4 ' + (collapsedEff ? 'justify-center' : '')}>
@@ -256,10 +266,17 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobil tepa panel — hamburger tugmasi */}
+      {/* Mobil tepa panel — hamburger tugmasi.
+          paddingTop'ga xavfsiz zona qo'shiladi — aks holda tirqishli (notch)
+          Android telefonlarda panel tizim status-bari ostiga kirib qolardi. */}
       <div
         className="lg:hidden sticky top-0 z-30 flex items-center gap-3 px-4 py-3 border-b"
-        style={{ borderColor: 'var(--line)', background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(6px)' }}
+        style={{
+          borderColor: 'var(--line)',
+          background: 'rgba(255,255,255,0.95)',
+          backdropFilter: 'blur(6px)',
+          paddingTop: 'calc(0.75rem + var(--safe-top))',
+        }}
       >
         <button
           type="button"
@@ -275,14 +292,14 @@ export default function Sidebar() {
       </div>
 
       {/* Desktop — doimiy sidebar */}
-      <div className="hidden lg:block h-screen sticky top-0">{renderBody(collapsed)}</div>
+      <div className="hidden lg:block h-dvh sticky top-0">{renderBody(collapsed)}</div>
 
       {/* Mobil — overlay sidebar (doim to'liq kengaytirilgan holda) */}
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-40 flex" onClick={() => setMobileOpen(false)}>
           <div style={{ background: 'rgba(20,20,19,0.5)' }} className="absolute inset-0" />
           <div className="relative h-full" onClick={(e) => e.stopPropagation()}>
-            {renderBody(false)}
+            {renderBody(false, true)}
           </div>
         </div>
       )}
