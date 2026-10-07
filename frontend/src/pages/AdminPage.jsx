@@ -15,7 +15,7 @@ export default function AdminPage() {
   const isSuperAdmin = user?.role === 'superadmin';
   const [users, setUsers] = useState(null);
   const [error, setError] = useState('');
-  const [form, setForm] = useState({ username: '', password: '', displayName: '' });
+  const [form, setForm] = useState({ username: '', password: '', displayName: '', role: 'user' });
   const [formError, setFormError] = useState('');
   const [creating, setCreating] = useState(false);
   const [aiStatus, setAiStatus] = useState(null);
@@ -128,9 +128,9 @@ export default function AdminPage() {
     setFormError('');
     setCreating(true);
     try {
-      const { user: created } = await api.createAdmin(form);
+      const { user: created } = await api.createUser(form);
       setUsers((prev) => [...(prev || []), created]);
-      setForm({ username: '', password: '', displayName: '' });
+      setForm({ username: '', password: '', displayName: '', role: 'user' });
     } catch (err) {
       setFormError(err.message);
     } finally {
@@ -139,10 +139,10 @@ export default function AdminPage() {
   }
 
   async function onDelete(u) {
-    if (!confirm(`"${u.username}" adminlikdan o'chirilsinmi?`)) return;
+    if (!confirm(`"${u.username}" butunlay o'chirilsinmi?`)) return;
     setUsers((prev) => prev.filter((x) => x.id !== u.id));
     try {
-      await api.deleteAdmin(u.id);
+      await api.deleteUser(u.id);
     } catch (err) {
       setError(err.message);
       refresh();
@@ -429,16 +429,16 @@ export default function AdminPage() {
           </div>
         )}
 
-        {isSuperAdmin && (
+        {(isSuperAdmin || user?.role === 'admin') && (
           <form
             onSubmit={onCreateAdmin}
             className="rounded-xl border p-5 mb-8"
             style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}
           >
             <div className="font-mono text-[10px] uppercase tracking-widest mb-3" style={{ color: 'var(--ink-soft)' }}>
-              Yangi admin qo'shish
+              Yangi foydalanuvchi qo'shish
             </div>
-            <div className="grid sm:grid-cols-3 gap-3 mb-3">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
               <input
                 value={form.username}
                 onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))}
@@ -463,6 +463,15 @@ export default function AdminPage() {
                 className="px-3 py-2.5 rounded-lg border outline-none"
                 style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
               />
+              <select
+                value={form.role}
+                onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
+                className="px-3 py-2.5 rounded-lg border outline-none"
+                style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
+              >
+                <option value="user">O'quvchi</option>
+                {isSuperAdmin && <option value="admin">Admin</option>}
+              </select>
             </div>
             {formError && (
               <div className="mb-3 text-sm px-3 py-2 rounded-lg inline-block" style={{ background: 'var(--error-bg)', color: 'var(--brick)' }}>
@@ -475,7 +484,7 @@ export default function AdminPage() {
               className="font-mono text-xs uppercase tracking-widest px-4 py-2.5 rounded-xl cursor-pointer font-semibold disabled:opacity-60"
               style={{ background: 'var(--pine)', color: 'var(--paper)' }}
             >
-              {creating ? 'Qo\'shilmoqda…' : '+ Admin qo\'shish'}
+              {creating ? 'Qo\'shilmoqda…' : '+ Qo\'shish'}
             </button>
           </form>
         )}
@@ -512,10 +521,10 @@ export default function AdminPage() {
               >
                 {ROLE_LABEL[u.role] || u.role}
               </span>
-              {isSuperAdmin && u.role === 'admin' && (
+              {u.id !== user?.id && u.role !== 'superadmin' && (isSuperAdmin || u.role === 'user') && (
                 <button
                   onClick={() => onDelete(u)}
-                  title="Adminlikdan o'chirish"
+                  title="O'chirish"
                   className="w-8 h-8 rounded-lg cursor-pointer shrink-0 flex items-center justify-center"
                   style={{ color: 'var(--brick)' }}
                 >

@@ -320,6 +320,8 @@ export const api = {
     return { perLang, totals, userCount: userCount || 0, bookCount: bookCount || 0 };
   },
 
+  createUser: (payload) => callFunction('admin', { action: 'create-user', ...payload }),
+  deleteUser: (id) => callFunction('admin', { action: 'delete-user', id }),
   createAdmin: (payload) => callFunction('admin', { action: 'create-admin', ...payload }),
   deleteAdmin: (id) => callFunction('admin', { action: 'delete-admin', id }),
 

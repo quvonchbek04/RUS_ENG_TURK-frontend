@@ -1,0 +1,16 @@
+# Netlify sozlamasi (repo ildizida). Netlify'da qo'shimcha hech narsa kiritish shart emas,
+# faqat Site settings → Environment variables ga 2 ta o'zgaruvchini qo'shing:
+#   VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
+[build]
+  base    = "frontend"
+  command = "npm ci && npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# React Router (SPA): barcha yo'llar index.html ga yo'naltiriladi
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200

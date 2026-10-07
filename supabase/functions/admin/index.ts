@@ -4,7 +4,7 @@
 // talab qilgani uchun klientdan to'g'ridan-to'g'ri emas, shu Edge Function
 // orqali (service-role kalit bilan) bajariladi.
 //
-// So'rov formati: POST { action: "create-admin" | "delete-admin" |
+// So'rov formati: POST { action: "create-user" | "delete-user" | "create-admin" | "delete-admin" |
 //                          "get-ai-settings" | "save-ai-settings" |
 //                          "list-api-keys" | "add-api-key" | "toggle-api-key" |
 //                          "delete-api-key", ...payload }
@@ -78,6 +78,53 @@ Deno.serve(async (req) => {
       await admin.from("profiles").update({ role: "admin" }).eq("id", created.user!.id);
       const { data: prof } = await admin.from("profiles").select("*").eq("id", created.user!.id).single();
       return json({ user: publicUser(prof!) });
+    }
+
+    // ---------- Yangi foydalanuvchi yoki admin yaratish ----------
+    // superadmin: 'user' yoki 'admin' yarata oladi; admin: faqat 'user' yarata oladi.
+    if (action === "create-user") {
+      if (!["admin", "superadmin"].includes(callerRole)) return json({ error: "Bu amal uchun ruxsatingiz yo'q" }, 403);
+      const role = body.role === "admin" ? "admin" : "user";
+      if (role === "admin" && callerRole !== "superadmin") {
+        return json({ error: "Admin yaratish faqat super admin uchun" }, 403);
+      }
+      const username = String(body.username || "").trim();
+      const password = String(body.password || "");
+      const displayName = body.displayName ? String(body.displayName) : username;
+      if (username.length < 3 || password.length < 4) {
+        return json({ error: "Foydalanuvchi nomi kamida 3, parol kamida 4 belgidan iborat bo'lishi kerak" }, 400);
+      }
+      const email = `${username.toLowerCase()}@til-sayohati.app`;
+      const { data: created, error } = await admin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: { username, display_name: displayName },
+      });
+      if (error) {
+        const msg = /already|registered|exists/i.test(error.message) ? "Bu foydalanuvchi nomi band" : error.message;
+        return json({ error: msg }, 400);
+      }
+      if (role !== "user") await admin.from("profiles").update({ role }).eq("id", created.user!.id);
+      const { data: prof } = await admin.from("profiles").select("*").eq("id", created.user!.id).single();
+      return json({ user: publicUser(prof!) });
+    }
+
+    // ---------- Foydalanuvchi/adminni o'chirish ----------
+    // superadmin: user va adminni o'chiradi; admin: faqat userni. Superadmin hech qachon o'chmaydi.
+    if (action === "delete-user") {
+      if (!["admin", "superadmin"].includes(callerRole)) return json({ error: "Bu amal uchun ruxsatingiz yo'q" }, 403);
+      const targetId = String(body.id || "");
+      if (targetId === user.id) return json({ error: "O'zingizni o'chira olmaysiz" }, 400);
+      const { data: target } = await admin.from("profiles").select("role").eq("id", targetId).single();
+      if (!target) return json({ error: "Foydalanuvchi topilmadi" }, 404);
+      if (target.role === "superadmin") return json({ error: "Super adminni o'chirib bo'lmaydi" }, 400);
+      if (target.role === "admin" && callerRole !== "superadmin") {
+        return json({ error: "Adminni faqat super admin o'chira oladi" }, 403);
+      }
+      const { error } = await admin.auth.admin.deleteUser(targetId);
+      if (error) return json({ error: error.message }, 400);
+      return json({ ok: true });
     }
 
     // ---------- Adminni o'chirish (faqat superadmin) ----------
