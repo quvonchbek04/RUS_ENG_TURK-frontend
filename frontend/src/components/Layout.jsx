@@ -2,7 +2,7 @@ import Sidebar from './Sidebar.jsx';
 
 export default function Layout({ children }) {
   return (
-    <div className="min-h-screen flex app-bg">
+    <div className="min-h-screen flex flex-col lg:flex-row app-bg">
       <Sidebar />
       <div className="flex-1 min-w-0 flex flex-col">
         <main className="flex-1">{children}</main>

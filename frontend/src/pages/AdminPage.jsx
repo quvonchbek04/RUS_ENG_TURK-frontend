@@ -383,7 +383,7 @@ export default function AdminPage() {
                       value={keyForm.label}
                       onChange={(e) => setKeyForm((f) => ({ ...f, label: e.target.value }))}
                       placeholder="Nomi (ixtiyoriy, masalan: 2-kalit)"
-                      className="w-40 px-3 py-2.5 rounded-lg border outline-none font-mono text-xs"
+                      className="w-full sm:w-40 px-3 py-2.5 rounded-lg border outline-none font-mono text-xs"
                       style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
                     />
                     <input
@@ -393,7 +393,7 @@ export default function AdminPage() {
                       type="text"
                       autoComplete="off"
                       required
-                      className="flex-1 min-w-[240px] px-3 py-2.5 rounded-lg border outline-none font-mono text-xs"
+                      className="flex-1 min-w-0 w-full sm:min-w-[240px] px-3 py-2.5 rounded-lg border outline-none font-mono text-xs"
                       style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
                     />
                     <button

@@ -183,3 +183,20 @@ main { animation: rise-in 0.35s ease both; }
 .tts-word { transition: background-color 0.15s ease, color 0.15s ease; border-radius: 4px; padding: 0 1px; }
 .tts-word.read { color: var(--ink-soft); }
 .tts-word.current { background: var(--gold-soft); color: var(--ink); font-weight: 600; }
+
+/* ───────── Telefon uchun moslashtirish ───────── */
+html { -webkit-text-size-adjust: 100%; }
+body { overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+img, svg, video { max-width: 100%; }
+
+@media (max-width: 640px) {
+  /* iOS inputga fokus berilganda sahifani kattalashtirib yubormasligi uchun */
+  input, textarea, select { font-size: 16px !important; }
+  /* barmoq uchun yetarli bosish maydoni */
+  button, a.rounded-xl, a.rounded-2xl { min-height: 40px; }
+  main { padding-bottom: env(safe-area-inset-bottom); }
+  .hero-card { border-radius: 22px; }
+  table { font-size: 12px; }
+  pre, code { white-space: pre-wrap; word-break: break-word; }
+  h1 { overflow-wrap: anywhere; }
+}

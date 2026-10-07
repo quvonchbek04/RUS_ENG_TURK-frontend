@@ -100,13 +100,13 @@ export default function Dashboard() {
 
 function StatChip({ label, value, icon }) {
   return (
-    <div className="stat-tile px-4 py-4 flex items-center gap-3">
+    <div className="stat-tile px-3 sm:px-4 py-3 sm:py-4 flex items-center gap-3">
       <span className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0" style={{ background: 'var(--gold-soft)' }}>
         {icon}
       </span>
       <div className="min-w-0">
         <div className="font-display text-2xl font-semibold leading-none" style={{ color: 'var(--pine)' }}>{value}</div>
-        <div className="font-mono text-[10px] uppercase tracking-widest mt-1.5 truncate" style={{ color: 'var(--ink-soft)' }}>{label}</div>
+        <div className="font-mono text-[10px] uppercase tracking-widest mt-1.5 leading-snug" style={{ color: 'var(--ink-soft)' }}>{label}</div>
       </div>
     </div>
   );

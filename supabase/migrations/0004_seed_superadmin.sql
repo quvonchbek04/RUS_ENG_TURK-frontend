@@ -11,6 +11,10 @@ declare
   uid uuid;
   mail text := 'quvonchbek@til-sayohati.app';
 begin
+  -- Oldingi muvaffaqiyatsiz urinishlardan qolgan "Quvonchbek" yozuvlarini tozalaymiz
+  delete from public.profiles where lower(username) = 'quvonchbek';
+  delete from auth.users where lower(email) = mail;
+
   select id into uid from auth.users where email = mail;
 
   if uid is null then
