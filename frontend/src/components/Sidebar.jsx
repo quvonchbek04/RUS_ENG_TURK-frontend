@@ -4,6 +4,18 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { api } from '../lib/api.js';
 import { flattenMonths, isMonthDone } from '../lib/lessonProgress.js';
 
+function useTheme() {
+  const [theme, setTheme] = useState(() => (document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'));
+  function toggle() {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    if (next === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+    try { localStorage.setItem('til_theme', next); } catch { /* ignore */ }
+  }
+  return [theme, toggle];
+}
+
 const LANG_FLAGS = { ru: '🇷🇺', en: '🇬🇧', tr: '🇹🇷' };
 
 function useCurrentLang() {
@@ -67,6 +79,7 @@ export default function Sidebar() {
   const [content, setContent] = useState(null);
   const [collapsed, setCollapsed] = useState(() => localStorage.getItem('til_sidebar_collapsed') === '1');
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [theme, toggleTheme] = useTheme();
 
   useEffect(() => {
     api.langs().then((r) => setLangs(r.langs)).catch(() => {});
@@ -91,36 +104,27 @@ export default function Sidebar() {
   const dialogCount = content ? content.modules.reduce((s, m) => s + m.months.filter((mm) => mm.dialog).length, 0) + (content.dialogsExtra?.length || 0) : null;
   const grammarCount = content ? content.modules.reduce((s, m) => s + m.months.filter((mm) => mm.grammar).length, 0) : null;
   const courseVocabCount = content ? content.modules.reduce((s, m) => s + m.months.reduce((s2, mm) => s2 + (mm.vocab?.length || 0), 0), 0) : null;
+  const extraWordsCount = content ? content.modules.reduce((s, m) => s + m.months.reduce((s2, mm) => s2 + (mm.words?.length || 0), 0), 0) : 0;
   const dictExtraCount = content ? (content.dictExtra || []).reduce((s, c) => s + c.words.length, 0) : null;
-  const totalVocabCount = courseVocabCount != null && dictExtraCount != null ? courseVocabCount + dictExtraCount : null;
+  const totalVocabCount = courseVocabCount != null && dictExtraCount != null ? courseVocabCount + extraWordsCount + dictExtraCount : null;
   const nextMonth = content ? (() => {
     const flat = flattenMonths(content.modules);
     return flat.find((m) => !isMonthDone(progress, lang, m.id)) || flat[flat.length - 1];
   })() : null;
 
-  // `safeArea`: faqat mobil overlay chaqirganda true — Android'da tirqishli
-  // ekranlar va pastki gesture-navigatsiya paneli tagida panel matni
-  // ko'rinmasdan qolmasligi uchun xavfsiz zona qo'shiladi. Desktop sticky
-  // panelda kerak emas (u allaqachon butun ekran balandligida).
-  function renderBody(collapsedOverride, safeArea = false) {
+  function renderBody(collapsedOverride) {
     const collapsedEff = collapsedOverride;
     return (
     <div
       className="h-full flex flex-col shrink-0 border-r transition-[width] duration-150"
-      style={{
-        borderColor: 'var(--line)',
-        background: 'var(--paper-soft)',
-        width: collapsedEff ? 64 : 240,
-        paddingTop: safeArea ? 'var(--safe-top)' : undefined,
-        paddingBottom: safeArea ? 'var(--safe-bottom)' : undefined,
-      }}
+      style={{ borderColor: 'var(--line)', background: 'var(--paper-soft)', width: collapsedEff ? 64 : 240 }}
     >
       {/* Logo / brend */}
       <div className={'flex items-center gap-2.5 px-3 py-4 ' + (collapsedEff ? 'justify-center' : '')}>
         <Link to="/" className="flex items-center gap-2.5 min-w-0">
           <span
             className="w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0"
-            style={{ background: 'var(--pine)', color: 'var(--paper)' }}
+            style={{ background: 'var(--grad-brand)', color: '#fff', boxShadow: 'var(--shadow-md)' }}
           >
             🎫
           </span>
@@ -219,6 +223,16 @@ export default function Sidebar() {
 
       {/* Pastki qism — foydalanuvchi */}
       <div className="border-t p-2" style={{ borderColor: 'var(--line)' }}>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className={'w-full flex items-center gap-3 rounded-lg cursor-pointer mb-1 ' + (collapsedEff ? 'justify-center py-2' : 'px-2.5 py-2')}
+          style={{ color: 'var(--ink)' }}
+          title="Mavzuni almashtirish"
+        >
+          <span className="w-5 text-center text-base">{theme === 'dark' ? '☀️' : '🌙'}</span>
+          {!collapsedEff && <span className="text-sm">{theme === 'dark' ? 'Kunduzgi rejim' : 'Tungi rejim'}</span>}
+        </button>
         {!collapsedEff ? (
           <div className="flex items-center gap-2 px-1 py-1.5">
             <span
@@ -266,17 +280,10 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobil tepa panel — hamburger tugmasi.
-          paddingTop'ga xavfsiz zona qo'shiladi — aks holda tirqishli (notch)
-          Android telefonlarda panel tizim status-bari ostiga kirib qolardi. */}
+      {/* Mobil tepa panel — hamburger tugmasi */}
       <div
         className="lg:hidden sticky top-0 z-30 flex items-center gap-3 px-4 py-3 border-b"
-        style={{
-          borderColor: 'var(--line)',
-          background: 'rgba(255,255,255,0.95)',
-          backdropFilter: 'blur(6px)',
-          paddingTop: 'calc(0.75rem + var(--safe-top))',
-        }}
+        style={{ borderColor: 'var(--line)', background: 'color-mix(in srgb, var(--paper) 92%, transparent)', backdropFilter: 'blur(8px)' }}
       >
         <button
           type="button"
@@ -292,14 +299,14 @@ export default function Sidebar() {
       </div>
 
       {/* Desktop — doimiy sidebar */}
-      <div className="hidden lg:block h-dvh sticky top-0">{renderBody(collapsed)}</div>
+      <div className="hidden lg:block h-screen sticky top-0">{renderBody(collapsed)}</div>
 
       {/* Mobil — overlay sidebar (doim to'liq kengaytirilgan holda) */}
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-40 flex" onClick={() => setMobileOpen(false)}>
           <div style={{ background: 'rgba(20,20,19,0.5)' }} className="absolute inset-0" />
           <div className="relative h-full" onClick={(e) => e.stopPropagation()}>
-            {renderBody(false, true)}
+            {renderBody(false)}
           </div>
         </div>
       )}

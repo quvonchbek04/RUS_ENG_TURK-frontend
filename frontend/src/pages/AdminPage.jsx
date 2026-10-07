@@ -383,7 +383,7 @@ export default function AdminPage() {
                       value={keyForm.label}
                       onChange={(e) => setKeyForm((f) => ({ ...f, label: e.target.value }))}
                       placeholder="Nomi (ixtiyoriy, masalan: 2-kalit)"
-                      className="w-full sm:w-40 px-3 py-2.5 rounded-lg border outline-none font-mono text-xs"
+                      className="w-40 px-3 py-2.5 rounded-lg border outline-none font-mono text-xs"
                       style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
                     />
                     <input
@@ -444,22 +444,15 @@ export default function AdminPage() {
                 onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))}
                 placeholder="Login"
                 required
-                minLength={3}
-                autoComplete="off"
-                autoCapitalize="none"
-                autoCorrect="off"
-                spellCheck={false}
                 className="px-3 py-2.5 rounded-lg border outline-none"
                 style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
               />
               <input
                 value={form.password}
                 onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                placeholder="Parol (kamida 6 belgi)"
+                placeholder="Parol"
                 type="password"
                 required
-                minLength={6}
-                autoComplete="new-password"
                 className="px-3 py-2.5 rounded-lg border outline-none"
                 style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
               />
@@ -493,7 +486,7 @@ export default function AdminPage() {
           {users?.map((u) => (
             <div
               key={u.id}
-              className="rounded-xl border p-4 flex flex-wrap items-center gap-3 sm:gap-4"
+              className="rounded-xl border p-4 flex items-center gap-4"
               style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}
             >
               <span
@@ -502,7 +495,7 @@ export default function AdminPage() {
               >
                 {(u.displayName || u.username).slice(0, 1).toUpperCase()}
               </span>
-              <div className="flex-1 min-w-[140px]">
+              <div className="flex-1 min-w-0">
                 <div className="font-display font-semibold truncate" style={{ color: 'var(--ink)' }}>
                   {u.displayName || u.username}
                 </div>

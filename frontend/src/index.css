@@ -1,88 +1,139 @@
 @import "tailwindcss";
 
+/* ───────── Dizayn tizimi: "Til sayohati" ─────────
+   Asosiy rang: chuqur zumrad (pine), aksent: iliq oltin (gold).
+   Tungi rejim: <html data-theme="dark"> */
 :root {
-  --paper: #ffffff;
-  --paper-soft: #f4f4f3;
+  --paper: #f7f5ef;
+  --paper-soft: #efece3;
   --panel: #ffffff;
-  --ink: #141413;
-  --ink-soft: #6b6b68;
-  --pine: #141413;
-  --pine-bright: #2b2b28;
-  --gold: #d97757;
-  --gold-soft: #fbe4da;
+  --ink: #17211d;
+  --ink-soft: #5f6b66;
+  --pine: #0f5f4d;
+  --pine-bright: #178a6e;
+  --gold: #d9822b;
+  --gold-soft: #fbead6;
   --brick: #c0392b;
-  --line: #e5e5e2;
-  --success-bg: #eaf6ec;
-  --error-bg: #fbeae8;
+  --line: #e3dfd2;
+  --success-bg: #e4f4ea;
+  --error-bg: #fbe9e6;
+
+  --shadow-sm: 0 1px 2px rgba(23, 33, 29, 0.06), 0 1px 3px rgba(23, 33, 29, 0.05);
+  --shadow-md: 0 6px 18px -6px rgba(23, 33, 29, 0.16), 0 2px 6px rgba(23, 33, 29, 0.05);
+  --shadow-lg: 0 18px 40px -12px rgba(15, 95, 77, 0.28);
+  --grad-brand: linear-gradient(135deg, #0f5f4d 0%, #178a6e 55%, #2fb58d 100%);
+  --grad-warm: linear-gradient(135deg, #d9822b 0%, #f0a850 100%);
+  --hero-glow: radial-gradient(60% 80% at 85% 0%, rgba(217, 130, 43, 0.22), transparent 60%),
+    radial-gradient(50% 70% at 0% 100%, rgba(23, 138, 110, 0.20), transparent 60%);
+  color-scheme: light;
 }
 
-html {
-  scroll-behavior: smooth;
-  /* Android'da matn hajmini foydalanuvchi tizim sozlamasiga ko'ra o'zgartirganda
-     landshaft rejimga o'tishda avtomatik kattalashtirishning oldini oladi. */
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
+:root[data-theme='dark'] {
+  --paper: #0d1512;
+  --paper-soft: #131e1a;
+  --panel: #17231f;
+  --ink: #e9f1ed;
+  --ink-soft: #97a7a0;
+  --pine: #3ed1a3;
+  --pine-bright: #6fe3bd;
+  --gold: #f0a24a;
+  --gold-soft: #3a2a14;
+  --brick: #ff7a68;
+  --line: #263630;
+  --success-bg: #12301f;
+  --error-bg: #3a1a16;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 20px -8px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 18px 40px -12px rgba(62, 209, 163, 0.25);
+  --grad-brand: linear-gradient(135deg, #0f5f4d 0%, #178a6e 60%, #2fb58d 100%);
+  --hero-glow: radial-gradient(60% 80% at 85% 0%, rgba(240, 162, 74, 0.16), transparent 60%),
+    radial-gradient(50% 70% at 0% 100%, rgba(62, 209, 163, 0.14), transparent 60%);
+  color-scheme: dark;
 }
 
-html, body {
-  /* Layout'dagi biror joy tasodifan konteynerdan kengroq bo'lib qolsa (masalan
-     uzun URL yoki jadval), butun sahifa YONGA emas, faqat o'sha qism ichida
-     gorizontal skrolllansin — aks holda telefonda butun sahifa yon tomonga
-     "suzib" ketishi mumkin edi. */
-  overflow-x: hidden;
-  width: 100%;
-}
+html { scroll-behavior: smooth; }
 
 body {
   background-color: var(--paper);
   color: var(--ink);
   font-family: 'Manrope', ui-sans-serif, system-ui, sans-serif;
-  /* Android Chrome'da tugma/havolani bosganda chiqadigan kulrang "yaltiroq"
-     dog'ni olib tashlaydi — o'rniga har bir elementning o'z hover/active
-     stilidan foydalaniladi. */
-  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-/* Barcha bosiladigan elementlar: ikki marta bosishda kattalashtirish (double-tap
-   zoom) kechikishini yo'qotadi — Android'da tugmalar darhol javob beradi. */
-a, button, [role='button'], input, select, textarea, summary {
-  touch-action: manipulation;
+.font-display { font-family: 'Fraunces', ui-serif, Georgia, serif; font-optical-sizing: auto; }
+.font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+/* Sahifa foni: yengil dekorativ nuqta to'ri */
+.app-bg {
+  background-color: var(--paper);
+  background-image: radial-gradient(var(--line) 1px, transparent 1px);
+  background-size: 22px 22px;
+  background-position: 0 0;
 }
 
-/* Kiritish maydonlari kamida 16px shrift bilan — Android'ning o'zi bunda
-   avtomatik kattalashtirmaydi, lekin ba'zi WebView'lar (masalan ichki
-   ilova brauzerlari) buni hurmat qiladi, shu bilan birga o'qish osonlashadi. */
-input, select, textarea {
-  font-size: 16px;
+/* Barcha "karta"lar uchun umumiy ko'rinish: yumshoq soya, silliq ko'tarilish */
+.rounded-xl.border,
+.rounded-2xl.border {
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
-@media (min-width: 640px) {
-  input, select, textarea {
-    font-size: inherit;
-  }
-}
-
-/* Android/iOS'da tirqishli ekranlar va tizim navigatsiya paneli ostida
-   kontent "kesilib" qolmasligi uchun xavfsiz zona (safe area) o'zgaruvchilari. */
-:root {
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-left: env(safe-area-inset-left, 0px);
-  --safe-right: env(safe-area-inset-right, 0px);
+a.rounded-xl.border:hover,
+a.rounded-2xl.border:hover,
+.lesson-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--pine-bright);
 }
 
-.font-display {
-  font-family: 'Fraunces', ui-serif, Georgia, serif;
-  font-optical-sizing: auto;
+/* Havolalar/tugmalar uchun fokus halqasi */
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+input, textarea { transition: border-color 0.2s, box-shadow 0.2s; }
+input:focus, textarea:focus {
+  border-color: var(--pine-bright) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pine-bright) 22%, transparent);
 }
 
-.font-mono {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+/* Gradient tugma va yorliqlar */
+.btn-brand {
+  background: var(--grad-brand);
+  color: #fff;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.15s ease, filter 0.2s ease;
+}
+.btn-brand:hover { transform: translateY(-1px); filter: brightness(1.06); }
+
+.hero-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--grad-brand);
+  color: #fff;
+  box-shadow: var(--shadow-lg);
+}
+.hero-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 90% 10%, rgba(255, 255, 255, 0.18), transparent 40%),
+    radial-gradient(circle at 5% 100%, rgba(240, 168, 80, 0.35), transparent 45%);
+  pointer-events: none;
+}
+.hero-card > * { position: relative; }
+
+.stat-tile {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--shadow-sm);
 }
 
 /* Perforated ticket edge */
-.ticket-edge {
-  position: relative;
-}
+.ticket-edge { position: relative; }
 .ticket-edge::before,
 .ticket-edge::after {
   content: '';
@@ -93,65 +144,42 @@ input, select, textarea {
   border-radius: 999px;
   top: 50%;
   transform: translateY(-50%);
+  box-shadow: inset 0 0 0 1px var(--line);
 }
 .ticket-edge::before { left: -9px; }
 .ticket-edge::after { right: -9px; }
 
 .dash-rail {
-  background-image: repeating-linear-gradient(
-    to bottom,
-    var(--line) 0,
-    var(--line) 8px,
-    transparent 8px,
-    transparent 16px
-  );
+  background-image: repeating-linear-gradient(to bottom, var(--line) 0, var(--line) 8px, transparent 8px, transparent 16px);
   width: 2px;
 }
-
 .dash-rail-h {
-  background-image: repeating-linear-gradient(
-    to right,
-    var(--line) 0,
-    var(--line) 8px,
-    transparent 8px,
-    transparent 16px
-  );
+  background-image: repeating-linear-gradient(to right, var(--line) 0, var(--line) 8px, transparent 8px, transparent 16px);
   height: 2px;
 }
+
+/* Sahifa ochilganda yumshoq paydo bo'lish */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+main { animation: rise-in 0.35s ease both; }
 
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
 
-::selection {
-  background: var(--gold-soft);
-  color: var(--ink);
-}
+::selection { background: var(--gold-soft); color: var(--ink); }
 
 * { scrollbar-width: thin; scrollbar-color: var(--gold) var(--paper-soft); }
-
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: var(--paper-soft); border-radius: 999px; }
 ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 999px; border: 2px solid var(--paper-soft); }
 ::-webkit-scrollbar-thumb:hover { background: var(--pine); }
 
-/* Ichki panel/oynalarda scroll aniq ko'rinishi uchun (scrollbar joyi oldindan band qilinadi, tarkib "sakramaydi") */
-.scroll-panel {
-  overflow-y: auto;
-  scrollbar-gutter: stable;
-}
+.scroll-panel { overflow-y: auto; scrollbar-gutter: stable; }
 
 /* TTS o'quvchi — so'z bo'yicha ajratib ko'rsatish */
-.tts-word {
-  transition: background-color 0.15s ease, color 0.15s ease;
-  border-radius: 4px;
-  padding: 0 1px;
-}
-.tts-word.read {
-  color: var(--ink-soft);
-}
-.tts-word.current {
-  background: var(--gold-soft);
-  color: var(--ink);
-  font-weight: 600;
-}
+.tts-word { transition: background-color 0.15s ease, color 0.15s ease; border-radius: 4px; padding: 0 1px; }
+.tts-word.read { color: var(--ink-soft); }
+.tts-word.current { background: var(--gold-soft); color: var(--ink); font-weight: 600; }

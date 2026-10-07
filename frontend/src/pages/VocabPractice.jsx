@@ -39,7 +39,9 @@ export default function VocabPractice() {
     if (!month) return;
     // Bir xil so'z takror kelsa, faqat birinchi uchrashuvi qoldiriladi.
     const seen = new Set();
-    const pool = (month.vocab || []).filter(([word]) => {
+    // Asosiy lug'at + kengaytirilgan so'zlardan (Word fayldan) tasodifiy 25 tasi
+    const extra = shuffle(month.words || []).slice(0, 25).map((w) => [w[0], '', w[1]]);
+    const pool = [...(month.vocab || []), ...extra].filter(([word]) => {
       const key = word.trim().toLowerCase();
       if (seen.has(key)) return false;
       seen.add(key);

@@ -1,0 +1,163 @@
+# -*- coding: utf-8 -*-
+import json, os
+from extras_part3 import L, E
+
+E['m10'] = L('Discussing a text',
+ [('A', 'What is the main idea of this text?', "Bu matnning asosiy g'oyasi nima?"),
+  ('B', 'The author argues that technology changes how we think.', "Muallif texnologiya fikrlash tarzimizni o'zgartiradi, deb ta'kidlaydi."),
+  ('A', 'Which word could replace "important"?', "'Important' o'rniga qaysi so'z ishlatilishi mumkin?"),
+  ('B', '"Significant" or "essential", depending on the context.', "Kontekstga qarab 'significant' yoki 'essential'."),
+  ('A', 'Is "huge" a synonym of "enormous"?', "'Huge' — 'enormous' ning sinonimimi?"),
+  ('B', 'Yes, but "enormous" sounds a bit more formal.', "Ha, lekin 'enormous' biroz rasmiyroq eshitiladi."),
+  ('A', 'I see. Style really depends on word choice.', "Tushundim. Uslub so'z tanloviga bog'liq ekan."),
+  ('B', 'Exactly. That is why a wide vocabulary matters.', "Aynan. Shuning uchun boy lug'at muhim.")],
+ [('Sinonimlar va ularning ottenkasi', "Sinonimlar ma'nosi yaqin, lekin uslubi va kuchi har xil: big — large — enormous; say — state — declare. Rasmiy matnda kuchliroq, aniqroq so'zlar tanlanadi.", [("The company faces a significant challenge.", "Kompaniya jiddiy qiyinchilikka duch kelmoqda."), ("She declared her intention to resign.", "U iste'foga chiqish niyatini e'lon qildi.")]),
+  ('Matn bilan ishlash', "Matnni o'qiganda: 1) asosiy g'oyani toping (main idea), 2) dalillarni belgilang (supporting details), 3) noma'lum so'zni kontekstdan taxmin qiling.", [("The main idea is that exercise improves memory.", "Asosiy g'oya shuki, mashq xotirani yaxshilaydi."), ("This detail supports the author's claim.", "Bu tafsilot muallifning da'vosini quvvatlaydi.")])],
+ ('Why vocabulary matters', "Researchers say that people with a rich vocabulary understand texts better and express their ideas more clearly. To expand your vocabulary, read widely, keep a notebook of new words and use them in your own sentences. Memorising lists alone is not enough; context is the key.", "Tadqiqotchilarning aytishicha, boy lug'atga ega odamlar matnlarni yaxshiroq tushunadi va fikrini aniqroq ifodalaydi. Lug'atni boyitish uchun ko'p o'qing, yangi so'zlar daftarini yuriting va ularni o'z gaplaringizda ishlating. Faqat ro'yxatni yodlash yetarli emas; kontekst — asosiy kalit.",
+  [("Who understands texts better?", "People with a rich vocabulary."), ("Name one way to expand vocabulary.", "Read widely / keep a notebook / use words in sentences."), ("What is the key?", "Context.")]))
+
+E['m11'] = L('A school debate',
+ [('A', 'Today\'s topic: should students wear school uniforms?', "Bugungi mavzu: o'quvchilar maktab formasini kiyishi kerakmi?"),
+  ('B', 'I am in favour. Uniforms make everyone equal.', "Men tarafdorman. Forma hammani tenglashtiradi."),
+  ('A', 'On the other hand, they limit self-expression.', "Boshqa tomondan, ular o'zini ifodalashni cheklaydi."),
+  ('B', 'That is a fair point; however, they save time and money.', "Bu o'rinli fikr; biroq ular vaqt va pulni tejaydi."),
+  ('A', 'I would argue that students should have a choice.', "Men o'quvchilarda tanlov bo'lishi kerak, deb bahslashaman."),
+  ('B', 'I partly agree, but a choice can create competition.', "Qisman qo'shilaman, lekin tanlov raqobat keltirib chiqarishi mumkin."),
+  ('A', 'In conclusion, both sides have strong arguments.', "Xulosa qilib aytganda, ikkala tomonning ham kuchli dalillari bor."),
+  ('B', 'Agreed. Let us vote.', "Kelishdik. Ovoz beraylik.")],
+ [('Bahs tuzilmasi', "Kirish: Today I will talk about... Dalil: Firstly, ... Secondly, ... Qarshi fikr: On the other hand, ... Xulosa: In conclusion, ... Har bir dalil misol bilan quvvatlanadi.", [("Firstly, it saves time. Secondly, it is cheap.", "Birinchidan, vaqtni tejaydi. Ikkinchidan, arzon."), ("In conclusion, I strongly support this idea.", "Xulosa qilib, bu g'oyani qat'iy qo'llab-quvvatlayman.")]),
+  ('Rozilik va e\'tiroz', "To'liq rozilik: I totally agree. Qisman: I partly agree, but... E'tiroz: I am afraid I disagree because... Hurmat bilan e'tiroz qiling, shaxsga emas, fikrga qarshi chiqing.", [("I see your point, but I disagree.", "Fikringizni tushunaman, lekin qo'shilmayman."), ("That is exactly what I think.", "Men ham aynan shunday o'ylayman.")])],
+ ('Should homework be banned?', "Some countries are thinking about banning homework. Supporters say that children need time to rest and play. Opponents argue that homework teaches discipline and helps students remember lessons. Perhaps a balanced approach is best: short, meaningful tasks instead of long, boring ones.", "Ba'zi mamlakatlar uy vazifasini taqiqlashni o'ylamoqda. Tarafdorlar bolalarga dam olish va o'yin uchun vaqt kerak, deydi. Qarshilar uy vazifasi intizomni o'rgatadi va darsni eslab qolishga yordam beradi, deb ta'kidlaydi. Ehtimol, muvozanatli yondashuv eng yaxshisi: uzun, zerikarli vazifalar o'rniga qisqa, mazmunli topshiriqlar.",
+  [("What do supporters of the ban say?", "Children need time to rest and play."), ("What do opponents say?", "Homework teaches discipline."), ("What is the suggested solution?", "A balanced approach with short, meaningful tasks.")]))
+
+E['m12'] = L('A job interview',
+ [('HR', 'Tell me a little about yourself.', "O'zingiz haqingizda ozgina gapirib bering."),
+  ('Candidate', 'I graduated last year and I have two years of experience.', "Men o'tgan yili bitirdim va ikki yillik tajribam bor."),
+  ('HR', 'What are your strengths?', "Kuchli tomonlaringiz qanday?"),
+  ('Candidate', 'I am organised, responsible and a fast learner.', "Men tartibli, mas'uliyatli va tez o'rganuvchiman."),
+  ('HR', 'Why do you want to work for us?', "Nega bizning kompaniyada ishlamoqchisiz?"),
+  ('Candidate', 'Because your company values growth and teamwork.', "Chunki kompaniyangiz o'sish va jamoaviy ishni qadrlaydi."),
+  ('HR', 'Do you have any questions for us?', "Bizga savollaringiz bormi?"),
+  ('Candidate', 'Yes. What does a typical day look like in this role?', "Ha. Bu lavozimda odatiy kun qanday o'tadi?")],
+ [('Taqdimot tuzilishi', "Yaxshi taqdimot: 1) Greeting va mavzu, 2) Asosiy 2–3 nuqta, 3) Xulosa, 4) Savollar uchun taklif. Iboralar: Let me start by..., Moving on to..., To sum up..., Any questions?", [("Let me start by introducing our project.", "Loyihamizni tanishtirishdan boshlay."), ("To sum up, we achieved all our goals.", "Xulosa qilsak, barcha maqsadlarimizga erishdik.")]),
+  ('Intervyu savollariga javob', "STAR usuli: Situation (vaziyat), Task (vazifa), Action (harakat), Result (natija). Javoblaringiz aniq va misolli bo'lsin.", [("I led a team of five and we finished two weeks early.", "Men besh kishilik jamoani boshqardim va ikki hafta erta tugatdik."), ("My greatest strength is attention to detail.", "Eng kuchli tomonim — mayda-chuydaga e'tibor.")])],
+ ('Preparing for an interview', "Before an interview, learn about the company and practise common questions. Dress neatly and arrive ten minutes early. During the conversation, make eye contact, listen carefully and give clear examples. After the interview, send a short thank-you message.", "Intervyudan oldin kompaniya haqida bilib oling va odatiy savollarni mashq qiling. Chiroyli kiyining va o'n daqiqa oldin keling. Suhbat davomida ko'zga qarang, diqqat bilan tinglang va aniq misollar keltiring. Intervyudan so'ng qisqa minnatdorchilik xabarini yuboring.",
+  [("When should you arrive?", "Ten minutes early."), ("What should you do during the conversation?", "Make eye contact, listen, give examples."), ("What should you send afterwards?", "A thank-you message.")]))
+
+E['m13'] = L('Calling the clinic',
+ [('Patient', 'Hello, I would like to see a doctor.', "Salom, shifokorga ko'rinmoqchiman."),
+  ('Nurse', 'What is the problem?', "Nima muammo?"),
+  ('Patient', 'I have had a headache since yesterday.', "Kechadan beri boshim og'riyapti."),
+  ('Nurse', 'Have you taken any medicine?', "Biror dori ichdingizmi?"),
+  ('Patient', 'Yes, I have taken two tablets, but it has not helped.', "Ha, ikki dona tabletka ichdim, lekin yordam bermadi."),
+  ('Nurse', 'The doctor is free at four o\'clock.', "Shifokor soat to'rtda bo'sh."),
+  ('Patient', 'That is fine. Thank you.', "Yaxshi. Rahmat."),
+  ('Nurse', 'Please bring your ID card.', "Iltimos, shaxsiy hujjatingizni olib keling.")],
+ [('Present Perfect: have/has + V3', "Natijasi hozirga ta'sir qiladigan ish: I have lost my keys (hozir yo'q). for + davom, since + boshlanish payti: for two days, since Monday.", [("She has lived here for five years.", "U bu yerda besh yildan beri yashaydi."), ("I have not eaten since morning.", "Men ertalabdan beri hech narsa yemadim.")]),
+  ('Ever, never, already, yet', "ever (hech) — savolda, never (hech qachon), already (allaqachon) — darakda, yet (hali) — inkor va savolda gap oxirida.", [("Have you ever been to a hospital?", "Siz hech kasalxonada bo'lganmisiz?"), ("I have not finished yet.", "Men hali tugatmadim.")])],
+ ('Stay healthy', "Doctors say that a healthy life is simple. Sleep at least seven hours, eat vegetables and fruit, drink enough water and walk every day. Do not forget to visit the doctor once a year, even if you feel fine. Prevention is better than cure.", "Shifokorlar sog'lom hayot oddiy, deydi. Kamida yetti soat uxlang, sabzavot va meva iste'mol qiling, yetarli suv iching va har kuni sayr qiling. O'zingizni yaxshi his qilsangiz ham, yilda bir marta shifokorga ko'rinishni unutmang. Oldini olish davolashdan yaxshi.",
+  [("How many hours should we sleep?", "At least seven."), ("How often should we visit the doctor?", "Once a year."), ("What is better than cure?", "Prevention.")]))
+
+E['m14'] = L('Checking in at the airport',
+ [('Agent', 'Good morning. May I see your passport and ticket?', "Xayrli tong. Pasport va chiptangizni ko'rsam bo'ladimi?"),
+  ('Traveller', 'Here you are.', "Marhamat."),
+  ('Agent', 'Do you have any luggage to check in?', "Topshiradigan yukingiz bormi?"),
+  ('Traveller', 'Yes, one suitcase.', "Ha, bitta chamadon."),
+  ('Agent', 'Would you like a window or an aisle seat?', "Deraza yonini yoki yo'lak tomonni xohlaysizmi?"),
+  ('Traveller', 'A window seat, please.', "Deraza yoni, iltimos."),
+  ('Agent', 'Your gate is number twelve. Boarding starts at ten.', "Chiqish eshigingiz o'n ikkinchi. Chiqish o'ndan boshlanadi."),
+  ('Traveller', 'Thank you. Have a nice day.', "Rahmat. Kuningiz xayrli o'tsin.")],
+ [('Going to va Will — sayohat rejalari', "Aniq reja: We are going to fly to Istanbul on Friday. Spontan qaror: The flight is delayed — I will wait in the cafe. Present Continuous ham yaqin rejalarda ishlatiladi: I am flying tomorrow.", [("We are going to visit Paris next month.", "Biz kelasi oy Parijga boramiz."), ("I will carry your bag.", "Men sumkangizni ko'taraman.")]),
+  ('Aeroport lug\'ati', "boarding pass (chiqish talonu), departure (jo'nash), arrival (yetib kelish), delay (kechikish), customs (bojxona), baggage claim (yukni olish).", [("The flight is delayed by one hour.", "Reys bir soatga kechikdi."), ("Please go to passport control.", "Iltimos, pasport nazoratiga boring.")])],
+ ('My first flight', "Last year I flew for the first time. I was nervous at the airport, but the staff were friendly. During take-off I held my seat tightly. After a few minutes I relaxed and looked out of the window. The clouds looked like white mountains.", "O'tgan yili birinchi marta uchdim. Aeroportda hayajonlangan edim, lekin xodimlar mehribon edi. Ko'tarilish paytida o'rindiqni mahkam ushladim. Bir necha daqiqadan keyin tinchlanib, derazadan qaradim. Bulutlar oq tog'larga o'xshardi.",
+  [("When did the writer fly for the first time?", "Last year."), ("How did the writer feel at the airport?", "Nervous."), ("What did the clouds look like?", "White mountains.")]))
+
+E['m15'] = L('A new app',
+ [('A', 'Have you tried this new app?', "Bu yangi ilovani sinab ko'rdingizmi?"),
+  ('B', 'Yes. It was developed by a local company.', "Ha. U mahalliy kompaniya tomonidan ishlab chiqilgan."),
+  ('A', 'Is it used by many people?', "U ko'p odam tomonidan ishlatiladimi?"),
+  ('B', 'More than a million users have downloaded it.', "Million dan ortiq foydalanuvchi uni yuklab olgan."),
+  ('A', 'How is the data protected?', "Ma'lumotlar qanday himoyalanadi?"),
+  ('B', 'All files are encrypted and stored safely.', "Barcha fayllar shifrlanadi va xavfsiz saqlanadi."),
+  ('A', 'Sounds impressive. I will install it.', "Ta'sirli eshitilyapti. Men ham o'rnataman."),
+  ('B', 'Do not forget to update it regularly.', "Uni muntazam yangilashni unutmang.")],
+ [('Passive Voice shakllari', "Passive: be + V3. Present: is made, Past: was made, Future: will be made, Perfect: has been made. Ish bajaruvchi muhim bo'lmaganda yoki noma'lum bo'lganda ishlatiladi; kerak bo'lsa 'by' bilan beriladi.", [("Phones are made in many countries.", "Telefonlar ko'p mamlakatlarda ishlab chiqariladi."), ("The email was sent yesterday.", "Xat kecha yuborilgan.")]),
+  ('Active → Passive', "Aktiv: The company created the app. Passiv: The app was created by the company. Obyekt ega bo'ladi, fe'l be+V3 ga o'zgaradi.", [("Millions of people use this site.", "Bu saytdan millionlab odam foydalanadi. → This site is used by millions of people.")])],
+ ('Technology and children', "Children today are born into a digital world. Phones and tablets are used for study, games and communication. Experts advise parents to limit screen time and to choose useful apps. Technology should serve people, not control them.", "Bugungi bolalar raqamli dunyoda tug'iladi. Telefon va planshetlar o'qish, o'yin va muloqot uchun ishlatiladi. Mutaxassislar ota-onalarga ekran vaqtini cheklash va foydali ilovalarni tanlashni maslahat beradi. Texnologiya odamlarga xizmat qilishi kerak, ularni boshqarmasligi kerak.",
+  [("What are phones and tablets used for?", "Study, games and communication."), ("What do experts advise parents?", "To limit screen time and choose useful apps."), ("What should technology do?", "Serve people.")]))
+
+E['m16'] = L('Course graduation',
+ [('Teacher', 'Congratulations! You have completed the course.', "Tabriklayman! Siz kursni tugatdingiz."),
+  ('Student', 'Thank you. I am proud that I managed to pass the exam.', "Rahmat. Imtihondan o'ta olganimdan faxrlanaman."),
+  ('Teacher', 'You worked very hard this year.', "Bu yil juda qattiq mehnat qildingiz."),
+  ('Student', 'At first it was difficult, but I did not give up.', "Avval qiyin edi, lekin taslim bo'lmadim."),
+  ('Teacher', 'What are your plans now?', "Endi rejalaringiz qanday?"),
+  ('Student', 'I am going to take an international English exam.', "Xalqaro ingliz tili imtihonini topshirmoqchiman."),
+  ('Teacher', 'I am sure you will succeed.', "Ishonchim komil, muvaffaqiyat qozonasiz."),
+  ('Student', 'Thank you for everything.', "Hamma narsa uchun rahmat.")],
+ [('Managed to va succeeded in', "manage to + fe'l = qiyinchilikka qaramay uddalamoq; succeed in + -ing = muvaffaqiyat qozonmoq. Inkori: failed to / did not manage to.", [("I managed to finish on time.", "Men vaqtida tugatishga ulgurdim."), ("She succeeded in passing the exam.", "U imtihondan o'ta oldi.")]),
+  ('Fikr-tuyg\'u: proud, grateful', "be proud of + ot/-ing (faxrlanmoq), be grateful for (minnatdor bo'lmoq), be satisfied with (mamnun bo'lmoq).", [("I am proud of my results.", "Natijalarimdan faxrlanaman."), ("We are grateful for your help.", "Yordamingiz uchun minnatdormiz.")])],
+ ('Looking back', "A year ago I could not speak English at all. Today I can talk about my life, read simple books and watch films with subtitles. I did not become perfect, but I made progress, and that is the most important thing. Learning never stops.", "Bir yil oldin men umuman inglizcha gapira olmasdim. Bugun hayotim haqida gapira olaman, oddiy kitoblarni o'qiyman va filmlarni subtitr bilan tomosha qilaman. Men mukammal bo'lmadim, lekin oldinga siljidim va bu eng muhimi. O'rganish hech qachon to'xtamaydi.",
+  [("What could the writer not do a year ago?", "Speak English."), ("What can the writer do today?", "Talk about life, read simple books, watch films with subtitles."), ("What is the most important thing?", "Making progress.")]))
+
+# Qo'llanma darslari
+E['guide-a1'] = L('At the hotel reception',
+ [('Guest', 'Hello, I have a reservation.', "Salom, mening bronim bor."),
+  ('Clerk', 'What is the name, please?', "Ism nima, iltimos?"),
+  ('Guest', 'Anvar Rakhimov.', "Anvar Rahimov."),
+  ('Clerk', 'Yes, a single room for two nights.', "Ha, ikki kecha uchun bir kishilik xona."),
+  ('Guest', 'Is breakfast included?', "Nonushta kiradimi?"),
+  ('Clerk', 'Yes, from seven to ten.', "Ha, yettidan o'ngacha."),
+  ('Guest', 'Thank you. What is the Wi-Fi password?', "Rahmat. Wi-Fi paroli nima?"),
+  ('Clerk', 'It is on the card. Enjoy your stay!', "U kartada yozilgan. Yaxshi dam oling!")],
+ [('A1 grammatika xulosasi', "A1 darajada asosiy tuzilmalar: to be (am/is/are), Present Simple, there is/are, can, have got. Gap tartibi: Ega + fe'l + to'ldiruvchi + joy + vaqt.", [("I can swim, but I cannot dance.", "Men suza olaman, lekin raqsga tusha olmayman."), ("She has got two brothers.", "Uning ikkita akasi bor.")]),
+  ('Savol so\'zlari', "What (nima), Where (qayer), When (qachon), Who (kim), Why (nega), How (qanday), How much/many (qancha). Savol so'zi + yordamchi fe'l + ega + fe'l.", [("Where do you work?", "Qayerda ishlaysiz?"), ("How much is this?", "Bu qancha turadi?")])],
+ ('My day', "My name is Anvar. I am a student. I get up at seven and go to university by bus. I have lunch with my friends. In the evening I read books and watch TV. I like my life.", "Mening ismim Anvar. Men talabaman. Yettida turaman va universitetga avtobusda boraman. Do'stlarim bilan tushlik qilaman. Kechqurun kitob o'qiyman va televizor ko'raman. Men hayotimni yaxshi ko'raman.",
+  [("What is the writer's name?", "Anvar."), ("How does he go to university?", "By bus."), ("What does he do in the evening?", "Reads books and watches TV.")]))
+
+E['guide-a2'] = L('Problems in the hotel room',
+ [('Guest', 'Excuse me, the air conditioner does not work.', "Kechirasiz, konditsioner ishlamayapti."),
+  ('Clerk', 'I am very sorry. I will send someone at once.', "Juda afsusdaman. Hozir birovni yuboraman."),
+  ('Guest', 'Also, could I have an extra towel?', "Yana, qo'shimcha sochiq olsam bo'ladimi?"),
+  ('Clerk', 'Of course. Anything else?', "Albatta. Yana biror narsa?"),
+  ('Guest', 'What time is check-out?', "Chiqish vaqti soat nechada?"),
+  ('Clerk', 'Check-out is at noon.', "Chiqish peshinda."),
+  ('Guest', 'Thank you for your help.', "Yordamingiz uchun rahmat."),
+  ('Clerk', 'My pleasure.', "Marhamat.")],
+ [('A2: zamonlar umumlashmasi', "Present Simple — odat; Present Continuous — hozir; Past Simple — tugagan ish; going to/will — kelajak. Zamon belgilari: every day, now, yesterday, tomorrow.", [("I usually walk, but today I am taking a taxi.", "Men odatda piyoda yuraman, lekin bugun taksi olyapman."), ("Yesterday we visited a museum.", "Kecha biz muzeyga bordik.")]),
+  ('Modal fe\'llar', "can (qila olmoq), must (majbur), should (maslahat), may (ruxsat). Modal fe'ldan keyin to siz asl fe'l keladi.", [("You should drink more water.", "Siz ko'proq suv ichishingiz kerak."), ("May I come in?", "Kirsam bo'ladimi?")])],
+ ('A city break', "Last weekend my friend and I visited Bukhara. We stayed in a small hotel near the old town. In the morning we visited the market and bought souvenirs. In the evening we ate plov in a traditional restaurant. It was a short trip, but we will remember it for a long time.", "O'tgan dam olish kunlari do'stim bilan Buxoroga bordik. Eski shahar yaqinidagi kichik mehmonxonada qoldik. Ertalab bozorga borib, esdalik sovg'alar oldik. Kechqurun an'anaviy restoranda palov yedik. Qisqa sayohat edi, lekin uni uzoq eslaymiz.",
+  [("Where did they stay?", "In a small hotel near the old town."), ("What did they buy?", "Souvenirs."), ("What did they eat in the evening?", "Plov.")]))
+
+E['guide-b1'] = L('Negotiating a work schedule',
+ [('Manager', 'I heard you want to change your working hours.', "Ish vaqtingizni o'zgartirmoqchi ekansiz."),
+  ('Employee', 'Yes. If I started earlier, I could finish at four.', "Ha. Agar erta boshlasam, to'rtda tugata olardim."),
+  ('Manager', 'Why is that important for you?', "Bu siz uchun nega muhim?"),
+  ('Employee', 'I am taking evening classes, and I would not be late.', "Men kechki kurslarga qatnayman va kechikmagan bo'lardim."),
+  ('Manager', 'If the whole team agrees, I will approve it.', "Agar butun jamoa rozi bo'lsa, tasdiqlayman."),
+  ('Employee', 'I have already spoken to them. They do not mind.', "Men ular bilan allaqachon gaplashganman. Qarshi emaslar."),
+  ('Manager', 'Then let us try it for a month.', "Unda bir oyga sinab ko'raylik."),
+  ('Employee', 'Thank you. I will not let you down.', "Rahmat. Sizni umidsizlantirmayman.")],
+ [('Conditionals 0, 1, 2', "0: If you heat ice, it melts (fakt). 1: If it rains, I will stay (real kelajak). 2: If I had time, I would travel (xayoliy hozir/kelajak) — if + Past Simple, would + fe'l.", [("If I were you, I would accept the offer.", "Sizning o'rningizda bo'lsam, taklifni qabul qilardim."), ("If we hurry, we will catch the train.", "Shoshilsak, poyezdga ulguramiz.")]),
+  ('Present Perfect va Past Simple', "Aniq o'tgan payt bo'lsa — Past Simple (yesterday, in 2020); payt noma'lum yoki hozirgacha davom etsa — Present Perfect (already, ever, for, since).", [("I lived in Samarkand in 2015.", "Men 2015 yilda Samarqandda yashaganman."), ("I have lived here since 2015.", "Men 2015 yildan beri shu yerda yashayman.")])],
+ ('Work-life balance', "Many employees now ask for flexible schedules. Companies that agree often see higher productivity, because happy people work better. However, flexibility needs trust and clear rules. If both sides are honest, everybody benefits.", "Ko'p xodimlar endi moslashuvchan jadval so'ramoqda. Rozi bo'lgan kompaniyalar ko'pincha yuqori samaradorlikka erishadi, chunki baxtli odamlar yaxshiroq ishlaydi. Biroq moslashuvchanlik ishonch va aniq qoidalarni talab qiladi. Agar ikki tomon halol bo'lsa, hamma foyda ko'radi.",
+  [("What do many employees ask for?", "Flexible schedules."), ("Why is productivity higher?", "Happy people work better."), ("What does flexibility need?", "Trust and clear rules.")]))
+
+E['guide-b2'] = L('A debate on remote work',
+ [('A', 'Remote work has transformed the modern workplace.', "Masofaviy ish zamonaviy ish joyini o'zgartirib yubordi."),
+  ('B', 'Admittedly, but it has also blurred the line between work and home.', "To'g'ri, lekin u ish va uy o'rtasidagi chegarani xiralashtirdi."),
+  ('A', 'Had companies not adopted it, many would have gone bankrupt.', "Agar kompaniyalar uni qo'llamaganida, ko'plari bankrot bo'lardi."),
+  ('B', 'Nevertheless, isolation is a genuine problem for employees.', "Shunga qaramay, yakkalanish xodimlar uchun haqiqiy muammo."),
+  ('A', 'Hybrid models might offer the best of both worlds.', "Gibrid modellar ikkala dunyoning eng yaxshisini berishi mumkin."),
+  ('B', 'That is a compelling argument, provided it is well organised.', "Bu ishonarli dalil, agar yaxshi tashkil etilsa."),
+  ('A', 'Ultimately, flexibility is what matters.', "Oxir-oqibat, muhimi — moslashuvchanlik."),
+  ('B', 'I could not agree more.', "Bunga to'liq qo'shilaman.")],
+ [('Inversion va murakkab shartlar', "Rasmiy uslubda if tushirilib, ega va yordamchi fe'l o'rni almashadi: Had I known, I would have called (= If I had known). Should you need help, call us. Were I you, I would wait.", [("Had she studied harder, she would have passed.", "U ko'proq o'qiganida, o'tgan bo'lardi."), ("Should you have any questions, please ask.", "Savollaringiz bo'lsa, so'rang.")]),
+  ('Akademik bog\'lovchilar', "nevertheless / nonetheless (shunga qaramay), furthermore / moreover (bundan tashqari), consequently (natijada), provided that (agar sharti bilan), whereas (holbuki).", [("The plan is risky; nevertheless, we will try.", "Reja xavfli; shunga qaramay, urinib ko'ramiz."), ("He is calm, whereas his brother is nervous.", "U xotirjam, ukasi esa asabiy.")])],
+ ('The age of information', "We live in an age of information overload. Every minute thousands of articles and videos appear online, and it is hard to tell truth from rumour. Critical thinking has therefore become one of the most valuable skills. Those who learn to question sources, compare evidence and stay open-minded will navigate the modern world with confidence.", "Biz axborot ortiqcha bo'lib ketgan asrda yashayapmiz. Har daqiqada onlaynda minglab maqola va video paydo bo'ladi, haqiqatni mish-mishdan ajratish qiyin. Shu sababli tanqidiy fikrlash eng qimmatli ko'nikmalardan biriga aylandi. Manbalarni so'roq qilish, dalillarni solishtirish va ochiq fikrli bo'lishni o'rganganlar zamonaviy dunyoda ishonch bilan harakat qiladi.",
+  [("What do we live in?", "An age of information overload."), ("Which skill has become valuable?", "Critical thinking."), ("What should people learn to do?", "Question sources, compare evidence, stay open-minded.")]))
+
+if __name__ == '__main__':
+    out = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lesson_extras_en.json')
+    json.dump(E, open(out, 'w', encoding='utf8'), ensure_ascii=False, indent=1)
+    print(len(E), 'ta dars yozildi ->', out)

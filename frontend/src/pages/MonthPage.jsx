@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Layout from '../components/Layout.jsx';
+import { GrammarMore, DialogExtra, ReadingBlock, WordsExplorer } from '../components/LessonExtras.jsx';
 import SpeakButton from '../components/SpeakButton.jsx';
 import AiTaskWidget from '../components/AiTaskWidget.jsx';
 import { api } from '../lib/api.js';
@@ -189,6 +190,7 @@ export default function MonthPage() {
               ))}
             </div>
           )}
+          <GrammarMore items={month.grammar.more} />
           <AiTaskWidget
             type="text"
             content={`${month.grammar.title}\n${month.grammar.text}\n${(month.grammar.examples || []).map((ex) => ex.join(' — ')).join('\n')}`}
@@ -228,6 +230,7 @@ export default function MonthPage() {
             ))}
           </div>
 
+          <WordsExplorer words={month.words} phrases={month.phrases} lang={lang} />
           <AiTaskWidget
             type="text"
             content={`Bu oyning so'zlari:\n${month.vocab.map(([w, , m]) => `${w} — ${m}`).join('\n')}`}
@@ -295,6 +298,8 @@ export default function MonthPage() {
               </div>
             ))}
           </div>
+          <DialogExtra dialog={month.dialog2} lang={lang} />
+          <ReadingBlock reading={month.reading} lang={lang} />
           <AiTaskWidget
             type="dialog"
             content={`${month.dialog.title}\n${month.dialog.lines.map(([s, l, tr]) => `${s}: ${l} (${tr})`).join('\n')}`}

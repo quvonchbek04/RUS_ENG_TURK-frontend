@@ -25,10 +25,10 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-dvh grid md:grid-cols-2" style={{ background: 'var(--paper)' }}>
+    <div className="min-h-screen grid md:grid-cols-2 app-bg">
       <div
         className="hidden md:flex flex-col justify-between p-12 relative overflow-hidden"
-        style={{ background: 'var(--pine)', color: 'var(--paper)' }}
+        style={{ background: 'var(--grad-brand)', color: '#fff' }}
       >
         <div className="font-mono text-xs tracking-[0.3em] uppercase opacity-80">Chegara nazorati · Kirish</div>
         <div>
@@ -68,11 +68,6 @@ export default function Login() {
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 autoFocus
-                name="username"
-                autoComplete="username"
-                autoCapitalize="none"
-                autoCorrect="off"
-                spellCheck={false}
                 className="w-full px-4 py-3 rounded-xl border outline-none transition-shadow focus:shadow-[0_0_0_3px_var(--gold-soft)]"
                 style={{ borderColor: 'var(--line)', background: 'var(--panel)', color: 'var(--ink)' }}
                 placeholder="masalan: anvar"
@@ -87,8 +82,6 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                name="current-password"
-                autoComplete="current-password"
                 className="w-full px-4 py-3 rounded-xl border outline-none transition-shadow focus:shadow-[0_0_0_3px_var(--gold-soft)]"
                 style={{ borderColor: 'var(--line)', background: 'var(--panel)', color: 'var(--ink)' }}
                 placeholder="••••••••"

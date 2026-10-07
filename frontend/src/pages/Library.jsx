@@ -76,10 +76,7 @@ export default function Library() {
     if (openVocabSet?.id === set.id) setOpenVocabSet(null);
     try {
       await api.deleteVocabSet(set.id);
-    } catch (err) {
-      // Avval xato butunlay yutib yuborilardi va ro'yxat sabab ko'rsatilmasdan
-      // qayta chiqib qolardi — foydalanuvchi nima bo'lganini tushunmasdi.
-      setVocabError(err.message || "O'chirib bo'lmadi");
+    } catch {
       refreshVocabSets();
     }
   }
@@ -129,8 +126,7 @@ export default function Library() {
     if (openBook?.id === book.id) setOpenBook(null);
     try {
       await api.deleteBook(book.id);
-    } catch (err) {
-      setError(err.message || "O'chirib bo'lmadi");
+    } catch {
       refresh();
     }
   }
@@ -223,14 +219,11 @@ export default function Library() {
           {books?.map((b) => (
             <div
               key={b.id}
-              // MUHIM: tor (Android) ekranlarda sarlavha + 3 ta tugma bitta qatorga
-              // sig'may, matn kesilib yoki tugmalar konteynerdan tashqariga chiqib
-              // ketardi. `flex-wrap` bilan endi tugmalar kerak bo'lsa pastga tushadi.
-              className="rounded-xl border p-4 flex flex-wrap items-center gap-3 sm:gap-4"
+              className="rounded-xl border p-4 flex items-center gap-4"
               style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}
             >
               <span className="text-2xl shrink-0">{FORMAT_ICON[b.ext] || '📄'}</span>
-              <div className="flex-1 min-w-[140px]">
+              <div className="flex-1 min-w-0">
                 <div className="font-display font-semibold truncate" style={{ color: 'var(--ink)' }}>
                   {b.title}
                 </div>
@@ -355,18 +348,18 @@ export default function Library() {
           {vocabSets?.map((v) => (
             <div
               key={v.id}
-              className="rounded-xl border p-4 flex flex-wrap items-center gap-3 sm:gap-4"
+              className="rounded-xl border p-4 flex items-center gap-4"
               style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}
             >
               <span className="text-2xl shrink-0">📖</span>
-              <div className="flex-1 min-w-[140px]">
+              <div className="flex-1 min-w-0">
                 <div className="font-display font-semibold truncate" style={{ color: 'var(--ink)' }}>
                   {v.title}
                 </div>
                 <div className="font-mono text-[11px] flex items-center gap-2 flex-wrap" style={{ color: 'var(--ink-soft)' }}>
                   <span>{LANG_OPTIONS.find((l) => l.key === v.lang)?.label}</span>
                   <span>·</span>
-                  <span>{(v.words || []).length} ta so'z</span>
+                  <span>{v.words.length} ta so'z</span>
                   <span>·</span>
                   <span>{new Date(v.createdAt).toLocaleDateString('uz-UZ')}</span>
                   {v.uploadedBy && (
@@ -430,7 +423,7 @@ export default function Library() {
               </button>
             </div>
             <div className="grid gap-2.5">
-              {(openVocabSet.words || []).map(([word, translit, meaning], i) => (
+              {openVocabSet.words.map(([word, translit, meaning], i) => (
                 <div
                   key={i}
                   className="rounded-xl border p-3.5 flex items-start gap-3"

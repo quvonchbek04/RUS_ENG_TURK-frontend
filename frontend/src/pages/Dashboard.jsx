@@ -21,31 +21,29 @@ export default function Dashboard() {
   return (
     <Layout>
       <div className="max-w-[1440px] mx-auto px-5 py-10">
-        <div className="mb-10">
-          <div className="font-mono text-xs tracking-[0.25em] uppercase mb-2" style={{ color: 'var(--gold)' }}>
-            Yo'lovchi paneli
-          </div>
-          <h1 className="font-display text-4xl font-semibold" style={{ color: 'var(--ink)' }}>
-            Xush kelibsiz, {user?.displayName || user?.username}
+        <div className="hero-card p-7 sm:p-10 mb-8">
+          <div className="font-mono text-xs tracking-[0.25em] uppercase mb-3 opacity-80">Yo'lovchi paneli</div>
+          <h1 className="font-display text-3xl sm:text-5xl font-semibold leading-tight">
+            Xush kelibsiz, {user?.displayName || user?.username} 👋
           </h1>
-          <p className="mt-2" style={{ color: 'var(--ink-soft)' }}>
-            Davom ettirmoqchi bo'lgan yo'nalishni tanlang. Har bir bekat — yangi dars oyi.
+          <p className="mt-3 max-w-xl opacity-90">
+            Davom ettirmoqchi bo'lgan yo'nalishni tanlang. Har bir bekat — yangi dars oyi: grammatika, lug'at, dialog va o'qish matni bilan.
           </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link to="/lang/en" className="px-5 py-3 rounded-xl font-semibold text-sm cursor-pointer" style={{ background: '#fff', color: '#0f5f4d' }}>
+              🇬🇧 Ingliz tilini davom ettirish →
+            </Link>
+            <Link to="/library" className="px-5 py-3 rounded-xl font-semibold text-sm cursor-pointer border border-white/40 hover:bg-white/10">
+              📚 Kutubxonam
+            </Link>
+          </div>
         </div>
 
-        <div className="flex items-center gap-4 mb-10 flex-wrap">
-          <StatChip label="Tugatilgan oylar" value={completedTotal} />
-          <StatChip label="Yo'nalishlar" value="3" />
-          {aiAccuracy !== null && (
-            <StatChip label={`🤖 AI ustoz aniqligi (${aiStats.attempts} urinish)`} value={`${aiAccuracy}%`} />
-          )}
-          <Link
-            to="/library"
-            className="rounded-xl border px-4 py-2.5 flex items-center gap-2 font-mono text-xs uppercase tracking-widest transition-colors"
-            style={{ borderColor: 'var(--line)', background: 'var(--panel)', color: 'var(--pine)' }}
-          >
-            📚 Kutubxonam
-          </Link>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+          <StatChip label="Tugatilgan oylar" value={completedTotal} icon="✅" />
+          <StatChip label="Yo'nalishlar" value="3" icon="🧭" />
+          <StatChip label="Ingliz: so'z va ibora" value="2458+" icon="🗂️" />
+          <StatChip label={aiAccuracy !== null ? `AI aniqligi (${aiStats.attempts})` : 'AI ustoz'} value={aiAccuracy !== null ? `${aiAccuracy}%` : '🤖'} icon="🎯" />
         </div>
 
         {error && (
@@ -60,7 +58,7 @@ export default function Dashboard() {
               <Link
                 key={lang.key}
                 to={`/lang/${lang.key}`}
-                className="ticket-edge group block rounded-2xl border p-6 relative overflow-hidden transition-transform hover:-translate-y-1"
+                className="ticket-edge group block rounded-3xl border p-7 relative overflow-hidden transition-transform hover:-translate-y-1.5"
                 style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}
               >
                 <div className="flex items-start justify-between mb-6">
@@ -100,15 +98,16 @@ export default function Dashboard() {
   );
 }
 
-function StatChip({ label, value }) {
+function StatChip({ label, value, icon }) {
   return (
-    <div className="rounded-xl border px-4 py-2.5 flex items-center gap-3" style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}>
-      <span className="font-display text-2xl font-semibold" style={{ color: 'var(--pine)' }}>
-        {value}
+    <div className="stat-tile px-4 py-4 flex items-center gap-3">
+      <span className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0" style={{ background: 'var(--gold-soft)' }}>
+        {icon}
       </span>
-      <span className="font-mono text-[10px] uppercase tracking-widest" style={{ color: 'var(--ink-soft)' }}>
-        {label}
-      </span>
+      <div className="min-w-0">
+        <div className="font-display text-2xl font-semibold leading-none" style={{ color: 'var(--pine)' }}>{value}</div>
+        <div className="font-mono text-[10px] uppercase tracking-widest mt-1.5 truncate" style={{ color: 'var(--ink-soft)' }}>{label}</div>
+      </div>
     </div>
   );
 }

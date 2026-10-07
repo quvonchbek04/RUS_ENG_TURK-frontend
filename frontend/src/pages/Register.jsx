@@ -26,10 +26,10 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-dvh grid md:grid-cols-2" style={{ background: 'var(--paper)' }}>
+    <div className="min-h-screen grid md:grid-cols-2 app-bg">
       <div
         className="hidden md:flex flex-col justify-between p-12"
-        style={{ background: 'var(--pine)', color: 'var(--paper)' }}
+        style={{ background: 'var(--grad-brand)', color: '#fff' }}
       >
         <div className="font-mono text-xs tracking-[0.3em] uppercase opacity-80">Yangi bilet · Ro'yxatdan o'tish</div>
         <div>
@@ -67,8 +67,6 @@ export default function Register() {
               <input
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                name="name"
-                autoComplete="name"
                 className="w-full px-4 py-3 rounded-xl border outline-none focus:shadow-[0_0_0_3px_var(--gold-soft)]"
                 style={{ borderColor: 'var(--line)', background: 'var(--panel)', color: 'var(--ink)' }}
                 placeholder="Anvar Anvarov"
@@ -83,11 +81,6 @@ export default function Register() {
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 minLength={3}
-                name="username"
-                autoComplete="username"
-                autoCapitalize="none"
-                autoCorrect="off"
-                spellCheck={false}
                 className="w-full px-4 py-3 rounded-xl border outline-none focus:shadow-[0_0_0_3px_var(--gold-soft)]"
                 style={{ borderColor: 'var(--line)', background: 'var(--panel)', color: 'var(--ink)' }}
                 placeholder="kamida 3 ta belgi"
@@ -102,12 +95,10 @@ export default function Register() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={6}
-                name="new-password"
-                autoComplete="new-password"
+                minLength={4}
                 className="w-full px-4 py-3 rounded-xl border outline-none focus:shadow-[0_0_0_3px_var(--gold-soft)]"
                 style={{ borderColor: 'var(--line)', background: 'var(--panel)', color: 'var(--ink)' }}
-                placeholder="kamida 6 ta belgi"
+                placeholder="kamida 4 ta belgi"
               />
             </div>
 
