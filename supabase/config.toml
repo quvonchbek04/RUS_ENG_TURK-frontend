@@ -14,10 +14,21 @@ port = 54323
 [auth]
 enabled = true
 site_url = "http://localhost:5173"
-additional_redirect_urls = ["http://localhost:5173"]
-# Username-asosida ishlash uchun email tasdiqlash o'chirilgan (email sun'iy,
-# "username@til-sayohati.local" ko'rinishida yaratiladi — h aqiqiy pochta emas).
+additional_redirect_urls = ["http://localhost:5173", "http://localhost:5173/reset-password"]
+minimum_password_length = 6
+
+[auth.email]
+# Telefon orqali ro'yxatdan o'tganlar uchun ichki (sun'iy) email ishlatiladi —
+# shuning uchun email tasdiqlash O'CHIRILGAN bo'lishi kerak.
 enable_confirmations = false
 
 [edge_runtime]
 enabled = true
+
+# Funksiyalar foydalanuvchini o'zlari tekshiradi (auth.getUser), shuning uchun
+# gateway JWT tekshiruvi o'chirilgan — bu Supabase'ning yangi JWT kalitlari bilan ham ishlaydi.
+[functions.ai]
+verify_jwt = false
+
+[functions.admin]
+verify_jwt = false

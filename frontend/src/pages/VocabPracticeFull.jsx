@@ -1,237 +1,329 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import Layout from '../components/Layout.jsx';
-import SpeakButton from '../components/SpeakButton.jsx';
-import { api } from '../lib/api.js';
+import PracticeSession from '../components/PracticeSession.jsx';
+import PracticeResult from '../components/PracticeResult.jsx';
+import { PageHeader, PageLoading } from '../components/ui.jsx';
+import { useContent } from '../lib/hooks.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { flattenMonths, getMistakeBank, withActivity, withPracticeSession } from '../lib/lessonProgress.js';
+import { MODES, dedupeItems } from '../lib/practice.js';
 
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
+const COUNTS = [10, 20, 30, 50, 100, 0];
 
-const ROUND_SIZE = 20;
+const SOURCES = [
+  { key: 'all', icon: '🌍', label: "Hamma so'zlar", sub: 'Kurs + 2161 so\'z + qo\'shimcha lug\'at' },
+  { key: 'course', icon: '📘', label: 'Kurs darslari', sub: "Darslardagi asosiy so'zlar" },
+  { key: 'lesson', icon: '🎯', label: 'Bitta dars', sub: "Tanlangan dars so'zlari" },
+  { key: 'wordcat', icon: '🗂️', label: 'Mavzu bo\'yicha', sub: "24 mavzu (Word fayldan)" },
+  { key: 'phrases', icon: '💬', label: 'Iboralar', sub: '297 ta foydali ibora' },
+  { key: 'dict', icon: '📖', label: "Qo'shimcha lug'at", sub: 'Kategoriyalar va yuklanganlar' },
+  { key: 'mistakes', icon: '🩹', label: 'Xatolarim', sub: "Avval xato qilgan so'zlar" },
+];
 
 export default function VocabPracticeFull() {
   const { lang } = useParams();
-  const { updateProgress } = useAuth();
-  const [data, setData] = useState(null);
-  const [error, setError] = useState('');
-  const [questions, setQuestions] = useState(null);
-  const [index, setIndex] = useState(0);
-  const [selected, setSelected] = useState(null);
-  const [correct, setCorrect] = useState(0);
-  const [finished, setFinished] = useState(false);
+  const [params, setParams] = useSearchParams();
+  const { progress, updateProgress } = useAuth();
+  const { data, error } = useContent(lang);
+
+  const [source, setSource] = useState(params.get('source') === 'uploaded' ? 'dict' : params.get('source') || 'all');
+  const [lessonId, setLessonId] = useState(params.get('lesson') || '');
+  const [wordCat, setWordCat] = useState(0);
+  const [phraseCat, setPhraseCat] = useState(-1);
+  const [dictCat, setDictCat] = useState(-1);
+  const [mode, setMode] = useState(() => {
+    try {
+      return localStorage.getItem('til_practice_mode') || 'choice';
+    } catch {
+      return 'choice';
+    }
+  });
+  const [count, setCount] = useState(20);
+  const [phase, setPhase] = useState('setup'); // setup | play | result
   const [round, setRound] = useState(0);
+  const [result, setResult] = useState(null);
+  const [retryItems, setRetryItems] = useState(null);
 
+  const mistakes = getMistakeBank(progress, lang);
+  const flat = useMemo(() => (data ? flattenMonths(data.modules) : []), [data]);
+
+  // Yuklangan lug'at to'plamiga to'g'ridan-to'g'ri havola: ?source=uploaded&set=ID
   useEffect(() => {
-    api.content(lang).then(setData).catch((e) => setError(e.message));
-  }, [lang]);
-
-  // Kurs so'zlari (barcha oylardan) + to'liq qo'shimcha lug'at — bittalashtirib birlashtiriladi.
-  // Bir xil so'z turli oylarda (masalan takrorlash uchun) qayta uchrashi mumkin —
-  // shu sabab dublikat kaliti faqat so'zning o'zi bo'yicha olinadi.
-  const pool = useMemo(() => {
-    if (!data) return null;
-    const seen = new Set();
-    const combined = [];
-    data.modules.forEach((mod) => {
-      mod.months.forEach((month) => {
-        (month.vocab || []).forEach(([word, translit, meaning]) => {
-          const key = word.trim().toLowerCase();
-          if (seen.has(key)) return;
-          seen.add(key);
-          combined.push([word, translit, meaning]);
-        });
-      });
-    });
-    (data.dictExtra || []).forEach((cat) => {
-      (cat.words || []).forEach(([word, translit, meaning]) => {
-        const key = word.trim().toLowerCase();
-        if (seen.has(key)) return;
-        seen.add(key);
-        combined.push([word, translit, meaning]);
-      });
-    });
-    return combined;
+    if (!data) return;
+    const setId = params.get('set');
+    if (setId) {
+      const idx = data.dictExtra.findIndex((c) => String(c.mediaId) === setId);
+      if (idx >= 0) {
+        setSource('dict');
+        setDictCat(idx);
+      }
+    }
+    if (!lessonId && flat.length) setLessonId(flat[0].id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  useEffect(() => {
-    if (!pool) return;
-    const roundWords = shuffle(pool).slice(0, Math.min(ROUND_SIZE, pool.length));
-    const qs = roundWords.map(([word, translit, meaning]) => {
-      const wrongPool = shuffle(pool.filter((v) => v[2] !== meaning)).slice(0, 3);
-      const options = shuffle([meaning, ...wrongPool.map((w) => w[2])]);
-      return { word, translit, meaning, options };
-    });
-    setQuestions(qs);
-    setIndex(0);
-    setCorrect(0);
-    setSelected(null);
-    setFinished(false);
-  }, [pool, round]);
+  const pools = useMemo(() => {
+    if (!data) return null;
+    const course = [];
+    data.modules.forEach((mod) => mod.months.forEach((m) => (m.vocab || []).forEach(([w, t, mm]) => course.push({ w, t: t !== w ? t : '', m: mm }))));
+    const wordbank = (data.wordbank || []).map((c) => c.rows.map(([w, m, s, st]) => ({ w, m, s, st })));
+    const phrasebank = (data.phrasebank || []).map((c) => c.rows.map(([w, m, s, st]) => ({ w, m, s, st })));
+    const dict = (data.dictExtra || []).map((c) => c.words.map(([w, t, m]) => ({ w, t: t !== w ? t : '', m })));
+    return { course, wordbank, phrasebank, dict };
+  }, [data]);
 
-  function choose(option) {
-    if (selected) return;
-    setSelected(option);
-    if (option === questions[index].meaning) setCorrect((c) => c + 1);
-  }
-
-  function next() {
-    if (index + 1 >= questions.length) {
-      finish();
-      return;
+  const { items, label } = useMemo(() => {
+    if (!pools) return { items: [], label: '' };
+    switch (source) {
+      case 'course':
+        return { items: pools.course, label: 'Kurs darslari' };
+      case 'lesson': {
+        const m = flat.find((x) => x.id === lessonId);
+        if (!m) return { items: [], label: 'Dars' };
+        return {
+          items: [...(m.vocab || []).map(([w, t, mm]) => ({ w, t: t !== w ? t : '', m: mm })), ...(m.words || []).map(([w, mm, s, st]) => ({ w, m: mm, s, st })), ...(m.phrases || []).map(([w, mm, s, st]) => ({ w, m: mm, s, st }))],
+          label: `${m.label}: ${m.topic}`,
+        };
+      }
+      case 'wordcat':
+        return { items: pools.wordbank[wordCat] || [], label: data.wordCats[wordCat] || 'Mavzu' };
+      case 'phrases':
+        return phraseCat < 0 ? { items: pools.phrasebank.flat(), label: 'Iboralar' } : { items: pools.phrasebank[phraseCat] || [], label: data.phraseCats[phraseCat] || 'Iboralar' };
+      case 'dict':
+        return dictCat < 0 ? { items: pools.dict.flat(), label: "Qo'shimcha lug'at" } : { items: pools.dict[dictCat] || [], label: data.dictExtra[dictCat]?.cat || "Lug'at" };
+      case 'mistakes':
+        return { items: mistakes.map((x) => ({ w: x.w, t: x.t, m: x.m, s: x.s, st: x.st })), label: 'Xatolarim' };
+      default:
+        return { items: [...pools.course, ...pools.wordbank.flat(), ...pools.dict.flat()], label: "Hamma so'zlar" };
     }
-    setIndex((i) => i + 1);
-    setSelected(null);
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pools, source, lessonId, wordCat, phraseCat, dictCat, mistakes.length]);
 
-  function finish() {
-    setFinished(true);
-    updateProgress((prev) => {
-      const vocabStats = { ...(prev.vocabStats || {}) };
-      const langStats = { ...(vocabStats[lang] || { attempts: 0, correct: 0 }) };
-      langStats.attempts += questions.length;
-      langStats.correct += correct;
-      vocabStats[lang] = langStats;
+  const distractorPool = useMemo(() => {
+    if (!pools) return [];
+    return source === 'phrases' ? pools.phrasebank.flat() : [...pools.course, ...pools.wordbank.flat()];
+  }, [pools, source]);
 
-      const testResultsFull = { ...(prev.testResultsFull || {}) };
-      testResultsFull[lang] = { correct, total: questions.length, at: Date.now() };
+  const uniqueCount = useMemo(() => dedupeItems(items).length, [items]);
 
-      return { ...prev, vocabStats, testResultsFull };
-    });
+  const onFinish = useCallback(
+    (record) => {
+      setResult(record);
+      setPhase('result');
+      updateProgress((prev) => {
+        const vocabStats = { ...(prev.vocabStats || {}) };
+        const s = { ...(vocabStats[lang] || { attempts: 0, correct: 0 }) };
+        s.attempts += record.answered;
+        s.correct += record.correct;
+        vocabStats[lang] = s;
+        return withActivity(withPracticeSession({ ...prev, vocabStats }, record), record.correct, { answers: record.answered });
+      });
+    },
+    [lang, updateProgress]
+  );
+
+  function start() {
+    try {
+      localStorage.setItem('til_practice_mode', mode);
+    } catch {
+      /* e'tiborsiz */
+    }
+    setRetryItems(null);
+    setResult(null);
+    setRound((r) => r + 1);
+    setPhase('play');
   }
 
   if (error) {
     return (
       <Layout>
-        <div className="max-w-2xl mx-auto px-5 py-16 text-center" style={{ color: 'var(--brick)' }}>
-          {error}
+        <div className="page-narrow">
+          <div className="alert alert-error">{error}</div>
         </div>
       </Layout>
     );
   }
+  if (!data || !pools) return <Layout><PageLoading /></Layout>;
 
-  if (!pool || !questions) {
+  if (phase === 'play') {
     return (
       <Layout>
-        <div className="max-w-2xl mx-auto px-5 py-16 font-mono text-sm" style={{ color: 'var(--ink-soft)' }}>
-          Yuklanmoqda…
+        <div className="page-narrow">
+          <PracticeSession
+            key={round}
+            items={retryItems || items}
+            pool={distractorPool}
+            lang={lang}
+            mode={mode}
+            count={retryItems ? 0 : count}
+            title={retryItems ? `Xatolar ustida ishlash` : label}
+            source={retryItems ? 'mistakes' : source}
+            label={retryItems ? `Xatolar ustida: ${label}` : label}
+            onFinish={onFinish}
+            onExit={() => setPhase('setup')}
+          />
         </div>
       </Layout>
     );
   }
 
+  if (phase === 'result' && result) {
+    return (
+      <Layout>
+        <div className="page-narrow">
+          <button type="button" className="back-link mb-4" onClick={() => setPhase('setup')}>
+            ← Mashq sozlamalari
+          </button>
+          <PracticeResult
+            record={result}
+            onRetryMistakes={(list) => {
+              setRetryItems(list.map((x) => ({ w: x.w, t: x.t, m: x.m, s: x.s, st: x.st })));
+              setResult(null);
+              setRound((r) => r + 1);
+              setPhase('play');
+            }}
+            onRestart={start}
+          />
+        </div>
+      </Layout>
+    );
+  }
+
+  // ---------- SOZLAMALAR ----------
   return (
     <Layout>
-      <div className="max-w-2xl mx-auto px-5 py-10">
-        <Link to={`/lang/${lang}`} className="font-mono text-xs uppercase tracking-widest" style={{ color: 'var(--ink-soft)' }}>
-          ← {data.meta.title}
-        </Link>
+      <div className="page">
+        <PageHeader
+          back={{ to: `/lang/${lang}`, label: data.meta.title }}
+          eyebrow="Lug'at mashqi"
+          title="Mashqni sozlang"
+          subtitle="Manba, savol turi va sonini tanlang. Istalgan payt «To'xtatish» tugmasini bossangiz — natija va xatolaringiz alohida ko'rsatiladi."
+        />
 
-        <div className="mt-4 mb-6">
-          <div className="font-mono text-xs tracking-[0.25em] uppercase mb-2" style={{ color: 'var(--gold)' }}>
-            Lug'at mashqi
-          </div>
-          <h1 className="font-display text-2xl font-semibold" style={{ color: 'var(--ink)' }}>
-            {pool.length} ta so'z (kurs + to'liq lug'at)
-          </h1>
-        </div>
-
-        <div className="mt-2">
-          {!finished ? (
-            <>
-              <div className="flex items-center justify-between mb-4 font-mono text-xs uppercase tracking-widest" style={{ color: 'var(--ink-soft)' }}>
-                <span>
-                  Savol {index + 1}/{questions.length}
-                </span>
-                <span>To'g'ri: {correct}</span>
-              </div>
-              <div className="h-1.5 rounded-full mb-8 overflow-hidden" style={{ background: 'var(--paper-soft)' }}>
-                <div
-                  className="h-full transition-all"
-                  style={{ width: `${((index + 1) / questions.length) * 100}%`, background: 'var(--gold)' }}
-                />
-              </div>
-
-              <div className="ticket-edge rounded-2xl border p-8 text-center mb-6" style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}>
-                <div className="font-mono text-[10px] uppercase tracking-widest mb-3" style={{ color: 'var(--ink-soft)' }}>
-                  Bu so'z nimani anglatadi?
-                </div>
-                <div className="font-display text-3xl font-semibold mb-1" style={{ color: 'var(--ink)' }}>
-                  {questions[index].word}
-                </div>
-                <div className="font-mono text-sm mb-3" style={{ color: 'var(--gold)' }}>
-                  {questions[index].translit}
-                </div>
-                <SpeakButton text={questions[index].word} lang={lang} size="lg" className="mx-auto" />
-              </div>
-
-              <div className="grid gap-3">
-                {questions[index].options.map((opt, i) => {
-                  const isSelected = selected === opt;
-                  const isCorrectOpt = opt === questions[index].meaning;
-                  let style = { borderColor: 'var(--line)', background: 'var(--panel)', color: 'var(--ink)' };
-                  if (selected) {
-                    if (isCorrectOpt) style = { borderColor: 'var(--pine)', background: 'var(--pine)', color: 'var(--paper)' };
-                    else if (isSelected) style = { borderColor: 'var(--brick)', background: 'var(--error-bg)', color: 'var(--brick)' };
-                  }
+        <div className="grid lg:grid-cols-[1.4fr_1fr] gap-6">
+          <div className="space-y-6">
+            <section>
+              <div className="label">1. So'zlar manbasi</div>
+              <div className="grid sm:grid-cols-2 gap-2.5">
+                {SOURCES.map((s) => {
+                  const active = source === s.key;
+                  const disabled = s.key === 'mistakes' && mistakes.length === 0;
                   return (
                     <button
-                      key={i}
-                      onClick={() => choose(opt)}
-                      className="text-left px-5 py-3.5 rounded-xl border transition-colors cursor-pointer"
-                      style={style}
+                      key={s.key}
+                      type="button"
+                      disabled={disabled}
+                      onClick={() => {
+                        setSource(s.key);
+                        setParams({}, { replace: true });
+                      }}
+                      className="card p-3.5 text-left flex items-center gap-3 transition-colors disabled:opacity-50"
+                      style={active ? { borderColor: 'var(--pine)', boxShadow: '0 0 0 3px var(--pine-soft)' } : undefined}
                     >
-                      {opt}
+                      <span className="text-2xl">{s.icon}</span>
+                      <div className="min-w-0">
+                        <div className="font-bold text-sm" style={{ color: 'var(--ink)' }}>
+                          {s.label}
+                          {s.key === 'mistakes' && <span className="badge badge-brick ml-1.5">{mistakes.length}</span>}
+                        </div>
+                        <div className="text-xs muted truncate">{s.sub}</div>
+                      </div>
                     </button>
                   );
                 })}
               </div>
 
-              {selected && (
-                <button
-                  onClick={next}
-                  className="mt-6 w-full py-3 rounded-xl font-mono text-sm uppercase tracking-widest font-semibold cursor-pointer"
-                  style={{ background: 'var(--pine)', color: 'var(--paper)' }}
-                >
-                  {index + 1 >= questions.length ? "Natijani ko'rish" : 'Keyingisi →'}
-                </button>
+              {source === 'lesson' && (
+                <select className="select mt-3" value={lessonId} onChange={(e) => setLessonId(e.target.value)}>
+                  {flat.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.moduleTitle} · {m.label} · {m.topic}
+                    </option>
+                  ))}
+                </select>
               )}
-            </>
-          ) : (
-            <div className="text-center py-10">
-              <div className="text-6xl mb-4">{correct === questions.length ? '🏆' : '🎫'}</div>
-              <h2 className="font-display text-3xl font-semibold mb-2" style={{ color: 'var(--ink)' }}>
-                {correct}/{questions.length} to'g'ri javob
-              </h2>
-              <p className="mb-8" style={{ color: 'var(--ink-soft)' }}>
-                {pool.length > ROUND_SIZE
-                  ? `${pool.length} ta so'zdan tasodifiy ${questions.length} tasi so'raldi. Yana bir turkum bilan davom eting.`
-                  : 'Natijangiz saqlandi.'}
-              </p>
-              <div className="flex items-center justify-center gap-3">
-                <button
-                  onClick={() => setRound((r) => r + 1)}
-                  className="px-6 py-3 rounded-xl font-mono text-sm uppercase tracking-widest font-semibold cursor-pointer"
-                  style={{ background: 'var(--gold)', color: 'var(--panel)' }}
-                >
-                  ↺ Yana bir turkum
-                </button>
-                <Link
-                  to={`/lang/${lang}`}
-                  className="inline-block px-6 py-3 rounded-xl font-mono text-sm uppercase tracking-widest font-semibold"
-                  style={{ background: 'var(--pine)', color: 'var(--paper)' }}
-                >
-                  Yo'nalishga qaytish
-                </Link>
+              {source === 'wordcat' && (
+                <select className="select mt-3" value={wordCat} onChange={(e) => setWordCat(Number(e.target.value))}>
+                  {(data.wordbank || []).map((c, i) => (
+                    <option key={i} value={i}>
+                      {i + 1}. {c.title} ({c.rows.length})
+                    </option>
+                  ))}
+                </select>
+              )}
+              {source === 'phrases' && (
+                <select className="select mt-3" value={phraseCat} onChange={(e) => setPhraseCat(Number(e.target.value))}>
+                  <option value={-1}>Barcha iboralar</option>
+                  {(data.phrasebank || []).map((c, i) => (
+                    <option key={i} value={i}>
+                      {i + 1}. {c.title} ({c.rows.length})
+                    </option>
+                  ))}
+                </select>
+              )}
+              {source === 'dict' && (
+                <select className="select mt-3" value={dictCat} onChange={(e) => setDictCat(Number(e.target.value))}>
+                  <option value={-1}>Barcha kategoriyalar</option>
+                  {(data.dictExtra || []).map((c, i) => (
+                    <option key={i} value={i}>
+                      {c.cat} ({c.words.length})
+                    </option>
+                  ))}
+                </select>
+              )}
+            </section>
+
+            <section>
+              <div className="label">2. Savol turi</div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                {Object.entries(MODES).map(([k, m]) => (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => setMode(k)}
+                    className="card p-3 text-left"
+                    style={mode === k ? { borderColor: 'var(--pine)', boxShadow: '0 0 0 3px var(--pine-soft)' } : undefined}
+                  >
+                    <div className="text-xl mb-1">{m.icon}</div>
+                    <div className="font-bold text-sm" style={{ color: 'var(--ink)' }}>
+                      {m.label}
+                    </div>
+                    <div className="text-[11px] muted leading-snug">{m.hint}</div>
+                  </button>
+                ))}
               </div>
+            </section>
+
+            <section>
+              <div className="label">3. Savollar soni</div>
+              <div className="tabs">
+                {COUNTS.map((c) => (
+                  <button key={c} type="button" className={`chip ${count === c ? 'chip-active' : ''}`} onClick={() => setCount(c)}>
+                    {c === 0 ? `Barchasi (${uniqueCount})` : c}
+                  </button>
+                ))}
+              </div>
+            </section>
+          </div>
+
+          <aside className="space-y-4">
+            <div className="card p-5 lg:sticky lg:top-6">
+              <div className="eyebrow mb-1">Tanlangan</div>
+              <div className="h2 mb-1">{label}</div>
+              <div className="text-sm muted mb-4">
+                {uniqueCount} ta so'z · {MODES[mode].label} · {count === 0 ? uniqueCount : Math.min(count, uniqueCount)} ta savol
+              </div>
+              <button type="button" className="btn btn-brand btn-lg btn-block" disabled={uniqueCount < 2} onClick={start}>
+                ▶ Mashqni boshlash
+              </button>
+              {uniqueCount < 2 && <div className="help">Bu manbada mashq uchun yetarli so'z yo'q.</div>}
+              <div className="divider my-4" />
+              <Link to="/results" className="btn btn-ghost btn-block">
+                📊 Natijalar va xatolar tarixi
+              </Link>
             </div>
-          )}
+          </aside>
         </div>
       </div>
     </Layout>

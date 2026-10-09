@@ -1,0 +1,317 @@
+# TEXNIK TOPSHIRIQ
+
+**Loyiha:** «Til sayohati» — ingliz, rus va turk tillarini o'zbek tilida o'rganish veb-platformasi (2-versiya)
+**Hujjat versiyasi:** 2.0 · **Sana:** 2026-yil oktabr
+**Buyurtmachi:** Quvonchbek (super administrator)
+
+---
+
+## 1. Umumiy ma'lumot
+
+### 1.1. Maqsad
+O'zbek tilida so'zlashuvchi foydalanuvchilarga ingliz, rus va turk tillarini A1 darajadan C1 darajagacha
+bosqichma-bosqich o'rgatadigan, telefonda qulay ishlaydigan, sun'iy intellekt (AI) ustoz bilan
+jihozlangan veb-platforma yaratish.
+
+### 1.2. Vazifalar
+1. Mavjud darsliklarni Word fayllardagi ma'lumotlar (2161 so'z, 297 ibora — gap va tarjimalari bilan)
+   asosida boyitish va ularni rus hamda turk tillariga tarjima qilib, uchala kursga qo'shish.
+2. Ro'yxatdan o'tishni telefon raqami yoki email orqali amalga oshirish.
+3. Avtomatik yaratiladigan super admin (login `quvonchbek`, parol `admin123`).
+4. Super admin tomonidan foydalanuvchi va admin qo'shish/o'chirish.
+5. Musiqa, video, rasm, matn, dialog, lug'at va yangiliklarni yuklash; chap menyuda alohida bo'limlar;
+   bo'limga kirilganda yuklanganlar ketma-ketlikda ochilishi.
+6. Lug'at mashqini kuchaytirish: istalgan payt to'xtatish va xatolarni alohida «Natija» bo'limida ko'rsatish.
+7. AI ustozni takomillashtirish va API kalitlarni admin panelda to'liq boshqarish.
+8. Dars o'rganish strukturasini qulay qilish, dizaynni yaxshilash, mobil moslashuvchanlik.
+9. GitHub + Netlify + Supabase orqali ishga tushirishga tayyor arxiv.
+
+### 1.3. Foydalanuvchilar
+| Rol | Tavsif |
+|---|---|
+| Mehmon | Faqat kirish/ro'yxatdan o'tish sahifalarini ko'radi |
+| O'quvchi (`user`) | Darslar, mashqlar, materiallar, AI ustoz, o'z natijalari |
+| Admin (`admin`) | O'quvchi imkoniyatlari + o'quvchi qo'shish/o'chirish/bloklash, materiallarni yuklash va boshqarish, statistika |
+| Super admin (`superadmin`) | Admin imkoniyatlari + adminlarni qo'shish/o'chirish, rol berish, AI sozlamalari va API kalitlar |
+
+---
+
+## 2. Texnologiyalar va arxitektura
+
+| Qatlam | Texnologiya |
+|---|---|
+| Frontend | React 19, React Router 7, Vite 8, Tailwind CSS 4 (SPA, PWA manifest) |
+| Backend | Supabase: PostgreSQL + Row Level Security, Supabase Auth, Supabase Storage, Edge Functions (Deno) |
+| AI | Google Gemini, OpenAI, Groq, OpenRouter, DeepSeek yoki istalgan OpenAI-mos API (admin tanlaydi) |
+| Hosting | Netlify (frontend), Supabase Cloud (backend), GitHub (kod, ixtiyoriy CI) |
+| Ovoz | Brauzerning Web Speech API'si: matnni o'qish (TTS) va ovoz bilan yozish (speech recognition) |
+
+```
+ Brauzer / telefon (React SPA, Netlify)
+   │  statik kontent: /content/meta.json, en.json, ru.json, tr.json
+   │
+   ├── Supabase Auth ........ kirish, ro'yxatdan o'tish, sessiya, parol tiklash
+   ├── Supabase Postgres .... profiles, progress, media_items, settings, ai_usage (RLS bilan)
+   ├── Supabase Storage ..... "media" bucket (audio, video, rasm)
+   └── Edge Functions
+         ├── admin ......... foydalanuvchilar, rollar, bloklash, AI sozlamalari, API kalitlar
+         └── ai ............ AI ustoz: vazifa, tekshiruv, chat, tushuntirish, kalitni sinash
+                               └──> Gemini / OpenAI / Groq / OpenRouter / DeepSeek
+```
+
+Kurs kontenti (darslar, lug'at banki) statik JSON fayllar sifatida beriladi — bu bazani yuklamaydi va
+sahifalarni tez ochadi. Foydalanuvchi progressi bitta `progress.state` (jsonb) maydonida saqlanadi.
+
+---
+
+## 3. Funksional talablar
+
+### 3.1. Ro'yxatdan o'tish va kirish
+| № | Talab |
+|---|---|
+| F-1.1 | Ro'yxatdan o'tish formasida **email va telefon raqami bir vaqtda** kiritiladi (kamida bittasi majburiy, ikkalasi ham mumkin). Boshqa maydonlar: ism, parol (≥ 6 belgi), parolni takrorlash |
+| F-1.2 | Telefon raqami normallashtiriladi (9 xonali raqamga `998` qo'shiladi, `+998XXXXXXXXX` ko'rinishida saqlanadi). Bitta raqam faqat bitta hisobga biriktiriladi (band bo'lsa formada darhol aytiladi). Faqat telefon kiritilgan bo'lsa, ichki email `tel998XXXXXXXXX@til-sayohati.app` yaratiladi |
+| F-1.3 | Kirish bitta maydon orqali: **email, telefon raqami yoki login — qaysi biri qulay bo'lsa**. Email bilan ochilgan hisobga telefon/login bilan kirilganda, server (`admin` funksiyasi, `login` amali) telefon/login bo'yicha emailni topadi va kirishni o'zi bajaradi — emaillar klientga oshkor bo'lmaydi |
+| F-1.3a | Profil sahifasida foydalanuvchi email va telefonni keyin ham qo'shishi yoki almashtirishi mumkin (kamida bitta kirish usuli qolishi shart) |
+| F-1.3b | Bitta login/email/telefon uchun 15 daqiqada 10 marta noto'g'ri parol kiritilsa, 15 daqiqaga vaqtincha qulflanadi |
+| F-1.4 | «Meni eslab qol» — belgilansa sessiya brauzer yopilganda ham saqlanadi |
+| F-1.5 | Email orqali ro'yxatdan o'tganlar uchun parolni tiklash (havola emailga yuboriladi, `/reset-password` sahifasida yangi parol) |
+| F-1.6 | Bloklangan foydalanuvchi tizimga kira olmaydi |
+| F-1.7 | Yangi foydalanuvchining roli doim `user` (rol ro'yxatdan o'tish ma'lumotidan olinmaydi) |
+| F-1.8 | Super admin `quvonchbek / admin123` SQL o'rnatish vaqtida avtomatik yaratiladi; qayta o'rnatishda o'chirilmaydi, paroli o'zgartirilmaydi |
+
+### 3.2. Kurs va dars tuzilmasi
+| № | Talab |
+|---|---|
+| F-2.1 | Har bir til uchun 5 bosqich (Poydevor, Erkinlikka qadam, Amaliy muloqot, Mukammallashtirish, Qo'shimcha qo'llanma), jami 33 dars |
+| F-2.2 | Darslar xaritasi: bosqichlar bo'yicha guruhlangan kartochkalar, har birida holat (yakunlangan / joriy / qulflangan), progress |
+| F-2.3 | Dars ichida 7 bosqichli stepper: Grammatika → Lug'at → Dialog → Mashqlar → Javoblar → O'qituvchi tavsiyasi → Test |
+| F-2.4 | Bosqichlar ketma-ket ochiladi; «✓ …, keyingisi →» tugmasi bosqichni bajarilgan deb belgilaydi. Telefonda tugma ekran pastida yopishib turadi |
+| F-2.5 | Dars testi (aralash savollar, ≥ 60%) topshirilgach va barcha bosqichlar bajarilgach dars yakunlanadi va keyingi dars ochiladi |
+| F-2.6 | Adminlar uchun barcha darslar ochiq |
+| F-2.7 | Lug'at bosqichida: ro'yxat, aylanuvchi kartochkalar (swipe), Word fayldagi so'z va iboralar (qidiruv, tarjimani yashirish, talaffuz) |
+| F-2.8 | Mashqlar bosqichida har bir javobni AI tekshirishi mumkin |
+| F-2.9 | Darsga admin biriktirgan materiallar (audio, video, matn…) dars sahifasida ko'rsatiladi |
+| F-2.10 | Dialog bosqichida: asosiy dialog, **ikkinchi dialog** va **o'qish matni** (tarjimasi va 3 ta tushunish savoli bilan) — ingliz, rus va turk kurslarining barcha 33 darsida. Ingliz tiliga xos joylar (masalan «ingliz tili kursi», ingliz sinonimlari) rus va turk tiliga moslashtirilgan |
+| F-2.11 | Har bir dialogda: «▶ Butun dialogni tinglash» va **«🎭 Rolli o'qish»**: o'quvchi rolni tanlaydi; ilova suhbatdoshning gaplarini ovoz chiqarib o'qiydi; o'quvchi o'z gapini mikrofonga aytadi, nutq aniqlanib asl matn bilan solishtiriladi va 0–100% baho beriladi; «Namuna», «Qayta aytish», «Keyingisi», yakunda o'rtacha ball va «boshqa rolda o'qish». Mikrofon qo'llab-quvvatlanmasa — ovoz chiqarib o'qib, «Keyingisi» bilan davom etiladi |
+
+### 3.3. Word fayllardagi ma'lumotlar
+| № | Talab |
+|---|---|
+| F-3.1 | «Inglizcha_2161_soz.docx» (24 bo'lim, 2161 so'z) va «297_ibora_jadval.docx» (20 bo'lim, 297 ibora) ma'lumotlari: so'z/ibora, o'zbekcha tarjima, misol gap, gap tarjimasi |
+| F-3.2 | Ma'lumotlar rus va turk tillariga tarjima qilingan (`data-src/i18n/`): rus/turk so'zi + rus/turk misol gapi; o'zbekcha tarjimalar umumiy |
+| F-3.3 | Har bir so'z/ibora aynan bitta darsga mavzuga mos holda biriktiriladi (uchala tilda bir xil taqsimot) |
+| F-3.4 | Rus so'zlari yonida lotin harflarida o'qilishi avtomatik ko'rsatiladi |
+| F-3.5 | Ingliz artikllari (*the, a/an*) rus va turk tillarida ekvivalenti yo'qligi sababli bu tillarga qo'shilmaydi |
+| F-3.6 | `node scripts/build-content.mjs` — manbadan kontent fayllarini qayta yig'adi va taqsimotni tekshiradi |
+
+### 3.4. Lug'at (to'liq lug'at sahifasi)
+| № | Talab |
+|---|---|
+| F-4.1 | Tablar: So'zlar (24 mavzu), Iboralar (20 mavzu), Kurs lug'ati (dars bo'yicha), Qo'shimcha (kategoriyalar + yuklangan lug'atlar) |
+| F-4.2 | Qidiruv (so'z yoki tarjima), mavzu filtri, tarjimani yashirish rejimi, so'z va gapni tinglash |
+| F-4.3 | Har bir so'z uchun «AI ustozdan tushuntirish» tugmasi |
+
+### 3.5. Lug'at mashqi va «Natija»
+| № | Talab |
+|---|---|
+| F-5.1 | Sozlash ekrani: **manba** (hamma so'zlar, kurs darslari, bitta dars, mavzu, iboralar, qo'shimcha/yuklangan lug'at, xatolarim), **savol turi** (so'z→ma'no, ma'no→so'z, yozish, tinglash, aralash), **soni** (10/20/30/50/100/barchasi) |
+| F-5.2 | Mashq paytida: savol raqami, to'g'ri/xato hisoblagichlari, progress, javobdan keyin izoh (to'g'ri javob, misol gap), «O'tkazib yuborish», klaviatura (1–4, Enter), «to'g'ri bo'lsa avtomatik keyingisi» |
+| F-5.3 | Yozish rejimida katta-kichik harf, tinish belgilari, `ё/е` farqi e'tiborga olinmaydi; ≥ 5 harfli so'zda bitta harf xatosi «kichik imlo xatosi» bilan to'g'ri hisoblanadi |
+| F-5.4 | **«⏹ To'xtatish»** tugmasi istalgan payt mashqni tugatadi va **Natija** ekranini ochadi |
+| F-5.5 | Natija ekrani: foiz (doira diagramma), to'g'ri/xato/javobsiz soni, vaqt; alohida tablar: **❌ Xatolar** (so'z, to'g'ri javob, foydalanuvchi javobi, savol turi, misol gap, talaffuz), **⏭ Javobsiz**, **✅ To'g'rilar** |
+| F-5.6 | «🔁 Xatolar ustida ishlash» — faqat xato qilingan so'zlar bilan yangi mashq |
+| F-5.7 | Har bir mashq tarixga yoziladi (oxirgi 40 ta); xato so'zlar «xatolar banki»ga tushadi va to'g'ri javob berilgan sari kamayadi |
+| F-5.8 | «📊 Natijalar» sahifasi: tillar bo'yicha filtr, umumiy statistika, mashqlar tarixi (har birini ochib xatolarni ko'rish), xato qilingan so'zlar ro'yxati va ular bo'yicha mashq |
+| F-5.9 | Dars testida to'xtatilsa, javob berilmagan savollar xato hisoblanadi (testni chetlab o'tishning oldi olinadi) |
+
+### 3.6. Materiallar (yuklash va ko'rish)
+| № | Talab |
+|---|---|
+| F-6.1 | Turlar: 🎵 musiqa/audio, 🎬 video, 🖼 rasm, 📄 matn, 💬 dialog, 📚 lug'at, 📰 yangilik. Har biri chap menyuda alohida bo'lim (soni bilan) |
+| F-6.2 | Yuklash faqat admin/super admin uchun: til (yoki barcha tillar), sarlavha, tavsif, darsga biriktirish, nashr holati |
+| F-6.3 | Audio, video, rasm — bir vaqtda bir nechta faylni yuklash (har biri ≤ 50 MB); sudrab tashlash (drag & drop) |
+| F-6.4 | Matn — PDF/DOCX/TXT dan avtomatik ajratib olish yoki qo'lda kiritish |
+| F-6.5 | Dialog — «A: Hello! \| Salom!» formatidagi matn (fayldan yoki qo'lda) + ixtiyoriy audio |
+| F-6.6 | Lug'at — «so'z — tarjima» yoki «so'z ; talaffuz ; tarjima» formatida; yuklangan lug'at avtomatik lug'at mashqiga va to'liq lug'atga qo'shiladi |
+| F-6.7 | Ketma-ketlik: elementlar admin belgilagan tartibda chiqadi (↑↓ tugmalari bilan o'zgartiriladi) |
+| F-6.8 | Audio/video — pleylist: «ketma-ket ijro» (biri tugasa keyingisi avtomatik boshlanadi), oldingi/keyingi |
+| F-6.9 | Rasm — galereya va katta ko'rinish; matn/dialog/lug'at — oynada ochiladi, «← Oldingi / Keyingisi →» bilan ketma-ket o'tish, «o'rganildi» belgisi |
+| F-6.10 | Admin elementni tahrirlashi, yashirishi va o'chirishi mumkin (fayl Storage'dan ham o'chiriladi) |
+| F-6.11 | Eng so'nggi yangiliklar bosh sahifada ko'rsatiladi |
+
+### 3.7. AI ustoz
+| № | Talab |
+|---|---|
+| F-7.1 | Chat paneli istalgan sahifadan ochiladi (desktop — suzuvchi tugma, telefon — pastki menyu, Ctrl/⌘+K); alohida «AI ustoz» sahifasi |
+| F-7.2 | Joriy dars konteksti (mavzu, grammatika, so'zlar) avtomatik uzatiladi; o'chirib qo'yish mumkin |
+| F-7.3 | Tezkor tugmalar: mavzuni tushuntirish, 5 ta test savoli, gapni tekshirish, so'z ma'nosi, suhbat mashqi, kunlik so'zlar |
+| F-7.4 | Ovoz bilan yozish (o'rganilayotgan tilda) |
+| F-7.5 | Javoblar o'zbek tilida, misollar tarjimasi bilan; administrator qo'shimcha ko'rsatma (uslub) bera oladi |
+| F-7.6 | «AI vazifa» vidjeti: vazifa turi (avtomatik, tarjima, gap tuzish, bo'sh joy, savol-javob, grammatika), maslahat, namunaviy javob, baho 0–100, tuzatilgan variant, maslahatlar, takrorlanmaslik |
+| F-7.7 | Kalit bo'lmasa «oddiy rejim»: shablon vazifalar, namunaga solishtirib tekshiruv, chatda lug'atdan so'z qidirish |
+| F-7.8 | O'quvchi uchun kunlik so'rovlar limiti (standart 150, 0 = cheksiz); adminlarga cheklov yo'q |
+
+### 3.8. Admin panel
+| № | Talab |
+|---|---|
+| F-8.1 | **Statistika:** foydalanuvchilar, shu hafta yangi, bugun faol, adminlar, bugungi AI so'rovlar, faol kalitlar, materiallar; kurs kontenti jadvali (tillar bo'yicha) |
+| F-8.0 | **Admin panel bosh ko'rinishi:** katta oynalar — **👥 Foydalanuvchilar** (jami, o'quvchilar, adminlar, bugun faol, shu hafta yangi), AI va API kalitlar, Materiallar; so'nggi ro'yxatdan o'tganlar; tezkor amallar. Oyna bosilganda tegishli bo'lim ochiladi |
+| F-8.1a | **«👥 Foydalanuvchilar» oynasi** chap menyuning «Boshqaruv» bo'limida ham alohida punkt sifatida turadi; bosilganda foydalanuvchilar ro'yxati ochiladi |
+| F-8.2 | **Foydalanuvchilar ro'yxati:** kompyuterda jadval (foydalanuvchi, email/telefon, rol, ro'yxatdan o'tgan sana, oxirgi kirish, amallar), telefonda kartochkalar; qidiruv (ism, login, email, telefon); filtr (barchasi, o'quvchilar, adminlar, bloklanganlar); saralash (yangi, eski, ism, oxirgi kirish); «Yangilash»; qo'shish (login yoki email + ixtiyoriy telefon + parol + ism + rol); rol o'zgartirish (faqat super admin); parolni tiklash; bloklash/ochish; o'chirish; foydalanuvchi kartasi (kirish ma'lumotlari, XP, seriya, darslar, oxirgi mashqlar, bugungi AI) |
+| F-8.3 | Ruxsatlar: admin faqat o'quvchilarni boshqaradi; super admin — o'quvchi va adminlarni; super adminni o'chirish/bloklash mumkin emas; o'zini o'chirish mumkin emas |
+| F-8.4 | **AI va API kalitlar:** provayder rejimi (avtomatik / aniq provayder / o'chiq), Gemini modeli, kunlik limit, ustoz uslubi; kalitlar ro'yxati (maskalangan, model, navbat, muvaffaqiyat/xato soni, oxirgi xato); qo'shish (provayder, nom, kalit, model, Base URL, navbat); **sinash** (javob vaqti va namuna); yoqish/o'chirish; tahrirlash; o'chirish |
+| F-8.5 | Kalitlar rotatsiyasi: biri xato bersa keyingisi ishlatiladi; yaroqsiz kalit (401/403) 3 marta ketma-ket xato bersa avtomatik o'chiriladi; limit (429) xatosida o'chirilmaydi |
+| F-8.6 | **Materiallar:** barcha bo'limlarga tezkor o'tish va sonlari |
+
+### 3.9. Profil va motivatsiya
+| № | Talab |
+|---|---|
+| F-9.1 | Profil: ismni o'zgartirish, parolni o'zgartirish, har bir til uchun ovoz va tezlik, mavzu (kunduzgi/tungi), «tizimda qolish» |
+| F-9.2 | XP: to'g'ri javob +1, dars bosqichi +10, dars yakuni +20, AI vazifa +5; kunlik maqsad 30 XP |
+| F-9.3 | Kunlik seriya (streak) va 7 kunlik faollik grafigi bosh sahifada |
+
+---
+
+## 4. Nofunksional talablar
+
+| № | Talab |
+|---|---|
+| N-1 | **Mobil moslashuv:** 360 px kenglikdan boshlab; telefonda pastki navigatsiya (Asosiy, Darslar, Mashq, AI ustoz, Menyu), chiquvchi yon menyu, katta bosish maydonlari (≥ 40 px), iOS'da kirish maydonida kattalashmaslik, `safe-area` qo'llab-quvvatlash |
+| N-2 | **PWA:** manifest va ikonkalar — telefon bosh ekraniga ilova sifatida qo'shish |
+| N-3 | **Tezlik:** sahifalar alohida yuklanadi (code splitting); kurs kontenti tilga qarab alohida faylda; PDF/DOCX kutubxonalari faqat yuklashda yuklanadi; statik fayllar keshlash sarlavhalari bilan |
+| N-4 | **Xavfsizlik:** barcha jadvallarda RLS; API kalitlar klientga chiqmaydi; rolni o'zgartirish trigger bilan himoyalangan; Edge Function'lar har so'rovda foydalanuvchini va rolini bazadan tekshiradi; Storage'ga yozish faqat adminlarga |
+| N-5 | **Barqarorlik:** Supabase sekin javob bersa ham darslar 3,5 soniyada statik kontent bilan ochiladi; tarmoq xatolari tushunarli o'zbekcha xabar bilan ko'rsatiladi; progress sahifa yopilganda ham saqlanadi |
+| N-6 | **Interfeys tili:** o'zbek (lotin) |
+| N-7 | **Mavzu:** kunduzgi va tungi rejim (tizim sozlamasiga moslashadi) |
+| N-8 | **Brauzerlar:** Chrome, Edge, Safari, Firefox, Samsung Internet — so'nggi 2 versiya |
+| N-9 | **Qulaylik:** klaviatura bilan boshqaruv, fokus halqasi, `prefers-reduced-motion` hurmat qilinadi |
+
+---
+
+## 5. Ma'lumotlar modeli (Supabase Postgres)
+
+| Jadval | Asosiy ustunlar | Kirish (RLS) |
+|---|---|---|
+| `profiles` | id, username, display_name, role (user/admin/superadmin), email, phone, is_blocked, last_seen_at, created_at | o'zi va adminlar o'qiydi; o'zi faqat ismini o'zgartiradi |
+| `progress` | user_id, state (jsonb), updated_at | o'zi o'qiydi/yozadi; adminlar o'qiydi |
+| `media_items` | id, kind, lang, title, description, storage_path, file_url, mime, size_bytes, content (jsonb), lesson_ref, position, is_published, uploaded_by, created_at | kirgan foydalanuvchilar nashr qilinganlarni o'qiydi; adminlar yozadi |
+| `settings` | key, value (ai_provider, ai_model_gemini, ai_daily_limit, ai_tutor_style) | kirganlar o'qiydi; super admin/Edge Function yozadi |
+| `api_keys` | id, provider, label, key_value, base_url, model, priority, is_active, failure_count, success_count, last_used_at, last_error | klientdan butunlay yopiq (faqat service-role) |
+| `ai_usage` | user_id, day, count | o'zi va adminlar o'qiydi; yozish faqat `bump_ai_usage()` orqali |
+| `login_attempts` | key (login/email/telefon), fails, window_start, locked_until | klientdan butunlay yopiq |
+
+`profiles.phone` — noyob (unique index). `phone_available(p_phone)` — ro'yxatdan o'tish formasi uchun ochiq funksiya.
+| `books`, `vocab_sets` | (1-versiyadan) | o'qish uchun saqlanadi; ma'lumotlari `media_items` ga ko'chirilgan |
+
+`progress.state` tarkibi: `reviewFlags` (dars bosqichlari), `testResults` (dars testlari), `practiceHistory`
+(mashqlar tarixi), `mistakeBank` (xato so'zlar), `activity` (kunlik XP), `xpTotal`, `vocabStats`, `aiStats`,
+`exerciseAnswers`, `mediaDone`, `voiceSettings`.
+
+Storage: `media` bucket (ommaviy o'qish, yozish — adminlar), yo'l: `<tur>/<YYYY-MM>/<uuid>.<kengaytma>`.
+
+---
+
+## 6. API (Edge Functions)
+
+Barcha so'rovlar: `POST /functions/v1/<nomi>`, sarlavha `Authorization: Bearer <sessiya tokeni>`, tana `{ "action": "...", ... }`.
+
+**`admin`**
+| action | Kim | Tavsif |
+|---|---|---|
+| `login` | **ochiq (tokensiz)** | `identifier` (email/telefon/login), `password` → `{session}`; urinishlar cheklovi bilan |
+| `update-my-contact` | har qanday kirgan foydalanuvchi | `email?`, `phone?` — o'z kirish ma'lumotlarini qo'shish/almashtirish |
+| `list-users`, `user-detail`, `stats` | admin+ | ro'yxat (oxirgi kirish bilan), foydalanuvchi kartasi, statistika |
+| `create-user` | admin+ (admin rolini faqat super admin) | `identifier` (login/email/telefon), `phone?`, `password`, `displayName`, `role` |
+| `delete-user`, `reset-password`, `block-user` | admin+ (ruxsat matritsasi bo'yicha) | o'chirish, yangi parol, bloklash (`blocked`) |
+| `set-role` | super admin | `role`: user / admin |
+| `get-ai-settings` | admin+ | AI holati |
+| `save-ai-settings` | super admin | `provider`, `geminiModel`, `dailyLimit`, `tutorStyle` |
+| `list-api-keys` | admin+ | maskalangan ro'yxat |
+| `add-api-key`, `update-api-key`, `toggle-api-key`, `delete-api-key` | super admin | kalitlarni boshqarish |
+
+**`ai`**
+| action | Tavsif |
+|---|---|
+| `status` | joriy provayder, faol kalitlar, kunlik limit va bugungi foydalanish |
+| `task` | `type`, `content`, `lang`, `taskKind?`, `level?`, `avoid?` → `{question, hint, sample}` |
+| `check` | `context`, `question`, `answer`, `lang`, `sample?` → `{correct, score, feedback, corrected, tips}` |
+| `chat` | `messages[]`, `lang`, `context?` → `{reply}` |
+| `explain` | `text`, `lang` → `{reply}` |
+| `test-key` (admin+) | `id` → `{ok, latencyMs, sample | error}` |
+
+---
+
+## 7. Interfeys (sahifalar)
+
+| Yo'l | Sahifa |
+|---|---|
+| `/login`, `/register`, `/reset-password` | Kirish, ro'yxatdan o'tish (telefon/email), parolni tiklash |
+| `/` | Bosh sahifa: salomlashish, kunlik maqsad, seriya, haftalik grafik, statistika, yo'nalishlar, tezkor amallar, yangiliklar, oxirgi natijalar |
+| `/lang/:til` | Darslar xaritasi |
+| `/lang/:til/month/:bosqich/:dars` | Dars (7 bosqichli stepper) |
+| `/lang/:til/practice/:bosqich/:dars` | Dars testi |
+| `/lang/:til/practice-full` | Lug'at mashqi (sozlash → mashq → natija) |
+| `/lang/:til/dictionary`, `/dialogs`, `/grammar`, `/verbs` | Lug'at, dialoglar, grammatika, fe'llar |
+| `/results` | Natijalar va xatolar |
+| `/media/:tur` | Materiallar (audio, video, image, text, dialog, vocab, news) |
+| `/ai` | AI ustoz |
+| `/profile` | Profil va sozlamalar |
+| `/admin` | Admin panel: Umumiy (oynalar) · `?tab=users` Foydalanuvchilar · `?tab=ai` AI va API kalitlar · `?tab=content` Materiallar · `?tab=stats` Statistika |
+
+Chap menyu bo'limlari: **Asosiy** (Bosh sahifa, Darslar, AI ustoz, Natijalar) · **Mashg'ulotlar** (Lug'at mashqi,
+Lug'at, Dialog mashqi, Grammatika, Fe'llar) · **Materiallar** (Yangiliklar, Musiqa, Video, Dialoglar, Lug'atlar,
+Matnlar, Rasmlar) · **Boshqaruv** (Admin panel, 👥 Foydalanuvchilar, AI va API kalitlar — faqat adminlarga). Yuqorida til tanlash (🇬🇧 🇷🇺 🇹🇷), pastda tungi rejim va profil.
+
+---
+
+## 8. Joylashtirish
+
+Batafsil: `DEPLOY.md`. Qisqacha:
+1. Supabase: `supabase/setup_full.sql` → SQL Editor → Run; Auth'da «Confirm email» o'chiriladi;
+   `admin` va `ai` funksiyalari JWT tekshiruvisiz joylanadi.
+2. GitHub: kod yuklanadi.
+3. Netlify: repozitoriy ulanadi, `VITE_SUPABASE_URL` va `VITE_SUPABASE_ANON_KEY` kiritiladi.
+4. `quvonchbek / admin123` bilan kirib, parol almashtiriladi va AI kaliti qo'shiladi.
+
+---
+
+## 9. Qabul qilish mezonlari (test ssenariylari)
+
+| № | Ssenariy | Kutilgan natija |
+|---|---|---|
+| T-1 | Email **va** telefon bilan birga ro'yxatdan o'tish; chiqish; avval email bilan, keyin telefon bilan, keyin login bilan kirish | Uchala usulda ham kirish muvaffaqiyatli; profilda email va telefon ko'rinadi |
+| T-1a | Faqat telefon bilan ro'yxatdan o'tish, keyin profilda email qo'shish va email bilan kirish | Muvaffaqiyatli |
+| T-1b | Band telefon raqami bilan ro'yxatdan o'tishga urinish | «Bu telefon raqami allaqachon ro'yxatdan o'tgan» |
+| T-1c | Rus tili 1-oy darsi → Dialog → «🎭 Rolli o'qish» → «Men — Сара» | Administrator gaplari ovoz chiqarib o'qiladi, o'quvchi gapida mikrofon tugmasi va baho chiqadi |
+| T-1d | Admin panel → «👥 Foydalanuvchilar» oynasini bosish (yoki chap menyudagi punkt) | Foydalanuvchilar ro'yxati (jadval) ochiladi; qidiruv, filtr va saralash ishlaydi |
+| T-2 | Email bilan ro'yxatdan o'tish va kirish; «Parolni unutdingizmi?» | Tiklash xati keladi, yangi parol bilan kirish mumkin |
+| T-3 | `quvonchbek / admin123` bilan kirish | Admin panel ochiladi, roli «Super admin» |
+| T-4 | Super admin admin qo'shadi; admin o'quvchi qo'shadi; admin boshqa adminni o'chirishga urinadi | Birinchi ikkisi muvaffaqiyatli, uchinchisi «ruxsat yo'q» |
+| T-5 | O'quvchini bloklash | U kira olmaydi; blokdan chiqarilgach kiradi |
+| T-6 | Gemini kalitini qo'shish → «Sinash» | ✅ «Ishlayapti (… ms)»; AI ustoz holati «AI faol» |
+| T-7 | Kalitni noto'g'ri qiymat bilan qo'shish → sinash | ❌ aniq xato matni; kalit ishlatilmaydi |
+| T-8 | Musiqa bo'limiga 3 ta mp3 yuklash, tartibini o'zgartirish | Pleylistda belgilangan tartib, ketma-ket ijro ishlaydi |
+| T-9 | Lug'at fayli (DOCX) yuklash | Lug'atlar bo'limida va lug'at mashqi manbalarida paydo bo'ladi |
+| T-10 | Lug'at mashqi: 20 savol, 5 tasiga javob berib «To'xtatish» | Natija: 5 ta javob bo'yicha foiz; xatolar alohida tabda, sizning javobingiz bilan; «Natijalar» sahifasida saqlangan |
+| T-11 | «Xatolar ustida ishlash» | Faqat xato qilingan so'zlar bilan yangi mashq |
+| T-12 | Rus tili 3-oy darsi → Lug'at bosqichi | Word fayldagi so'zlar rus tilida, lotin o'qilishi va misol gaplar bilan |
+| T-13 | Turk tili lug'at sahifasi | 2159 so'z va 297 ibora, mavzular bo'yicha |
+| T-14 | Telefonda (375 px) barcha sahifalar | Gorizontal aylantirish yo'q, pastki menyu ishlaydi, tugmalar qulay |
+| T-15 | O'quvchi admin sahifasiga kiradi (`/admin`) | «Ruxsat yo'q» |
+
+---
+
+## 10. Cheklovlar va tavsiyalar
+
+- **SMS orqali tasdiqlash** joriy versiyada yo'q (telefon raqami parol bilan ishlaydi). Kerak bo'lsa, Supabase
+  Phone provider + SMS xizmati (Twilio, Eskiz.uz va h.k.) ulanib, OTP qo'shilishi mumkin.
+- Bepul Supabase rejasi: 500 MB baza, 1 GB fayl saqlash, har bir fayl ≤ 50 MB. Ko'p video uchun pullik reja
+  yoki tashqi video xosting (YouTube havolasi) tavsiya etiladi.
+- Matnni ovoz bilan o'qish sifati qurilmadagi ovozlarga bog'liq (Profil → Talaffuz ovozi).
+- «Qo'shimcha grammatika» izohlari faqat ingliz kursida (ingliz grammatikasiga xos); rus va turk kurslarida
+  asosiy grammatika bo'limi bor.
+- Rolli o'qishdagi nutqni aniqlash brauzerga bog'liq (Chrome, Edge, Android'dagi Chrome va Safari'ning yangi
+  versiyalari qo'llab-quvvatlaydi).
+- Kelajak uchun: offline rejim (service worker), push-bildirishnomalar (kunlik eslatma), sertifikat generatsiyasi,
+  guruhlar va o'qituvchi kabineti, reyting jadvali.

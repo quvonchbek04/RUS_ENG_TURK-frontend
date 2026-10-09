@@ -165,24 +165,16 @@ export default function TtsReader({ text, lang, rate, voiceURI, onRateChange, on
   return (
     <div>
       <div className="flex flex-wrap items-center gap-3 mb-4">
-        <button
-          onClick={togglePlay}
-          className="font-mono text-xs uppercase tracking-widest px-4 py-2.5 rounded-xl cursor-pointer font-semibold"
-          style={{ background: 'var(--pine)', color: 'var(--paper)' }}
-        >
-          {isPlaying ? '⏸ Pauza' : finished ? "↺ Qayta o'ynash" : '▶️ O\'qish'}
+        <button type="button" onClick={togglePlay} className="btn btn-primary">
+          {isPlaying ? '⏸ Pauza' : finished ? "↺ Qayta o'qish" : "▶ Ovoz bilan o'qish"}
         </button>
         {(isPlaying || elapsedBeforePauseRef.current > 0) && (
-          <button
-            onClick={stop}
-            className="font-mono text-xs uppercase tracking-widest px-3 py-2.5 rounded-xl cursor-pointer border"
-            style={{ borderColor: 'var(--line)', color: 'var(--ink-soft)' }}
-          >
+          <button type="button" onClick={stop} className="btn btn-ghost">
             ⏹ To'xtatish
           </button>
         )}
 
-        <label className="flex items-center gap-2 font-mono text-xs" style={{ color: 'var(--ink-soft)' }}>
+        <label className="flex items-center gap-2 text-xs font-semibold muted">
           Tezlik
           <input
             type="range"
@@ -191,7 +183,8 @@ export default function TtsReader({ text, lang, rate, voiceURI, onRateChange, on
             step="0.1"
             value={rate}
             onChange={(e) => onRateChange(parseFloat(e.target.value))}
-            className="w-24 accent-current"
+            className="w-24"
+            style={{ accentColor: 'var(--pine)' }}
           />
           <span className="font-mono">{rate.toFixed(1)}x</span>
         </label>
@@ -200,8 +193,7 @@ export default function TtsReader({ text, lang, rate, voiceURI, onRateChange, on
           <select
             value={voiceURI || ''}
             onChange={(e) => onVoiceChange(e.target.value || null)}
-            className="font-mono text-xs px-2 py-2 rounded-lg border"
-            style={{ borderColor: 'var(--line)', background: 'var(--panel)', color: 'var(--ink)' }}
+            className="select !w-auto !py-2 text-xs"
           >
             <option value="">Standart ovoz</option>
             {voices.map((v) => (
@@ -215,8 +207,8 @@ export default function TtsReader({ text, lang, rate, voiceURI, onRateChange, on
 
       <div
         ref={containerRef}
-        className="rounded-xl border p-5 leading-relaxed max-h-[50vh] overflow-y-auto whitespace-pre-wrap"
-        style={{ borderColor: 'var(--line)', background: 'var(--panel)', color: 'var(--ink)' }}
+        className="card p-5 leading-relaxed max-h-[60vh] overflow-y-auto whitespace-pre-wrap text-[15px]"
+        style={{ color: 'var(--ink)' }}
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </div>

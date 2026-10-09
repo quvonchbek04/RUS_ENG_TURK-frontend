@@ -1,0 +1,241 @@
+22.102|вздыхать|Он вздохнул с облегчением.|iç çekmek|Rahatlayarak iç çekti.
+22.103|поскользнуться|Будь осторожен, не поскользнись.|kaymak|Kaymamaya dikkat et.
+22.104|сортировать|Рассортируй бумаги по дате.|sıralamak|Kâğıtları tarihe göre sırala.
+22.105|произносить по буквам|Как пишется твоё имя?|harf harf söylemek|Adın nasıl yazılıyor?
+22.106|делить, разделять|Давай разделим расходы.|bölüşmek|Masrafı bölüşelim.
+22.107|намазывать, распространять|Намажь масло на хлеб.|sürmek, yaymak|Ekmeğe tereyağı sür.
+22.108|красть|Не воруй.|çalmak|Hırsızlık yapma.
+22.109|приклеивать|Приклей марку на конверт.|yapıştırmak|Pulu zarfa yapıştır.
+22.110|растягивать|Потяни руки.|germek|Kollarını ger.
+22.111|бороться|Они борются с денежными проблемами.|mücadele etmek|Para sorunlarıyla mücadele ediyorlar.
+22.112|учиться, изучать|Я учу английский каждый вечер.|çalışmak (ders)|Her gece İngilizce çalışırım.
+22.113|страдать|Он страдает от головной боли.|acı çekmek|Baş ağrısı çekiyor.
+22.114|снабжать|Ферма поставляет свежее молоко.|tedarik etmek|Çiftlik taze süt tedarik ediyor.
+22.115|окружать|Горы окружают город.|çevrelemek|Dağlar şehri çevreliyor.
+22.116|выживать|Он выжил в аварии.|hayatta kalmak|Kazadan sağ kurtuldu.
+22.117|глотать|Проглоти таблетку с водой.|yutmak|Hapı suyla yut.
+22.118|переключать|Включи свет.|değiştirmek, açmak|Işığı aç.
+22.119|иметь тенденцию|Цены имеют тенденцию расти.|eğiliminde olmak|Fiyatlar artma eğiliminde.
+22.120|переводить|Можешь перевести этот текст?|çevirmek|Bu metni çevirebilir misin?
+22.121|лечить; обращаться|Врач лечит пациентов.|tedavi etmek; davranmak|Doktor hastaları tedavi ediyor.
+22.122|обманывать|Он меня обманул.|kandırmak|Beni kandırdı.
+22.123|беспокоить|Не беспокой его.|rahatsız etmek|Onu rahatsız etme.
+22.124|крутить|Открути крышку, чтобы открыть.|çevirmek, bükmek|Açmak için kapağı çevir.
+22.125|объединяться|Люди объединяются ради мира.|birleşmek|İnsanlar barış için birleşiyor.
+22.126|обновлять|Обнови свой телефон.|güncellemek|Telefonunu güncelle.
+22.127|различаться|Цены различаются от магазина к магазину.|değişmek, farklılık göstermek|Fiyatlar dükkândan dükkâna değişir.
+22.128|голосовать|Мы голосуем в воскресенье.|oy vermek|Pazar günü oy veriyoruz.
+22.129|бродить|Они бродили по городу.|dolaşmak|Şehirde dolaştılar.
+22.130|взвешивать|Взвесь яблоки.|tartmak|Elmaları tart.
+22.131|приветствовать, встречать|Мы радушно встречаем гостей.|ağırlamak, karşılamak|Misafirlerimizi ağırlıyoruz.
+22.132|свистеть|Он умеет насвистывать песню.|ıslık çalmak|Islıkla bir şarkı çalabiliyor.
+22.133|интересоваться, задаваться вопросом|Интересно, где он.|merak etmek|Nerede olduğunu merak ediyorum.
+22.134|поклоняться, молиться|Они молятся в мечети.|ibadet etmek|Camide ibadet ediyorlar.
+22.135|заворачивать|Заверни подарок в бумагу.|sarmak, paketlemek|Hediyeyi kâğıda sar.
+22.136|кричать, орать|Не кричи на меня.|bağırmak|Bana bağırma.
+# 23. Sifatlar (qo'shimcha)
+23.1|отсутствующий|Сегодня его нет.|yok, devamsız|Bugün yok.
+23.2|присутствующий|Все студенты присутствуют.|mevcut, burada|Bütün öğrenciler burada.
+23.3|активный|Она активная девочка.|aktif|O aktif bir kız.
+23.4|фактический|Какова фактическая цена?|gerçek|Gerçek fiyat ne?
+23.5|древний|Это древний город.|antik, kadim|Bu antik bir şehir.
+23.6|раздражающий|Шум раздражает.|sinir bozucu|Gürültü sinir bozucu.
+23.7|тревожный|Она чувствует тревогу.|endişeli|Endişeli hissediyor.
+23.8|очевидный|Очевидно, что он устал.|belli, açık|Yorgun olduğu belli.
+23.9|искусственный|Эти цветы искусственные.|yapay|Bu çiçekler yapay.
+23.10|привлекательный|Она привлекательная женщина.|çekici|O çekici bir kadın.
+23.11|базовый|Сначала выучи базовый английский.|temel|Önce temel İngilizceyi öğren.
+23.12|скучающий|Мне скучно.|sıkılmış|Sıkıldım.
+23.13|сломанный|Окно разбито.|kırık|Pencere kırık.
+23.14|спокойный|Сохраняй спокойствие.|sakin|Sakin ol.
+23.15|способный|Она способный менеджер.|yetenekli|O yetenekli bir yönetici.
+23.16|весёлый|Он весёлый мальчик.|neşeli|O neşeli bir çocuk.
+23.17|главный|Он главный инженер.|baş, şef|O baş mühendis.
+23.18|гражданский|Гражданские права важны.|sivil, medeni|Medeni haklar önemlidir.
+23.19|классический|Это классический фильм.|klasik|Bu klasik bir film.
+23.20|близкий|Банк недалеко от моего дома.|yakın|Banka evime yakın.
+23.21|холоднокровный|Змея — холоднокровное животное.|soğukkanlı|Yılan soğukkanlı bir hayvandır.
+23.22|удобный|Этот стул удобный.|rahat|Bu sandalye rahat.
+23.23|уверенный (в себе)|Она уверена в себе.|kendinden emin|Kendinden emin.
+23.24|растерянный|Я запутался.|kafası karışık|Kafam karıştı.
+23.25|в сознании|Сейчас он в сознании.|bilinçli|Şimdi bilinci yerinde.
+23.26|сумасшедший|Это безумная идея.|çılgın|Bu fikir çılgınca.
+23.27|жестокий|Бить животных жестоко.|zalim|Hayvanlara vurmak zalimcedir.
+23.28|любопытный|Дети любопытны.|meraklı|Çocuklar meraklıdır.
+23.29|ежедневный|Это мой распорядок дня.|günlük|Bu benim günlük rutinim.
+23.30|дорогой (милый)|Дорогие друзья, добро пожаловать!|sevgili, aziz|Sevgili dostlar, hoş geldiniz!
+23.31|достойный|Он получает достойную зарплату.|makul, düzgün|Makul bir maaş alıyor.
+23.32|хрупкий, нежный|Стекло хрупкое.|narin, kırılgan|Cam kırılgan.
+23.33|зависимый|Ребёнок зависит от родителей.|bağımlı|Çocuk ebeveynlerine bağımlıdır.
+23.34|прямой|Есть прямой рейс в Ташкент.|direkt|Taşkent'e direkt uçuş var.
+23.35|с инвалидностью|В здании есть доступ для людей с инвалидностью.|engelli|Binada engelliler için erişim var.
+23.36|далёкий|Они живут в далёкой деревне.|uzak|Uzak bir köyde yaşıyorlar.
+23.37|скучный, тусклый|Урок был скучным.|sıkıcı|Ders sıkıcıydı.
+23.38|жаждущий, стремящийся|Она очень хочет учиться.|istekli|Öğrenmeye istekli.
+23.39|образованный|Он образованный человек.|eğitimli|O eğitimli bir adam.
+23.40|эффективный|Это лекарство эффективно.|etkili|Bu ilaç etkili.
+23.41|пожилой|Уважайте пожилых людей.|yaşlı|Yaşlılara saygı gösterin.
+23.42|смущённый|Мне было неловко.|mahcup|Mahcup oldum.
+23.43|эмоциональный|Она была очень эмоциональна.|duygusal|Çok duygusaldı.
+23.44|пустоголовый|Не будь пустоголовым.|boş kafalı|Boş kafalı olma.
+23.45|весь, целый|Я прочитал всю книгу.|bütün, tüm|Bütün kitabı okudum.
+23.46|равный|Все люди равны.|eşit|Bütün insanlar eşittir.
+23.47|необходимый, существенный|Вода необходима для жизни.|temel, gerekli|Su yaşam için gereklidir.
+23.48|вечный|Ничто не вечно.|ebedî, sonsuz|Hiçbir şey sonsuz değildir.
+23.49|злой|История о злом короле.|kötü, şeytani|Hikâye kötü bir kral hakkında.
+23.50|точный|Какое точное время?|tam, kesin|Saat tam olarak kaç?
+23.51|измученный|Я измотан.|bitkin|Bitkinim.
+23.52|знакомый|Эта улица кажется знакомой.|tanıdık|Bu sokak tanıdık geliyor.
+23.53|шикарный|Это шикарный отель.|lüks, şık|Bu lüks bir otel.
+23.54|фантастический|Вид фантастический.|harika, fantastik|Manzara harika.
+23.55|модный|Она носит модную одежду.|moda, şık|Şık kıyafetler giyiyor.
+23.56|толстый|Кот толстый.|şişman|Kedi şişman.
+23.57|женский|Она женщина-врач.|kadın (cinsiyet)|O bir kadın doktor.
+23.58|мужской|Он медбрат.|erkek (cinsiyet)|O bir erkek hemşire.
+23.59|свирепый|Лев свирепый.|vahşi, yırtıcı|Aslan çok vahşi.
+23.60|твёрдый, крепкий|У него крепкое рукопожатие.|sıkı, sağlam|Sıkı bir el sıkışması var.
+23.61|фиксированный|Цена фиксированная.|sabit|Fiyat sabit.
+23.62|гибкий|У меня гибкий график.|esnek|Programım esnek.
+23.63|глупый|Не будь глупым.|aptalca, ahmak|Aptallık etme.
+23.64|иностранный|Он говорит на иностранном языке.|yabancı|Yabancı bir dil konuşuyor.
+23.65|официальный, строгий|Он был в строгой одежде.|resmî|Resmî kıyafetler giydi.
+23.66|частый|Он частый гость.|sık|Sık gelen bir ziyaretçi.
+23.67|испуганный|Ребёнок испугался.|korkmuş|Çocuk korkmuş.
+23.68|замёрзший|Озеро замёрзло.|donmuş|Göl donmuş.
+23.69|весёлый, забавный|Игра была весёлой.|eğlenceli|Oyun eğlenceliydi.
+23.70|общий|Это общая информация.|genel|Bu genel bir bilgi.
+23.71|мягкий, нежный|Он мягкий человек.|nazik, yumuşak huylu|O nazik bir adam.
+23.72|глобальный|Это глобальная проблема.|küresel|Bu küresel bir sorun.
+23.73|благодарный|Я тебе благодарен.|minnettar|Sana minnettarım.
+23.74|великий, отличный|Это отличная идея.|harika, büyük|Bu harika bir fikir.
+23.75|виноватый|Он чувствовал себя виноватым.|suçlu|Kendini suçlu hissetti.
+23.76|удобный, полезный|Это удобный инструмент.|kullanışlı|Bu kullanışlı bir alet.
+23.77|скрытый|Ключ спрятан под ковром.|gizli, saklı|Anahtar halının altında saklı.
+23.78|святой|Мечеть — святое место.|kutsal|Cami kutsal bir yerdir.
+23.79|полный надежды|Она полна надежды.|umutlu|Umutlu.
+23.80|безнадёжный|Ситуация безнадёжная.|umutsuz|Durum umutsuz.
+23.81|вспыльчивый|Он вспыльчивый человек.|sinirli, öfkeli|O sinirli bir adam.
+23.82|скромный|Он скромный человек.|alçakgönüllü|O alçakgönüllü bir adam.
+23.83|одинаковый, идентичный|Близнецы выглядят одинаково.|aynı, özdeş|İkizler birbirinin aynısı.
+23.84|немедленный|Мне нужен немедленный ответ.|acil, hemen|Hemen bir cevaba ihtiyacım var.
+23.85|нетерпеливый|Не будь нетерпеливым.|sabırsız|Sabırsız olma.
+23.86|независимый|Она независимая женщина.|bağımsız|O bağımsız bir kadın.
+23.87|неофициальный|Это была неофициальная встреча.|gayriresmî|Gayriresmî bir toplantıydı.
+23.88|невинный|Ребёнок невиновен.|masum|Çocuk masum.
+23.89|внутренний|У него есть внутренняя сила.|iç|İçsel bir gücü var.
+23.90|умный|Она умная девушка.|zeki|O zeki bir kız.
+23.91|радостный|Это был радостный день.|neşeli, sevinçli|Neşeli bir gündü.
+23.92|ревнивый, завистливый|Он завидует своему брату.|kıskanç|Kardeşini kıskanıyor.
+23.93|сочный|Персик сочный.|sulu|Şeftali sulu.
+23.94|увлечённый|Он увлекается футболом.|meraklı, hevesli|Futbola meraklı.
+23.95|известный|Он известный писатель.|bilinen, tanınmış|Tanınmış bir yazar.
+23.96|законный|Это юридический документ.|yasal|Bu yasal bir belge.
+23.97|оживлённый|Это оживлённый город.|canlı, hareketli|Canlı bir şehir.
+23.98|логичный|Его идея логична.|mantıklı|Fikri mantıklı.
+23.99|потерянный|Я заблудился.|kayıp|Kayboldum.
+23.100|верный|Собака верная.|sadık|Köpek sadıktır.
+23.101|волшебный|Это фокус.|sihirli|Bu bir sihir numarası.
+23.102|сердитый, злой|Он злится на меня.|kızgın|Bana kızgın.
+23.103|крупный, главный|Это серьёзная проблема.|büyük, önemli|Bu büyük bir sorun.
+23.104|незначительный|Это незначительная проблема.|küçük, önemsiz|Bu küçük bir sorun.
+23.105|отсутствующий, пропавший|Не хватает одной страницы.|eksik, kayıp|Bir sayfa eksik.
+23.106|смешанный|Это смешанный салат.|karışık|Bu karışık bir salata.
+23.107|мобильный|У меня есть мобильный телефон.|mobil, taşınabilir|Cep telefonum var.
+23.108|скромный|Она скромная девушка.|mütevazı|O mütevazı bir kız.
+23.109|моральный|Это моральный вопрос.|ahlaki|Bu ahlaki bir soru.
+23.110|естественный|Волноваться естественно.|doğal|Gergin hissetmek doğaldır.
+23.111|аккуратный|Её комната аккуратная.|düzenli, derli toplu|Odası derli toplu.
+23.112|нервный|Я нервничаю перед экзаменом.|gergin|Sınavdan önce gerginim.
+23.113|приятный, хороший|Хороший день.|güzel, hoş|Güzel bir gün.
+23.114|шумный|Улица шумная.|gürültülü|Sokak gürültülü.
+23.115|многочисленный|Пришло много людей.|çok sayıda|Çok sayıda insan geldi.
+23.116|очевидный|Ответ очевиден.|açık, belli|Cevap açık.
+23.117|странный|Странно, что он не позвонил.|tuhaf|Aramaması tuhaf.
+23.118|онлайн|Я учусь онлайн.|çevrimiçi|Çevrimiçi ders çalışıyorum.
+23.119|оптимистичный|Она оптимистка.|iyimser|O iyimser.
+23.120|оригинальный, подлинный|Это оригинальная фотография.|orijinal|Bu orijinal fotoğraf.
+23.121|на открытом воздухе|Мы любим спорт на свежем воздухе.|açık hava|Açık hava sporlarını severiz.
+23.122|заграничный; за границей|Он работает за границей.|yurt dışı|Yurt dışında çalışıyor.
+23.123|болезненный|Травма болезненная.|ağrılı, acı veren|Sakatlık acı veriyor.
+23.124|бледный|Она выглядит бледной.|solgun|Solgun görünüyor.
+23.125|частичный|Это частичный ответ.|kısmi|Bu kısmi bir cevap.
+23.126|мирный|Это мирная деревня.|huzurlu|Huzurlu bir köy.
+23.127|пессимистичный|Он пессимист.|kötümser|Kötümser biri.
+23.128|физический|Физические упражнения полезны.|fiziksel|Fiziksel egzersiz iyidir.
+23.129|простой|Она носит простую одежду.|sade|Sade kıyafetler giyiyor.
+23.130|приятный|Это был приятный вечер.|hoş, keyifli|Keyifli bir akşamdı.
+23.131|довольный|Я доволен результатом.|memnun|Sonuçtan memnunum.
+23.132|положительный|У него позитивный настрой.|olumlu|Olumlu bir tutumu var.
+23.133|отрицательный|Не будь таким негативным.|olumsuz|Bu kadar olumsuz olma.
+23.134|мощный|Это мощный двигатель.|güçlü|Bu güçlü bir motor.
+23.135|практичный|Это практичная идея.|pratik|Bu pratik bir fikir.
+23.136|драгоценный|Время бесценно.|değerli|Zaman değerlidir.
+23.137|беременная|Она беременна.|hamile|Hamile.
+23.138|предыдущий|Посмотри предыдущую страницу.|önceki|Önceki sayfaya bak.
+23.139|основной, первичный|Это моя главная цель.|birincil, temel|Bu benim temel hedefim.
+23.140|профессиональный|Он профессиональный игрок.|profesyonel|Profesyonel bir oyuncu.
+23.141|подходящий, правильный|Используй подходящий инструмент.|uygun, doğru|Uygun aleti kullan.
+23.142|защитный|Надевайте защитные очки.|koruyucu|Koruyucu gözlük takın.
+23.143|чистый|Вода чистая.|saf, temiz|Su saf.
+23.144|постоянный, регулярный|Он постоянный клиент.|düzenli, daimi|Daimi bir müşteri.
+23.145|расслабленный|Я чувствую себя расслабленно.|rahat|Kendimi rahat hissediyorum.
+23.146|надёжный|Он надёжный друг.|güvenilir|Güvenilir bir arkadaş.
+23.147|религиозный|Они религиозная семья.|dindar|Dindar bir aile.
+23.148|отдалённый|Это отдалённая деревня.|ücra|Ücra bir köy.
+23.149|ответственный|Она отвечает за проект.|sorumlu|Projeden sorumlu.
+23.150|священный|Это священное место.|kutsal|Burası kutsal bir yer.
+23.151|удовлетворённый|Я доволен обслуживанием.|memnun|Hizmetten memnunum.
+23.152|испуганный|Я боюсь собак.|korkmuş|Köpeklerden korkarım.
+23.153|эгоистичный|Не будь эгоистом.|bencil|Bencil olma.
+23.154|разумный|Это было разумное решение.|mantıklı|Mantıklı bir karardı.
+23.155|чувствительный|Она чувствительная девушка.|hassas|O hassas bir kız.
+23.156|сильный, тяжёлый|У него сильная головная боль.|şiddetli|Şiddetli bir baş ağrısı var.
+23.157|потрясённый|Я был потрясён новостью.|şok olmuş|Haberle şok oldum.
+23.158|тихий, безмолвный|В комнате было тихо.|sessiz|Oda sessizdi.
+23.159|глупый, нелепый|Не глупи.|saçma, aptalca|Saçmalama.
+23.160|искренний|Он искренний друг.|samimi|Samimi bir arkadaş.
+23.161|квалифицированный|Он квалифицированный рабочий.|usta, vasıflı|Vasıflı bir işçi.
+23.162|сонный|Ребёнок хочет спать.|uykulu|Çocuk uykulu.
+23.163|небольшой, незначительный|Есть небольшая проблема.|hafif, küçük|Küçük bir sorun var.
+23.164|твёрдый, прочный|Стол прочный.|sağlam, katı|Masa sağlam.
+23.165|запасной|У меня есть запасной ключ.|yedek|Yedek bir anahtarım var.
+23.166|духовный|Он духовный человек.|manevi|O manevi bir insan.
+23.167|стабильный|Цена стабильная.|istikrarlı|Fiyat istikrarlı.
+23.168|постоянный, устойчивый|У него постоянная работа.|düzenli, istikrarlı|Düzenli bir işi var.
+23.169|липкий|Пол липкий.|yapışkan|Yer yapış yapış.
+23.170|затёкший, жёсткий|У меня затекла шея.|tutulmuş, sert|Boynum tutuldu.
+23.171|упрямый|Он упрямый человек.|inatçı|İnatçı bir adam.
+23.172|успешный|Она успешная бизнесвумен.|başarılı|Başarılı bir iş kadını.
+23.173|внезапный|Это было внезапное изменение.|ani|Ani bir değişiklikti.
+23.174|солнечный|Солнечный день.|güneşli|Güneşli bir gün.
+23.175|подходящий|Эта комната нам подходит.|uygun|Bu oda bize uygun.
+23.176|талантливый|Она талантливая певица.|yetenekli|Yetenekli bir şarkıcı.
+23.177|технический|У него техническая проблема.|teknik|Teknik bir sorunu var.
+23.178|нежный, мягкий|Мясо нежное.|yumuşak, şefkatli|Et yumuşak.
+23.179|напряжённый|Ситуация напряжённая.|gergin|Durum gergin.
+23.180|благодарный|Я благодарен за твою помощь.|minnettar|Yardımın için minnettarım.
+23.181|тесный|Эти туфли тесные.|dar, sıkı|Bu ayakkabılar dar.
+23.182|жёсткий, крепкий|Мясо жёсткое.|sert, dayanıklı|Et sert.
+23.183|типичный|Это типичный день.|tipik|Tipik bir gün.
+23.184|неспособный|Он не может прийти.|-amayan, yapamayan|Gelemiyor.
+23.185|неопределённый|Будущее неопределённо.|belirsiz|Gelecek belirsiz.
+23.186|несправедливый|Это несправедливо.|adaletsiz|Bu adaletsiz.
+23.187|несчастный|Она несчастна.|mutsuz|Mutsuz.
+23.188|уникальный|Это уникальное место.|eşsiz|Eşsiz bir yer.
+23.189|неизвестный|Автор неизвестен.|bilinmeyen|Yazarı bilinmiyor.
+23.190|необычный|Это необычное имя.|alışılmadık|Alışılmadık bir isim.
+23.191|расстроенный|Она расстроена.|üzgün, morali bozuk|Morali bozuk.
+23.192|срочный|Это срочное дело.|acil|Bu acil bir mesele.
+23.193|привыкший|Я привык к холодной погоде.|alışkın|Soğuk havaya alışkınım.
+23.194|ценный|Это ценная книга.|değerli|Değerli bir kitap.
+23.195|различный|Есть разные цвета.|çeşitli|Çeşitli renkler var.
+23.196|обширный|Это огромная пустыня.|uçsuz bucaksız|Uçsuz bucaksız bir çöl.
+23.197|видимый|Сегодня ночью видны звёзды.|görünür|Bu gece yıldızlar görünüyor.
+23.198|жизненно важный|Это жизненно важный вопрос.|hayati|Bu hayati bir soru.
+23.199|сердечный, добрый|Она добросердечная женщина.|sıcakkanlı|Sıcakkanlı bir kadın.
+23.200|странный|Это странная история.|tuhaf|Tuhaf bir hikâye.
+23.201|дикий|Это дикое животное.|vahşi|Bu vahşi bir hayvan.
+23.202|готовый (согласный)|Я готов помочь.|istekli, gönüllü|Yardım etmeye gönüllüyüm.
+23.203|мудрый|Он мудрый человек.|bilge|Bilge bir adam.
+23.204|обеспокоенный|Я волнуюсь.|endişeli|Endişeliyim.
+23.205|бесполезный, ничего не стоящий|Старая монета ничего не стоит.|değersiz|Eski para değersiz.

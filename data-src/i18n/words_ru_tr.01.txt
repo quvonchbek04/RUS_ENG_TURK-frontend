@@ -1,0 +1,151 @@
+# So'zlar: rus va turk tarjimasi. Format: bo'lim.qator|rus so'z|rus gap|turk so'z|turk gap
+# 1. Eng muhim fe'llar
+1.1|быть|Я хочу быть врачом.|olmak|Doktor olmak istiyorum.
+1.2|иметь|У нас большой сад.|sahip olmak|Büyük bir bahçemiz var.
+1.3|делать|Что ты делаешь по воскресеньям?|yapmak|Pazar günleri ne yaparsın?
+1.4|сказать|Пожалуйста, скажи своё имя ещё раз.|söylemek|Lütfen adını tekrar söyle.
+1.5|идти|Я езжу в школу на автобусе.|gitmek|Okula otobüsle giderim.
+1.6|получать|Я встаю в семь часов каждый день.|almak|Her gün saat yedide kalkarım.
+1.7|делать, готовить|Моя мама печёт вкусный хлеб.|yapmak|Annem lezzetli ekmek yapar.
+1.8|знать|Я очень хорошо знаю этот город.|bilmek|Bu şehri çok iyi bilirim.
+1.9|думать|Я думаю, это хорошая идея.|düşünmek|Bence bu iyi bir fikir.
+1.10|брать|Возьми с собой зонт.|almak|Şemsiyeni yanına al.
+1.11|видеть|Из моего окна видны горы.|görmek|Penceremden dağları görebiliyorum.
+1.12|приходить|Пожалуйста, приходи ко мне домой завтра.|gelmek|Lütfen yarın evime gel.
+1.13|хотеть|Я хочу чашку чая.|istemek|Bir fincan çay istiyorum.
+1.14|смотреть|Посмотри на голубое небо!|bakmak|Mavi gökyüzüne bak!
+1.15|использовать|Можно воспользоваться твоим телефоном?|kullanmak|Telefonunu kullanabilir miyim?
+1.16|находить|Я не могу найти свои ключи.|bulmak|Anahtarlarımı bulamıyorum.
+1.17|давать|Дай мне книгу, пожалуйста.|vermek|Kitabı bana ver, lütfen.
+1.18|рассказывать|Расскажи мне о своём дне.|anlatmak|Bana gününü anlat.
+1.19|работать|Мой отец работает в банке.|çalışmak|Babam bir bankada çalışıyor.
+1.20|звонить|Я позвоню тебе сегодня вечером.|aramak|Bu akşam seni arayacağım.
+1.21|пробовать|Попробуй этот суп, он вкусный.|denemek|Bu çorbayı dene, çok lezzetli.
+1.22|спрашивать|Задай учителю вопрос.|sormak|Öğretmene bir soru sor.
+1.23|нуждаться|Мне нужно немного воды.|ihtiyaç duymak|Biraz suya ihtiyacım var.
+1.24|чувствовать|Сегодня я чувствую себя очень счастливым.|hissetmek|Bugün kendimi çok mutlu hissediyorum.
+1.25|становиться|Она хочет стать пилотом.|olmak (dönüşmek)|Pilot olmak istiyor.
+1.26|уходить|Мы уходим в восемь часов.|ayrılmak|Saat sekizde ayrılıyoruz.
+1.27|класть, ставить|Поставь чашку на стол.|koymak|Fincanı masaya koy.
+1.28|значить|Что значит это слово?|anlamına gelmek|Bu kelime ne anlama geliyor?
+1.29|хранить|Пожалуйста, сохрани этот секрет.|saklamak|Lütfen bu sırrı sakla.
+1.30|позволять|Позволь мне помочь тебе.|izin vermek|Sana yardım etmeme izin ver.
+1.31|начинаться|Урок начинается в девять.|başlamak|Ders dokuzda başlıyor.
+1.32|казаться|Ты сегодня выглядишь усталым.|görünmek|Bugün yorgun görünüyorsun.
+1.33|помогать|Можешь помочь мне с этой сумкой?|yardım etmek|Bu çantayla bana yardım edebilir misin?
+1.34|разговаривать|Мы разговариваем по телефону каждый вечер.|konuşmak|Her akşam telefonda konuşuruz.
+1.35|поворачивать|Поверни направо у банка.|dönmek|Bankadan sağa dön.
+1.36|начинать|Давайте начнём собрание.|başlatmak|Toplantıya başlayalım.
+1.37|показывать|Покажи мне свои фотографии.|göstermek|Bana fotoğraflarını göster.
+1.38|слышать|Я тебя плохо слышу.|duymak|Seni iyi duyamıyorum.
+1.39|играть|Дети играют во дворе.|oynamak|Çocuklar bahçede oynuyor.
+1.40|бегать|Он бегает в парке каждое утро.|koşmak|Her sabah parkta koşar.
+1.41|двигаться|Пожалуйста, не двигайся.|hareket etmek|Lütfen kıpırdama.
+1.42|нравиться|Я люблю свежие фрукты.|sevmek, hoşlanmak|Taze meyveyi severim.
+1.43|жить|Они живут в маленькой деревне.|yaşamak|Küçük bir köyde yaşıyorlar.
+1.44|верить|Я тебе верю.|inanmak|Sana inanıyorum.
+1.45|держать|Подержи мою сумку минутку.|tutmak|Bir dakika çantamı tut.
+1.46|приносить|Пожалуйста, принеси немного хлеба.|getirmek|Lütfen biraz ekmek getir.
+1.47|случаться|Что здесь случилось?|olmak (meydana gelmek)|Burada ne oldu?
+1.48|писать|Я пишу письмо своему другу.|yazmak|Arkadaşıma bir mektup yazıyorum.
+1.49|обеспечивать|Отель предоставляет бесплатный завтрак.|sağlamak|Otel ücretsiz kahvaltı sağlıyor.
+1.50|сидеть|Садитесь сюда, пожалуйста.|oturmak|Buraya oturun, lütfen.
+1.51|стоять|Встаньте в очередь, пожалуйста.|durmak, ayakta durmak|Lütfen sıraya girin.
+1.52|терять|Не потеряй свой билет.|kaybetmek|Biletini kaybetme.
+1.53|платить|Я заплачу картой.|ödemek|Kartla ödeyeceğim.
+1.54|встречаться|Давай встретимся в полдень.|buluşmak|Öğlen buluşalım.
+1.55|включать|Цена включает завтрак.|içermek|Fiyata kahvaltı dahil.
+1.56|продолжать|Пожалуйста, продолжай свой рассказ.|devam etmek|Lütfen hikâyene devam et.
+1.57|устанавливать|Поставь будильник на шесть часов.|kurmak|Alarmı saat altıya kur.
+1.58|учить, изучать|Каждый день я учу десять новых слов.|öğrenmek|Her gün on yeni kelime öğrenirim.
+1.59|менять|Люди могут менять свои привычки.|değiştirmek|İnsanlar alışkanlıklarını değiştirebilir.
+1.60|руководить|Она будет руководить командой.|yönetmek|Takımı o yönetecek.
+1.61|понимать|Я понимаю вопрос.|anlamak|Soruyu anlıyorum.
+1.62|смотреть (фильм)|Мы смотрим фильм каждую пятницу.|izlemek|Her cuma bir film izleriz.
+1.63|следовать|Следуйте за мной, пожалуйста.|takip etmek|Beni takip edin, lütfen.
+1.64|останавливаться|Автобус останавливается здесь.|durmak|Otobüs burada durur.
+1.65|создавать|Художники создают красивые вещи.|yaratmak|Sanatçılar güzel şeyler yaratır.
+1.66|говорить|Вы говорите по-английски?|konuşmak|İngilizce konuşuyor musunuz?
+1.67|читать|Я читаю книгу перед сном.|okumak|Yatmadan önce kitap okurum.
+1.68|разрешать|На уроке не разрешают телефоны.|izin vermek|Sınıfta telefona izin vermiyorlar.
+1.69|добавлять|Добавь в чай немного сахара.|eklemek|Çaya biraz şeker ekle.
+1.70|тратить|Я трачу слишком много денег на кофе.|harcamak|Kahveye çok fazla para harcıyorum.
+1.71|расти|Помидоры хорошо растут летом.|büyümek, yetişmek|Domatesler yazın iyi yetişir.
+1.72|открывать|Открой окно, пожалуйста.|açmak|Pencereyi aç, lütfen.
+1.73|ходить пешком|Я каждый день хожу на работу пешком.|yürümek|Her gün işe yürüyerek giderim.
+1.74|побеждать|Наша команда хочет победить.|kazanmak|Takımımız kazanmak istiyor.
+1.75|предлагать|Они предлагают дешёвые номера.|teklif etmek, sunmak|Ucuz odalar sunuyorlar.
+1.76|помнить|Я помню её имя.|hatırlamak|Onun adını hatırlıyorum.
+1.77|любить|Я люблю свою семью.|sevmek|Ailemi seviyorum.
+1.78|рассматривать|Пожалуйста, рассмотрите моё предложение.|düşünmek, göz önünde bulundurmak|Lütfen teklifimi düşünün.
+1.79|появляться|На небе появилась радуга.|ortaya çıkmak, belirmek|Gökyüzünde bir gökkuşağı belirdi.
+1.80|покупать|Я хочу купить новый телефон.|satın almak|Yeni bir telefon almak istiyorum.
+1.81|ждать|Жди меня на вокзале.|beklemek|Beni istasyonda bekle.
+1.82|обслуживать, подавать|В кафе подают горячий чай.|servis etmek|Kafe sıcak çay servis ediyor.
+1.83|умирать|Цветы погибают без воды.|ölmek|Çiçekler susuz ölür.
+1.84|отправлять|Я отправлю тебе сообщение.|göndermek|Sana bir mesaj göndereceğim.
+1.85|ожидать|Я жду от него звонка.|beklemek (ummak)|Ondan bir telefon bekliyorum.
+1.86|строить|Они строят новую школу.|inşa etmek|Yeni bir okul inşa ediyorlar.
+1.87|оставаться|Сегодня оставайся дома.|kalmak|Bugün evde kal.
+1.88|падать|Осенью падают листья.|düşmek|Sonbaharda yapraklar düşer.
+1.89|резать|Нарежь хлеб ножом.|kesmek|Ekmeği bıçakla kes.
+1.90|достигать|Мы добрались до деревни ночью.|ulaşmak|Köye gece ulaştık.
+1.91|убивать|Курение может убивать людей.|öldürmek|Sigara insanları öldürebilir.
+1.92|оставаться (в состоянии)|Пожалуйста, сохраняйте спокойствие.|kalmak (durumda)|Lütfen sakin kalın.
+1.93|предлагать (идею)|Я предлагаю пойти домой.|önermek|Eve gitmemizi öneriyorum.
+1.94|поднимать|Поднимите руку, если знаете.|kaldırmak|Biliyorsanız elinizi kaldırın.
+1.95|передавать, проходить|Передай мне соль, пожалуйста.|uzatmak, geçmek|Tuzu uzatır mısın, lütfen?
+1.96|продавать|Он продаёт фрукты на рынке.|satmak|Pazarda meyve satıyor.
+1.97|требовать|Эта работа требует опыта.|gerektirmek|Bu iş deneyim gerektirir.
+1.98|сообщать, докладывать|Студент доложит о результатах.|rapor etmek|Öğrenci sonuçları rapor edecek.
+1.99|решать|Я решил остаться дома.|karar vermek|Evde kalmaya karar verdim.
+1.100|тянуть|Тяни дверь, а не толкай.|çekmek|Kapıyı çek, itme.
+1.101|толкать, нажимать|Нажми на кнопку.|itmek, basmak|Düğmeye bas.
+1.102|выбирать|Выбери цвет, который тебе нравится.|seçmek|Sevdiğin bir renk seç.
+1.103|есть|Мы ужинаем в семь.|yemek|Akşam yemeğini yedide yeriz.
+1.104|пить|Каждое утро я пью зелёный чай.|içmek|Her sabah yeşil çay içerim.
+1.105|спать|Младенцы много спят.|uyumak|Bebekler çok uyur.
+1.106|просыпаться|Я просыпаюсь рано.|uyanmak|Erken uyanırım.
+1.107|мыть|Мой руки перед едой.|yıkamak|Yemekten önce ellerini yıka.
+1.108|убирать|По субботам я убираю свою комнату.|temizlemek|Cumartesileri odamı temizlerim.
+1.109|готовить (еду)|Мой папа любит готовить плов.|pişirmek, yemek yapmak|Babam pilav pişirmeyi sever.
+1.110|водить машину|Он водит такси.|araba sürmek|Taksi şoförlüğü yapıyor.
+1.111|ездить верхом / на велосипеде|Я езжу в школу на велосипеде.|binmek|Okula bisikletle giderim.
+1.112|летать|Птицы летают в небе.|uçmak|Kuşlar gökyüzünde uçar.
+1.113|плавать|Ты умеешь плавать?|yüzmek|Yüzebilir misin?
+1.114|петь|Она очень хорошо поёт.|şarkı söylemek|Çok güzel şarkı söylüyor.
+1.115|танцевать|Они танцуют на свадьбах.|dans etmek|Düğünlerde dans ederler.
+1.116|смеяться|Мы вместе много смеёмся.|gülmek|Birlikte çok güleriz.
+1.117|плакать|Малыш начал плакать.|ağlamak|Bebek ağlamaya başladı.
+1.118|улыбаться|Она любит улыбаться.|gülümsemek|Gülümsemeyi sever.
+1.119|кричать|Не кричи в библиотеке.|bağırmak|Kütüphanede bağırma.
+1.120|шептать|Он прошептал мне секрет.|fısıldamak|Bana bir sır fısıldadı.
+1.121|слушать|Внимательно слушайте учителя.|dinlemek|Öğretmeni dikkatlice dinleyin.
+1.122|трогать|Не трогай горячую кастрюлю.|dokunmak|Sıcak tencereye dokunma.
+1.123|пахнуть, нюхать|Я чувствую запах свежего хлеба.|koklamak|Taze ekmek kokusunu alabiliyorum.
+1.124|пробовать на вкус|Сначала попробуй суп.|tadına bakmak|Önce çorbanın tadına bak.
+1.125|нести|Он носит тяжёлые сумки.|taşımak|Ağır çantalar taşıyor.
+1.126|бросать|Брось мне мяч.|atmak|Topu bana at.
+1.127|ловить|Лови мяч!|yakalamak|Topu yakala!
+1.128|ломать, разбивать|Осторожно, не разбей стакан.|kırmak|Dikkat et, bardağı kırma.
+1.129|чинить|Он может починить машину.|tamir etmek|Arabayı tamir edebilir.
+1.130|присоединяться|Присоединяйтесь к нам за ужином.|katılmak|Akşam yemeğinde bize katıl.
+1.131|посещать|По воскресеньям мы навещаем бабушку и дедушку.|ziyaret etmek|Pazar günleri büyükanne ve büyükbabamızı ziyaret ederiz.
+1.132|путешествовать|Я люблю путешествовать на поезде.|seyahat etmek|Trenle seyahat etmeyi severim.
+1.133|прибывать|Поезд прибывает в шесть.|varmak|Tren altıda varıyor.
+1.134|возвращать(ся)|Верни книгу в понедельник.|geri vermek, dönmek|Kitabı pazartesi geri ver.
+1.135|входить|Пожалуйста, тихо войдите в комнату.|girmek|Lütfen odaya sessizce girin.
+1.136|выход; выходить|Воспользуйтесь левым выходом.|çıkış; çıkmak|Soldaki çıkışı kullanın.
+1.137|подниматься, лезть|Каждое лето они поднимаются на гору.|tırmanmak|Her yaz dağa tırmanırlar.
+1.138|прыгать|Кошка умеет высоко прыгать.|zıplamak|Kedi yükseğe zıplayabilir.
+1.139|прятать(ся)|Мальчик прячется под кроватью.|saklanmak, saklamak|Çocuk yatağın altına saklanıyor.
+1.140|искать; поиск|Я ищу свой телефон.|aramak; arama|Telefonumu arıyorum.
+1.141|проверять|Пожалуйста, проверьте свои ответы.|kontrol etmek|Lütfen cevaplarınızı kontrol edin.
+1.142|считать|Посчитай от одного до десяти.|saymak|Birden ona kadar say.
+1.143|измерять|Сначала измерь стол.|ölçmek|Önce masayı ölç.
+1.144|делиться|Давай разделим торт.|paylaşmak|Pastayı paylaşalım.
+1.145|сохранять, спасать, копить|Копи деньги на поездку.|biriktirmek, kurtarmak|Paranı yolculuk için biriktir.
+1.146|защищать|Носи шляпу, чтобы защитить голову.|korumak|Başını korumak için şapka tak.
+1.147|готовить (подготавливать)|Я готовлю ужин в шесть.|hazırlamak|Akşam yemeğini altıda hazırlarım.
+1.148|практиковаться|Практикуй английский каждый день.|pratik yapmak|Her gün İngilizce pratik yap.
+1.149|улучшать|Я хочу улучшить свой английский.|geliştirmek|İngilizcemi geliştirmek istiyorum.

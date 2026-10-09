@@ -2,314 +2,210 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { api } from '../lib/api.js';
-import { flattenMonths, isMonthDone } from '../lib/lessonProgress.js';
+import { useCurrentLang, useTheme } from '../lib/hooks.js';
+import { MEDIA_META, MEDIA_ORDER } from '../lib/media.js';
+import { isAdminRole, getStreak } from '../lib/lessonProgress.js';
+import { LANG_OPTIONS } from './ui.jsx';
 
-function useTheme() {
-  const [theme, setTheme] = useState(() => (document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'));
-  function toggle() {
-    const next = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    if (next === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-    else document.documentElement.removeAttribute('data-theme');
-    try { localStorage.setItem('til_theme', next); } catch { /* ignore */ }
-  }
-  return [theme, toggle];
-}
-
-const LANG_FLAGS = { ru: '🇷🇺', en: '🇬🇧', tr: '🇹🇷' };
-
-function useCurrentLang() {
-  const { pathname } = useLocation();
-  const m = pathname.match(/^\/lang\/([a-z]{2})/);
-  return m ? m[1] : null;
-}
-
-function NavRow({ icon, label, to, active, collapsed, onClick }) {
+function NavRow({ icon, label, to, active, collapsed, onClick, count, accent }) {
   const cls =
-    'flex items-center gap-3 rounded-lg transition-colors group cursor-pointer ' +
-    (collapsed ? 'justify-center px-0 py-2.5' : 'px-2.5 py-2.5');
+    'flex items-center gap-3 rounded-xl transition-colors cursor-pointer select-none ' +
+    (collapsed ? 'justify-center h-10 w-10 mx-auto' : 'px-3 py-2');
   const style = {
     color: active ? 'var(--pine)' : 'var(--ink)',
-    background: active ? 'var(--gold-soft)' : 'transparent',
-    fontWeight: active ? 600 : 500,
+    background: active ? 'var(--pine-soft)' : 'transparent',
+    fontWeight: active ? 700 : 600,
   };
-  const hoverProps = active
-    ? {}
-    : {
-        onMouseEnter: (e) => (e.currentTarget.style.background = 'var(--paper-soft)'),
-        onMouseLeave: (e) => (e.currentTarget.style.background = 'transparent'),
-      };
-
   const inner = (
     <>
-      <span className="w-5 text-center shrink-0 text-base">{icon}</span>
-      {!collapsed && <span className="text-sm truncate">{label}</span>}
+      <span className="w-5 text-center shrink-0 text-[17px] leading-none">{icon}</span>
+      {!collapsed && <span className="text-[13.5px] truncate flex-1">{label}</span>}
+      {!collapsed && count != null && count > 0 && (
+        <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: accent ? 'var(--gold-soft)' : 'var(--paper-soft)', color: accent ? 'var(--gold)' : 'var(--ink-soft)' }}>
+          {count}
+        </span>
+      )}
     </>
   );
-
+  const hover = {
+    onMouseEnter: (e) => !active && (e.currentTarget.style.background = 'var(--paper-soft)'),
+    onMouseLeave: (e) => !active && (e.currentTarget.style.background = 'transparent'),
+  };
   if (onClick) {
     return (
-      <button type="button" onClick={onClick} className={cls + ' w-full text-left'} style={style} {...hoverProps} title={collapsed ? label : undefined}>
+      <button type="button" onClick={onClick} className={cls + ' w-full text-left'} style={style} title={collapsed ? label : undefined} {...hover}>
         {inner}
       </button>
     );
   }
   return (
-    <Link to={to} className={cls} style={style} {...hoverProps} title={collapsed ? label : undefined}>
+    <Link to={to} className={cls} style={style} title={collapsed ? label : undefined} {...hover}>
       {inner}
     </Link>
   );
 }
 
 function SectionLabel({ children, collapsed }) {
-  if (collapsed) return <div className="h-px my-2" style={{ background: 'var(--line)' }} />;
-  return (
-    <div className="font-mono text-[10px] uppercase tracking-widest px-2.5 pt-4 pb-1.5" style={{ color: 'var(--ink-soft)' }}>
-      {children}
-    </div>
-  );
+  if (collapsed) return <div className="h-px my-3 mx-3" style={{ background: 'var(--line)' }} />;
+  return <div className="text-[10.5px] font-bold uppercase tracking-[0.16em] px-3 pt-5 pb-1.5 faint">{children}</div>;
 }
 
-export default function Sidebar() {
+export default function Sidebar({ collapsed = false, onToggleCollapse, onNavigate, mobile = false }) {
   const { user, logout, progress } = useAuth();
   const navigate = useNavigate();
   const lang = useCurrentLang();
-  const { pathname } = useLocation();
-  const [langs, setLangs] = useState(null);
-  const [content, setContent] = useState(null);
-  const [collapsed, setCollapsed] = useState(() => localStorage.getItem('til_sidebar_collapsed') === '1');
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const { pathname, search } = useLocation();
+  const adminTab = new URLSearchParams(search).get('tab');
   const [theme, toggleTheme] = useTheme();
+  const [counts, setCounts] = useState({});
+  const [meta, setMeta] = useState(null);
 
   useEffect(() => {
-    api.langs().then((r) => setLangs(r.langs)).catch(() => {});
-  }, []);
+    api.mediaCounts().then(setCounts).catch(() => {});
+    api.meta().then(setMeta).catch(() => {});
+  }, [pathname]);
 
   useEffect(() => {
-    setContent(null);
-    if (lang) api.content(lang).then(setContent).catch(() => {});
-  }, [lang]);
-
-  useEffect(() => {
-    localStorage.setItem('til_sidebar_collapsed', collapsed ? '1' : '0');
-  }, [collapsed]);
-
-  useEffect(() => {
-    setMobileOpen(false);
+    onNavigate?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   if (!user) return null;
+  const isStaff = isAdminRole(user.role);
+  const streak = getStreak(progress);
+  const langInfo = meta?.LANGS?.[lang];
+  const is = (p) => pathname === p;
 
-  const isAdmin = user.role === 'admin' || user.role === 'superadmin';
-  const dialogCount = content ? content.modules.reduce((s, m) => s + m.months.filter((mm) => mm.dialog).length, 0) + (content.dialogsExtra?.length || 0) : null;
-  const grammarCount = content ? content.modules.reduce((s, m) => s + m.months.filter((mm) => mm.grammar).length, 0) : null;
-  const courseVocabCount = content ? content.modules.reduce((s, m) => s + m.months.reduce((s2, mm) => s2 + (mm.vocab?.length || 0), 0), 0) : null;
-  const extraWordsCount = content ? content.modules.reduce((s, m) => s + m.months.reduce((s2, mm) => s2 + (mm.words?.length || 0), 0), 0) : 0;
-  const dictExtraCount = content ? (content.dictExtra || []).reduce((s, c) => s + c.words.length, 0) : null;
-  const totalVocabCount = courseVocabCount != null && dictExtraCount != null ? courseVocabCount + extraWordsCount + dictExtraCount : null;
-  const nextMonth = content ? (() => {
-    const flat = flattenMonths(content.modules);
-    return flat.find((m) => !isMonthDone(progress, lang, m.id)) || flat[flat.length - 1];
-  })() : null;
-
-  function renderBody(collapsedOverride) {
-    const collapsedEff = collapsedOverride;
-    return (
+  return (
     <div
-      className="h-full flex flex-col shrink-0 border-r transition-[width] duration-150"
-      style={{ borderColor: 'var(--line)', background: 'var(--paper-soft)', width: collapsedEff ? 64 : 240 }}
+      className="h-full flex flex-col border-r"
+      style={{ borderColor: 'var(--line)', background: 'var(--panel)', width: collapsed ? 72 : 264 }}
     >
-      {/* Logo / brend */}
-      <div className={'flex items-center gap-2.5 px-3 py-4 ' + (collapsedEff ? 'justify-center' : '')}>
+      {/* Brend */}
+      <div className={'flex items-center gap-2.5 px-4 pt-4 pb-3 ' + (collapsed ? 'justify-center px-2' : '')}>
         <Link to="/" className="flex items-center gap-2.5 min-w-0">
-          <span
-            className="w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0"
-            style={{ background: 'var(--grad-brand)', color: '#fff', boxShadow: 'var(--shadow-md)' }}
-          >
-            🎫
-          </span>
-          {!collapsedEff && (
+          <img src="/icon.svg" alt="" className="w-9 h-9 rounded-xl shrink-0" />
+          {!collapsed && (
             <div className="leading-tight min-w-0">
-              <div className="font-display font-semibold text-sm truncate" style={{ color: 'var(--ink)' }}>
+              <div className="font-display font-semibold text-[17px] truncate" style={{ color: 'var(--ink)' }}>
                 Til sayohati
               </div>
-              <div className="font-mono text-[9px] tracking-[0.15em] uppercase truncate" style={{ color: 'var(--ink-soft)' }}>
-                Yo'lovchi biletlari
-              </div>
+              <div className="text-[10px] font-bold tracking-[0.14em] uppercase faint truncate">EN · RU · TR</div>
             </div>
           )}
         </Link>
-        {collapsedOverride === collapsed && (
-          <button
-            type="button"
-            onClick={() => setCollapsed((v) => !v)}
-            className="ml-auto w-7 h-7 rounded-lg flex items-center justify-center cursor-pointer shrink-0 hidden lg:flex"
-            style={{ color: 'var(--ink-soft)' }}
-            title={collapsedEff ? 'Panelni kengaytirish' : "Panelni yig'ish"}
-          >
-            {collapsedEff ? '»' : '«'}
+        {!mobile && !collapsed && (
+          <button type="button" onClick={onToggleCollapse} className="ml-auto btn btn-ghost btn-icon !w-8 !h-8 !min-h-8 text-xs" title="Panelni yig'ish">
+            «
           </button>
         )}
       </div>
+      {!mobile && collapsed && (
+        <button type="button" onClick={onToggleCollapse} className="mx-auto mb-1 btn btn-ghost btn-icon !w-8 !h-8 !min-h-8 text-xs" title="Panelni kengaytirish">
+          »
+        </button>
+      )}
 
-      <div className="flex-1 overflow-y-auto scroll-panel px-2 pb-3">
-        <NavRow icon="🏠" label="Bosh sahifa" to="/" active={pathname === '/'} collapsed={collapsedEff} />
-        <NavRow icon="📚" label="Kutubxona" to="/library" active={pathname === '/library'} collapsed={collapsedEff} />
-        {isAdmin && <NavRow icon="👑" label="Admin panel" to="/admin" active={pathname === '/admin'} collapsed={collapsedEff} />}
+      {/* Til tanlash */}
+      <div className={collapsed ? 'flex flex-col items-center gap-1.5 px-2 pb-2' : 'grid grid-cols-3 gap-1.5 px-3 pb-2'}>
+        {LANG_OPTIONS.map((l) => {
+          const active = lang === l.key;
+          return (
+            <Link
+              key={l.key}
+              to={`/lang/${l.key}`}
+              className={'flex items-center justify-center gap-1.5 rounded-xl text-sm font-bold transition-colors ' + (collapsed ? 'w-10 h-10' : 'h-10')}
+              style={{
+                background: active ? 'var(--gold-soft)' : 'var(--panel-2)',
+                border: `1px solid ${active ? 'var(--gold)' : 'var(--line)'}`,
+                color: active ? 'var(--ink)' : 'var(--ink-soft)',
+              }}
+              title={l.label}
+            >
+              <span className="text-lg leading-none">{l.flag}</span>
+              {!collapsed && <span className="text-[11px]">{l.short}</span>}
+            </Link>
+          );
+        })}
+      </div>
 
-        <SectionLabel collapsed={collapsedEff}>Yo'nalish</SectionLabel>
-        <div className={collapsedEff ? 'flex flex-col gap-1 items-center' : 'flex gap-1.5 px-1'}>
-          {langs &&
-            Object.values(langs).map((l) => (
-              <Link
-                key={l.key}
-                to={`/lang/${l.key}`}
-                className="w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-colors shrink-0"
-                style={{
-                  background: lang === l.key ? 'var(--gold-soft)' : 'transparent',
-                  border: lang === l.key ? '1px solid var(--gold)' : '1px solid var(--line)',
-                }}
-                title={l.title}
-              >
-                {l.flag || LANG_FLAGS[l.key] || '🏳️'}
-              </Link>
-            ))}
-        </div>
+      <nav className="flex-1 overflow-y-auto no-scrollbar px-2 pb-4">
+        <SectionLabel collapsed={collapsed}>Asosiy</SectionLabel>
+        <NavRow icon="🏠" label="Bosh sahifa" to="/" active={is('/')} collapsed={collapsed} />
+        <NavRow icon="🧭" label={langInfo ? `Darslar · ${langInfo.label}` : 'Darslar'} to={`/lang/${lang}`} active={is(`/lang/${lang}`) || pathname.includes('/month/')} collapsed={collapsed} />
+        <NavRow icon="🤖" label="AI ustoz" to="/ai" active={is('/ai')} collapsed={collapsed} />
+        <NavRow icon="📊" label="Natijalar" to="/results" active={is('/results')} collapsed={collapsed} />
 
-        {lang && content && (
+        <SectionLabel collapsed={collapsed}>Mashg'ulotlar</SectionLabel>
+        <NavRow icon="🔀" label="Lug'at mashqi" to={`/lang/${lang}/practice-full`} active={is(`/lang/${lang}/practice-full`)} collapsed={collapsed} />
+        <NavRow icon="📖" label="Lug'at" to={`/lang/${lang}/dictionary`} active={is(`/lang/${lang}/dictionary`)} collapsed={collapsed} />
+        <NavRow icon="🎧" label="Dialog mashqi" to={`/lang/${lang}/dialogs`} active={is(`/lang/${lang}/dialogs`)} collapsed={collapsed} />
+        <NavRow icon="📐" label="Grammatika" to={`/lang/${lang}/grammar`} active={is(`/lang/${lang}/grammar`)} collapsed={collapsed} />
+        <NavRow icon="🔤" label="Fe'llar jadvali" to={`/lang/${lang}/verbs`} active={is(`/lang/${lang}/verbs`)} collapsed={collapsed} />
+
+        <SectionLabel collapsed={collapsed}>Materiallar</SectionLabel>
+        {MEDIA_ORDER.map((k) => (
+          <NavRow
+            key={k}
+            icon={MEDIA_META[k].icon}
+            label={MEDIA_META[k].label}
+            to={`/media/${k}`}
+            active={is(`/media/${k}`)}
+            collapsed={collapsed}
+            count={counts[k]}
+            accent={k === 'news'}
+          />
+        ))}
+
+        {isStaff && (
           <>
-            <SectionLabel collapsed={collapsedEff}>{content.meta.title}</SectionLabel>
-            <NavRow icon="📘" label="Darslar" to={`/lang/${lang}`} active={pathname === `/lang/${lang}`} collapsed={collapsedEff} />
-            <NavRow
-              icon="🎧"
-              label={collapsedEff ? 'Dialog' : `Dialog mashqi${dialogCount != null ? ` · ${dialogCount}` : ''}`}
-              to={`/lang/${lang}/dialogs`}
-              active={pathname === `/lang/${lang}/dialogs`}
-              collapsed={collapsedEff}
-            />
-            <NavRow
-              icon="📐"
-              label={collapsedEff ? 'Grammatika' : `Grammatika${grammarCount != null ? ` · ${grammarCount}` : ''}`}
-              to={`/lang/${lang}/grammar`}
-              active={pathname === `/lang/${lang}/grammar`}
-              collapsed={collapsedEff}
-            />
-            <NavRow
-              icon="🔤"
-              label={collapsedEff ? "Fe'llar" : `Fe'llar lug'ati${content.verbTable ? ` · ${content.verbTable.length}` : ''}`}
-              to={`/lang/${lang}/verbs`}
-              active={pathname === `/lang/${lang}/verbs`}
-              collapsed={collapsedEff}
-            />
-            {nextMonth && (
-              <NavRow
-                icon="🔀"
-                label={collapsedEff ? "Lug'at" : `Lug'at mashqi${totalVocabCount != null ? ` · ${totalVocabCount}` : ''}`}
-                to={`/lang/${lang}/practice-full`}
-                active={pathname === `/lang/${lang}/practice-full`}
-                collapsed={collapsedEff}
-              />
-            )}
-            <NavRow
-              icon="📖"
-              label={collapsedEff ? 'Lug\'at' : `To'liq lug'at${dictExtraCount != null ? ` · ${dictExtraCount}` : ''}`}
-              to={`/lang/${lang}/dictionary`}
-              active={pathname === `/lang/${lang}/dictionary`}
-              collapsed={collapsedEff}
-            />
+            <SectionLabel collapsed={collapsed}>Boshqaruv</SectionLabel>
+            <NavRow icon="👑" label="Admin panel" to="/admin" active={is('/admin') && (!adminTab || adminTab === 'home')} collapsed={collapsed} />
+            <NavRow icon="👥" label="Foydalanuvchilar" to="/admin?tab=users" active={is('/admin') && adminTab === 'users'} collapsed={collapsed} />
+            <NavRow icon="🔑" label="AI va API kalitlar" to="/admin?tab=ai" active={is('/admin') && adminTab === 'ai'} collapsed={collapsed} />
           </>
         )}
-      </div>
+      </nav>
 
-      {/* Pastki qism — foydalanuvchi */}
-      <div className="border-t p-2" style={{ borderColor: 'var(--line)' }}>
-        <button
-          type="button"
-          onClick={toggleTheme}
-          className={'w-full flex items-center gap-3 rounded-lg cursor-pointer mb-1 ' + (collapsedEff ? 'justify-center py-2' : 'px-2.5 py-2')}
-          style={{ color: 'var(--ink)' }}
-          title="Mavzuni almashtirish"
-        >
-          <span className="w-5 text-center text-base">{theme === 'dark' ? '☀️' : '🌙'}</span>
-          {!collapsedEff && <span className="text-sm">{theme === 'dark' ? 'Kunduzgi rejim' : 'Tungi rejim'}</span>}
-        </button>
-        {!collapsedEff ? (
-          <div className="flex items-center gap-2 px-1 py-1.5">
-            <span
-              className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0"
-              style={{ background: 'var(--gold-soft)', color: 'var(--ink)' }}
-            >
-              {(user.displayName || user.username || '?').slice(0, 1).toUpperCase()}
-            </span>
-            <div className="min-w-0 flex-1 leading-tight">
-              <div className="text-xs font-semibold truncate" style={{ color: 'var(--ink)' }}>
-                {user.displayName || user.username}
-              </div>
-            </div>
+      {/* Pastki qism */}
+      <div className="border-t p-2 space-y-1" style={{ borderColor: 'var(--line)', paddingBottom: mobile ? 'calc(8px + env(safe-area-inset-bottom))' : undefined }}>
+        <NavRow icon={theme === 'dark' ? '☀️' : '🌙'} label={theme === 'dark' ? 'Kunduzgi rejim' : 'Tungi rejim'} onClick={toggleTheme} collapsed={collapsed} />
+        {collapsed ? (
+          <NavRow icon="👤" label="Profil" to="/profile" active={is('/profile')} collapsed />
+        ) : (
+          <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl" style={{ background: is('/profile') ? 'var(--pine-soft)' : 'transparent' }}>
+            <Link to="/profile" className="flex items-center gap-2.5 min-w-0 flex-1">
+              <span
+                className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+                style={{ background: 'var(--grad-brand)', color: '#fff' }}
+              >
+                {(user.displayName || user.username || '?').slice(0, 1).toUpperCase()}
+              </span>
+              <span className="min-w-0 leading-tight">
+                <span className="block text-[13px] font-bold truncate" style={{ color: 'var(--ink)' }}>
+                  {user.displayName || user.username}
+                </span>
+                <span className="block text-[11px] faint truncate">
+                  {streak > 0 ? `🔥 ${streak} kun ketma-ket` : user.role === 'superadmin' ? 'Super admin' : user.role === 'admin' ? 'Admin' : "O'quvchi"}
+                </span>
+              </span>
+            </Link>
             <button
               type="button"
-              onClick={() => {
-                logout();
+              onClick={async () => {
+                await logout();
                 navigate('/login');
               }}
-              className="font-mono text-[10px] uppercase tracking-widest px-2 py-1.5 rounded-lg cursor-pointer shrink-0"
-              style={{ color: 'var(--brick)' }}
+              className="btn btn-ghost btn-icon !w-9 !h-9 !min-h-9 shrink-0"
               title="Chiqish"
+              aria-label="Chiqish"
+              style={{ color: 'var(--brick)' }}
             >
-              Chiqish
+              ⎋
             </button>
           </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => {
-              logout();
-              navigate('/login');
-            }}
-            className="w-full flex items-center justify-center py-2 rounded-lg cursor-pointer"
-            style={{ color: 'var(--brick)' }}
-            title="Chiqish"
-          >
-            ⎋
-          </button>
         )}
       </div>
     </div>
-    );
-  }
-
-  return (
-    <>
-      {/* Mobil tepa panel — hamburger tugmasi */}
-      <div
-        className="lg:hidden sticky top-0 z-30 flex items-center gap-3 px-4 py-3 border-b"
-        style={{ borderColor: 'var(--line)', background: 'color-mix(in srgb, var(--paper) 92%, transparent)', backdropFilter: 'blur(8px)' }}
-      >
-        <button
-          type="button"
-          onClick={() => setMobileOpen(true)}
-          className="w-9 h-9 rounded-lg flex items-center justify-center cursor-pointer"
-          style={{ color: 'var(--ink)' }}
-        >
-          ☰
-        </button>
-        <span className="font-display font-semibold" style={{ color: 'var(--ink)' }}>
-          Til sayohati
-        </span>
-      </div>
-
-      {/* Desktop — doimiy sidebar */}
-      <div className="hidden lg:block h-screen sticky top-0">{renderBody(collapsed)}</div>
-
-      {/* Mobil — overlay sidebar (doim to'liq kengaytirilgan holda) */}
-      {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 z-40 flex" onClick={() => setMobileOpen(false)}>
-          <div style={{ background: 'rgba(20,20,19,0.5)' }} className="absolute inset-0" />
-          <div className="relative h-full" onClick={(e) => e.stopPropagation()}>
-            {renderBody(false)}
-          </div>
-        </div>
-      )}
-    </>
   );
 }

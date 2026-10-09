@@ -1,20 +1,19 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import SpeakButton from './SpeakButton.jsx';
-
-const card = { borderColor: 'var(--line)', background: 'var(--panel)' };
+import { readingHint } from '../lib/translit.js';
+import { getSpeechRecognition, langToBCP47, speakSequence, speakWithEnd } from '../lib/tts.js';
+import { normalizeAnswer, shuffle } from '../lib/practice.js';
+import { withActivity } from '../lib/lessonProgress.js';
+import { useAuth } from '../context/AuthContext.jsx';
 
 function SectionTitle({ icon, children, hint }) {
   return (
     <div className="flex items-center gap-2 mt-7 mb-3">
       <span className="text-lg">{icon}</span>
-      <h4 className="font-display text-base font-semibold flex-1" style={{ color: 'var(--ink)' }}>
+      <h4 className="font-display text-[17px] font-semibold flex-1" style={{ color: 'var(--ink)' }}>
         {children}
       </h4>
-      {hint && (
-        <span className="font-mono text-[10px] uppercase tracking-widest" style={{ color: 'var(--gold)' }}>
-          {hint}
-        </span>
-      )}
+      {hint && <span className="badge badge-gold">{hint}</span>}
     </div>
   );
 }
@@ -24,19 +23,25 @@ export function GrammarMore({ items }) {
   if (!items?.length) return null;
   return (
     <div>
-      <SectionTitle icon="📘" hint="Kengaytma">Qo'shimcha grammatika</SectionTitle>
+      <SectionTitle icon="📘" hint="Kengaytma">
+        Qo'shimcha grammatika
+      </SectionTitle>
       <div className="space-y-3">
         {items.map((g, i) => (
-          <div key={i} className="rounded-xl border p-4 lesson-card" style={card}>
+          <div key={i} className="card p-4">
             <div className="font-display font-semibold mb-1.5" style={{ color: 'var(--pine)' }}>
               {i + 1}. {g.title}
             </div>
-            <p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--ink)' }}>{g.text}</p>
+            <p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--ink)' }}>
+              {g.text}
+            </p>
             <div className="space-y-1.5">
               {g.examples?.map((ex, k) => (
-                <div key={k} className="text-sm flex gap-2 items-start rounded-lg px-3 py-2" style={{ background: 'var(--paper-soft)' }}>
-                  <span className="font-mono flex-1" style={{ color: 'var(--ink)' }}>{ex[0]}</span>
-                  <span style={{ color: 'var(--ink-soft)' }}>{ex[1]}</span>
+                <div key={k} className="text-sm flex flex-wrap gap-x-3 gap-y-0.5 items-baseline rounded-lg px-3 py-2" style={{ background: 'var(--panel-2)' }}>
+                  <span className="font-semibold" style={{ color: 'var(--ink)' }}>
+                    {ex[0]}
+                  </span>
+                  <span className="muted">{ex[1]}</span>
                 </div>
               ))}
             </div>
@@ -47,37 +52,295 @@ export function GrammarMore({ items }) {
   );
 }
 
-/** Ikkinchi dialog */
-export function DialogExtra({ dialog, lang }) {
-  const [showTr, setShowTr] = useState(true);
-  if (!dialog?.lines?.length) return null;
+/** Aytilgan gap bilan asl gapning so'zma-so'z mosligi (0–100). */
+function speechScore(target, said, lang) {
+  const tok = (s) => normalizeAnswer(s, lang).split(' ').filter(Boolean);
+  const t = tok(target);
+  const pool = tok(said);
+  if (!t.length) return 0;
+  let hit = 0;
+  for (const w of t) {
+    const i = pool.indexOf(w);
+    if (i >= 0) {
+      hit += 1;
+      pool.splice(i, 1);
+    }
+  }
+  return Math.round((hit / t.length) * 100);
+}
+
+/** 🎭 Rolli o'qish: o'quvchi bitta rolni o'ynaydi — ilova qolgan gaplarni o'qiydi,
+ *  o'quvchi o'z gapini mikrofonga aytadi va talaffuzi baholanadi. */
+function RolePlay({ lines, lang, showTr, onExit }) {
+  const { progress, updateProgress } = useAuth();
+  const voice = progress.voiceSettings?.[lang] || {};
+  const speakers = [...new Set(lines.map((l) => l[0]))];
+  const [role, setRole] = useState(null);
+  const [step, setStep] = useState(-1);
+  const [scores, setScores] = useState({});
+  const [heard, setHeard] = useState({});
+  const [listening, setListening] = useState(false);
+  const stopRef = useRef(null);
+  const recRef = useRef(null);
+  const SpeechRec = getSpeechRecognition();
+  const finished = step >= lines.length;
+
+  useEffect(() => () => {
+    stopRef.current?.();
+    recRef.current?.abort?.();
+  }, []);
+
+  // Suhbatdoshning gapi — avtomatik o'qiladi va keyingisiga o'tiladi
+  useEffect(() => {
+    if (step < 0 || finished) return;
+    const [speaker, text] = lines[step];
+    if (speaker === role) return;
+    stopRef.current = speakWithEnd(text, lang, { rate: voice.rate ?? 0.9, voiceURI: voice.voiceURI }, () => setTimeout(() => setStep((s) => s + 1), 350));
+    return () => stopRef.current?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, role]);
+
+  useEffect(() => {
+    if (!finished || !role) return;
+    const mine = Object.values(scores);
+    if (!mine.length) return;
+    const avg = Math.round(mine.reduce((a, b) => a + b, 0) / mine.length);
+    updateProgress((prev) => withActivity(prev, Math.max(2, Math.round(avg / 10))));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [finished]);
+
+  function listen() {
+    if (!SpeechRec) return;
+    const rec = new SpeechRec();
+    rec.lang = langToBCP47(lang);
+    rec.interimResults = false;
+    rec.maxAlternatives = 3;
+    rec.onresult = (e) => {
+      const alts = Array.from(e.results?.[0] || []).map((a) => a.transcript);
+      const best = alts.reduce((acc, a) => {
+        const sc = speechScore(lines[step][1], a, lang);
+        return sc > acc.sc ? { sc, a } : acc;
+      }, { sc: -1, a: alts[0] || '' });
+      setHeard((h) => ({ ...h, [step]: best.a }));
+      setScores((s) => ({ ...s, [step]: Math.max(0, best.sc) }));
+    };
+    rec.onend = () => setListening(false);
+    rec.onerror = () => setListening(false);
+    recRef.current = rec;
+    setListening(true);
+    rec.start();
+  }
+
+  function restart(newRole = role) {
+    stopRef.current?.();
+    setRole(newRole);
+    setScores({});
+    setHeard({});
+    setStep(newRole ? 0 : -1);
+  }
+
+  if (!role) {
+    return (
+      <div className="card-soft p-4">
+        <div className="font-bold mb-1" style={{ color: 'var(--ink)' }}>
+          🎭 Rolli o'qish
+        </div>
+        <p className="text-sm muted mb-3">
+          Rolni tanlang. Ilova suhbatdoshning gaplarini o'qiydi, siz o'z gaplaringizni {SpeechRec ? 'mikrofonga ayting — talaffuzingiz baholanadi' : "ovoz chiqarib o'qing"}.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {speakers.map((s) => (
+            <button key={s} type="button" className="btn btn-primary btn-sm" onClick={() => restart(s)}>
+              Men — {s}
+            </button>
+          ))}
+          <button type="button" className="btn btn-ghost btn-sm" onClick={onExit}>
+            Bekor qilish
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const mineScores = Object.values(scores);
+  const avg = mineScores.length ? Math.round(mineScores.reduce((a, b) => a + b, 0) / mineScores.length) : null;
+
   return (
     <div>
-      <SectionTitle icon="💬" hint="2-dialog">{dialog.title}</SectionTitle>
-      <label className="flex items-center gap-2 text-xs mb-3 cursor-pointer select-none" style={{ color: 'var(--ink-soft)' }}>
-        <input type="checkbox" checked={showTr} onChange={(e) => setShowTr(e.target.checked)} />
-        Tarjimani ko'rsatish
-      </label>
+      <div className="flex flex-wrap items-center gap-2 mb-3">
+        <span className="badge badge-gold">🎭 Sizning rolingiz: {role}</span>
+        {avg != null && <span className={`badge ${avg >= 70 ? 'badge-pine' : 'badge-brick'}`}>O'rtacha: {avg}%</span>}
+        <button type="button" className="btn btn-ghost btn-sm ml-auto" onClick={() => restart(role)}>
+          ↺ Boshidan
+        </button>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={() => { stopRef.current?.(); onExit(); }}>
+          ✕ Chiqish
+        </button>
+      </div>
       <div className="space-y-2.5">
-        {dialog.lines.map(([speaker, line, tr], i) => {
-          const right = i % 2 === 1;
+        {lines.map(([speaker, line, tr], i) => {
+          const mine = speaker === role;
+          const visible = i <= step;
+          const current = i === step && !finished;
+          const sc = scores[i];
+          if (!visible) return null;
           return (
-            <div key={i} className={`flex gap-2 items-end ${right ? 'flex-row-reverse' : ''}`}>
-              <span className="font-mono text-[10px] px-2 py-1 rounded-full shrink-0" style={{ background: 'var(--paper-soft)', color: 'var(--ink-soft)' }}>
+            <div key={i} className={`flex gap-2 items-end ${mine ? 'flex-row-reverse' : ''} anim-rise`}>
+              <span className="text-[11px] font-bold px-2 py-1 rounded-full shrink-0" style={{ background: 'var(--paper-soft)', color: 'var(--ink-soft)' }}>
                 {speaker}
               </span>
               <div
                 className="rounded-2xl px-4 py-2.5 max-w-[85%] border"
                 style={{
-                  background: right ? 'var(--pine)' : 'var(--panel)',
-                  color: right ? 'var(--paper)' : 'var(--ink)',
-                  borderColor: right ? 'var(--pine)' : 'var(--line)',
+                  background: mine ? 'var(--pine)' : 'var(--panel)',
+                  color: mine ? '#fff' : 'var(--ink)',
+                  borderColor: current ? 'var(--gold)' : mine ? 'var(--pine)' : 'var(--line)',
+                  boxShadow: current ? '0 0 0 3px var(--gold-soft)' : 'none',
                 }}
               >
-                <div className="text-sm">{line}</div>
-                {showTr && (
-                  <div className="text-xs mt-1 opacity-75">{tr}</div>
+                <div className="text-[15px]">{line}</div>
+                {readingHint(line, lang) && <div className="text-[11px] mt-0.5 opacity-70 font-mono">{readingHint(line, lang)}</div>}
+                {showTr && tr && <div className="text-xs mt-1 opacity-80">{tr}</div>}
+                {mine && heard[i] !== undefined && (
+                  <div className="text-xs mt-1.5 pt-1.5 border-t" style={{ borderColor: 'rgba(255,255,255,.25)' }}>
+                    🎙 «{heard[i] || '…'}» — <b>{sc}%</b> {sc >= 85 ? "a'lo!" : sc >= 60 ? 'yaxshi' : 'yana urinib ko\'ring'}
+                  </div>
                 )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {!finished && step >= 0 && lines[step][0] === role && (
+        <div className="flex flex-wrap gap-2 mt-4">
+          {SpeechRec && (
+            <button type="button" className={`btn ${listening ? 'btn-danger' : 'btn-brand'}`} onClick={listen} disabled={listening}>
+              {listening ? <><span className="spinner" /> Tinglayapman…</> : scores[step] !== undefined ? '🎙 Qayta aytish' : '🎙 Gapingizni ayting'}
+            </button>
+          )}
+          <button type="button" className="btn btn-ghost" onClick={() => speakWithEnd(lines[step][1], lang, { rate: voice.rate ?? 0.9, voiceURI: voice.voiceURI })}>
+            🔊 Namuna
+          </button>
+          <button type="button" className="btn btn-primary" onClick={() => setStep((s) => s + 1)} disabled={listening}>
+            {SpeechRec && scores[step] === undefined ? "O'tkazib yuborish →" : 'Keyingisi →'}
+          </button>
+        </div>
+      )}
+      {!finished && step >= 0 && lines[step][0] !== role && (
+        <div className="text-sm muted mt-4 flex items-center gap-2">
+          <span className="spinner" /> {lines[step][0]} gapirmoqda…
+        </div>
+      )}
+      {finished && (
+        <div className="alert alert-success mt-4">
+          🎉 Dialog tugadi!{avg != null ? ` O'rtacha talaffuz: ${avg}%.` : ''}{' '}
+          <button type="button" className="underline font-bold" onClick={() => restart(speakers.find((s) => s !== role) || role)}>
+            Boshqa rolda o'qish
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Dialog — chat ko'rinishida, butun dialogni ketma-ket ovoz bilan tinglash va rolli o'qish imkoni bilan. */
+export function DialogView({ title, lines, lang, hint, audioUrl, defaultShowTr = true }) {
+  const { progress } = useAuth();
+  const voice = progress.voiceSettings?.[lang] || {};
+  const [showTr, setShowTr] = useState(defaultShowTr);
+  const [playing, setPlaying] = useState(-1);
+  const [rolePlay, setRolePlay] = useState(false);
+  const stopRef = useRef(null);
+
+  useEffect(() => () => stopRef.current?.(), []);
+
+  if (!lines?.length) return null;
+  const speakers = [...new Set(lines.map((l) => l[0]))];
+
+  if (rolePlay) {
+    return (
+      <div>
+        {title && (
+          <SectionTitle icon="💬" hint={hint}>
+            {title}
+          </SectionTitle>
+        )}
+        <label className="flex items-center gap-2 text-xs muted cursor-pointer select-none mb-3">
+          <input type="checkbox" checked={showTr} onChange={(e) => setShowTr(e.target.checked)} style={{ accentColor: 'var(--pine)' }} />
+          Tarjimani ko'rsatish
+        </label>
+        <RolePlay lines={lines} lang={lang} showTr={showTr} onExit={() => setRolePlay(false)} />
+      </div>
+    );
+  }
+
+  function playAll() {
+    if (playing >= 0) {
+      stopRef.current?.();
+      setPlaying(-1);
+      return;
+    }
+    stopRef.current = speakSequence(
+      lines.map((l) => l[1]),
+      lang,
+      { rate: voice.rate ?? 0.9, voiceURI: voice.voiceURI, onLine: setPlaying, onEnd: () => setPlaying(-1) }
+    );
+  }
+
+  return (
+    <div>
+      {title && (
+        <SectionTitle icon="💬" hint={hint}>
+          {title}
+        </SectionTitle>
+      )}
+      <div className="flex flex-wrap items-center gap-2 mb-3">
+        <button type="button" onClick={playAll} className={`btn btn-sm ${playing >= 0 ? 'btn-danger' : 'btn-soft'}`}>
+          {playing >= 0 ? '⏹ To\'xtatish' : '▶ Butun dialogni tinglash'}
+        </button>
+        {speakers.length >= 2 && (
+          <button
+            type="button"
+            className="btn btn-sm btn-gold"
+            onClick={() => {
+              stopRef.current?.();
+              setPlaying(-1);
+              setRolePlay(true);
+            }}
+          >
+            🎭 Rolli o'qish
+          </button>
+        )}
+        <label className="flex items-center gap-2 text-xs muted cursor-pointer select-none ml-auto">
+          <input type="checkbox" checked={showTr} onChange={(e) => setShowTr(e.target.checked)} style={{ accentColor: 'var(--pine)' }} />
+          Tarjimani ko'rsatish
+        </label>
+      </div>
+      {audioUrl && <audio controls preload="none" src={audioUrl} className="w-full mb-3" />}
+      <div className="space-y-2.5">
+        {lines.map(([speaker, line, tr], i) => {
+          const right = speakers.indexOf(speaker) % 2 === 1;
+          const active = playing === i;
+          return (
+            <div key={i} className={`flex gap-2 items-end ${right ? 'flex-row-reverse' : ''}`}>
+              <span className="text-[11px] font-bold px-2 py-1 rounded-full shrink-0" style={{ background: 'var(--paper-soft)', color: 'var(--ink-soft)' }}>
+                {speaker}
+              </span>
+              <div
+                className="rounded-2xl px-4 py-2.5 max-w-[82%] border transition-shadow"
+                style={{
+                  background: right ? 'var(--pine)' : 'var(--panel)',
+                  color: right ? '#fff' : 'var(--ink)',
+                  borderColor: active ? 'var(--gold)' : right ? 'var(--pine)' : 'var(--line)',
+                  boxShadow: active ? '0 0 0 3px var(--gold-soft)' : 'none',
+                }}
+              >
+                <div className="text-[15px]">{line}</div>
+                {lang === 'ru' && readingHint(line, lang) && showTr && (
+                  <div className="text-[11px] mt-0.5 opacity-70 font-mono">{readingHint(line, lang)}</div>
+                )}
+                {showTr && tr && <div className="text-xs mt-1 opacity-80">{tr}</div>}
               </div>
               <SpeakButton text={line} lang={lang} />
             </div>
@@ -88,6 +351,12 @@ export function DialogExtra({ dialog, lang }) {
   );
 }
 
+/** Ikkinchi dialog (ingliz tili darslarida) */
+export function DialogExtra({ dialog, lang }) {
+  if (!dialog?.lines?.length) return null;
+  return <DialogView title={dialog.title} lines={dialog.lines} lang={lang} hint="2-dialog" />;
+}
+
 /** O'qish matni + savollar */
 export function ReadingBlock({ reading, lang }) {
   const [showTr, setShowTr] = useState(false);
@@ -95,45 +364,39 @@ export function ReadingBlock({ reading, lang }) {
   if (!reading) return null;
   return (
     <div>
-      <SectionTitle icon="📖" hint="O'qish">{reading.title}</SectionTitle>
-      <div className="rounded-xl border p-4 lesson-card" style={card}>
+      <SectionTitle icon="📖" hint="O'qish">
+        {reading.title}
+      </SectionTitle>
+      <div className="card p-4">
         <div className="flex gap-3 items-start">
-          <p className="flex-1 leading-relaxed" style={{ color: 'var(--ink)' }}>{reading.text}</p>
+          <p className="flex-1 leading-relaxed text-[15px]" style={{ color: 'var(--ink)' }}>
+            {reading.text}
+          </p>
           <SpeakButton text={reading.text} lang={lang} />
         </div>
-        <button
-          type="button"
-          onClick={() => setShowTr((v) => !v)}
-          className="mt-3 text-xs font-mono uppercase tracking-widest cursor-pointer"
-          style={{ color: 'var(--gold)' }}
-        >
-          {showTr ? '▾ Tarjimani yashirish' : '▸ Tarjimani ko\'rsatish'}
+        <button type="button" onClick={() => setShowTr((v) => !v)} className="mt-3 text-xs font-bold" style={{ color: 'var(--gold)' }}>
+          {showTr ? '▾ Tarjimani yashirish' : "▸ Tarjimani ko'rsatish"}
         </button>
         {showTr && (
-          <p className="mt-2 text-sm leading-relaxed rounded-lg p-3" style={{ background: 'var(--paper-soft)', color: 'var(--ink-soft)' }}>
+          <p className="mt-2 text-sm leading-relaxed rounded-lg p-3" style={{ background: 'var(--panel-2)', color: 'var(--ink-soft)' }}>
             {reading.uz}
           </p>
         )}
       </div>
       {reading.questions?.length > 0 && (
         <div className="mt-3 space-y-2">
-          <div className="font-mono text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-soft)' }}>
-            Tushunish savollari
-          </div>
+          <div className="text-[11px] font-bold uppercase tracking-wider muted">Tushunish savollari</div>
           {reading.questions.map(([q, a], i) => (
-            <div key={i} className="rounded-xl border p-3" style={card}>
-              <div className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>{i + 1}. {q}</div>
+            <div key={i} className="card-soft p-3">
+              <div className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>
+                {i + 1}. {q}
+              </div>
               {open[i] ? (
                 <div className="text-sm mt-1.5 px-3 py-1.5 rounded-lg" style={{ background: 'var(--success-bg)', color: 'var(--ink)' }}>
                   ✅ {a}
                 </div>
               ) : (
-                <button
-                  type="button"
-                  className="text-xs font-mono uppercase tracking-widest mt-1.5 cursor-pointer"
-                  style={{ color: 'var(--pine)' }}
-                  onClick={() => setOpen((o) => ({ ...o, [i]: true }))}
-                >
+                <button type="button" className="text-xs font-bold mt-1.5" style={{ color: 'var(--pine)' }} onClick={() => setOpen((o) => ({ ...o, [i]: true }))}>
                   Javobni ko'rish
                 </button>
               )}
@@ -145,97 +408,200 @@ export function ReadingBlock({ reading, lang }) {
   );
 }
 
-/** Kengaytirilgan so'zlar va iboralar: qidiruv, tarjimani yashirish, talaffuz */
-export function WordsExplorer({ words = [], phrases = [], lang }) {
+/** Kengaytirilgan so'zlar va iboralar (Word fayldan): qidiruv, tarjimani yashirish, talaffuz */
+export function WordsExplorer({ words = [], phrases = [], lang, wordCats = [], phraseCats = [] }) {
   const [tab, setTab] = useState(words.length ? 'words' : 'phrases');
   const [q, setQ] = useState('');
   const [hide, setHide] = useState(false);
-  const [limit, setLimit] = useState(24);
+  const [limit, setLimit] = useState(20);
 
   const list = tab === 'words' ? words : phrases;
+  const cats = tab === 'words' ? wordCats : phraseCats;
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
     if (!s) return list;
-    return list.filter((r) => r[0].toLowerCase().includes(s) || r[1].toLowerCase().includes(s));
+    return list.filter((r) => String(r[0]).toLowerCase().includes(s) || String(r[1]).toLowerCase().includes(s));
   }, [list, q]);
 
   if (!words.length && !phrases.length) return null;
 
-  const tabBtn = (key, label, n) => (
-    <button
-      type="button"
-      key={key}
-      onClick={() => { setTab(key); setLimit(24); }}
-      className="px-4 py-2 rounded-full text-sm font-semibold cursor-pointer transition-colors"
-      style={{
-        background: tab === key ? 'var(--pine)' : 'var(--paper-soft)',
-        color: tab === key ? 'var(--paper)' : 'var(--ink-soft)',
-      }}
-    >
-      {label} <span className="font-mono text-xs opacity-80">{n}</span>
-    </button>
-  );
-
   return (
     <div>
-      <SectionTitle icon="🗂️" hint="Kengaytirilgan lug'at">Gaplar bilan so'zlar va iboralar</SectionTitle>
+      <SectionTitle icon="🗂️" hint="Word fayldan">
+        Gaplar bilan so'zlar va iboralar
+      </SectionTitle>
       <div className="flex flex-wrap items-center gap-2 mb-3">
-        {words.length > 0 && tabBtn('words', "So'zlar", words.length)}
-        {phrases.length > 0 && tabBtn('phrases', 'Iboralar', phrases.length)}
-        <label className="ml-auto flex items-center gap-2 text-xs cursor-pointer select-none" style={{ color: 'var(--ink-soft)' }}>
-          <input type="checkbox" checked={hide} onChange={(e) => setHide(e.target.checked)} />
-          Tarjimani yashirish (o'zingizni sinang)
+        {words.length > 0 && (
+          <button type="button" className={`chip ${tab === 'words' ? 'chip-active' : ''}`} onClick={() => { setTab('words'); setLimit(20); }}>
+            So'zlar · {words.length}
+          </button>
+        )}
+        {phrases.length > 0 && (
+          <button type="button" className={`chip ${tab === 'phrases' ? 'chip-active' : ''}`} onClick={() => { setTab('phrases'); setLimit(20); }}>
+            Iboralar · {phrases.length}
+          </button>
+        )}
+        <label className="ml-auto flex items-center gap-2 text-xs muted cursor-pointer select-none">
+          <input type="checkbox" checked={hide} onChange={(e) => setHide(e.target.checked)} style={{ accentColor: 'var(--pine)' }} />
+          Tarjimani yashirish
         </label>
       </div>
-      <input
-        value={q}
-        onChange={(e) => { setQ(e.target.value); setLimit(24); }}
-        placeholder="🔍 Qidirish…"
-        className="w-full rounded-xl border px-4 py-2.5 text-sm mb-3 outline-none"
-        style={{ borderColor: 'var(--line)', background: 'var(--panel)', color: 'var(--ink)' }}
-      />
+      <input value={q} onChange={(e) => { setQ(e.target.value); setLimit(20); }} placeholder="🔍 Qidirish…" className="input mb-3" />
       <div className="space-y-2">
-        {filtered.slice(0, limit).map(([w, tr, sent, sentTr], i) => (
-          <div key={w + i} className="rounded-xl border p-3.5 lesson-card" style={card}>
-            <div className="flex items-start gap-3">
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-baseline gap-x-3">
-                  <span className="font-display font-semibold text-base" style={{ color: 'var(--ink)' }}>{w}</span>
-                  <span
-                    className="text-sm transition-all"
-                    style={{ color: 'var(--gold)', filter: hide ? 'blur(6px)' : 'none' }}
-                    onClick={(e) => { e.currentTarget.style.filter = 'none'; }}
-                  >
-                    {tr}
-                  </span>
+        {filtered.slice(0, limit).map(([w, tr, sent, sentTr, cat], i) => {
+          const hint = readingHint(w, lang);
+          return (
+            <div key={w + i} className="card-soft p-3.5">
+              <div className="flex items-start gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+                    <span className="font-display font-semibold text-[17px]" style={{ color: 'var(--ink)' }}>
+                      {w}
+                    </span>
+                    {hint && <span className="font-mono text-xs faint">{hint}</span>}
+                    <span
+                      className="text-sm font-semibold transition-all cursor-pointer"
+                      style={{ color: 'var(--gold)', filter: hide ? 'blur(6px)' : 'none' }}
+                      onClick={(e) => (e.currentTarget.style.filter = 'none')}
+                    >
+                      {tr}
+                    </span>
+                  </div>
+                  {sent && (
+                    <div className="text-sm mt-1.5 italic" style={{ color: 'var(--ink)' }}>
+                      {sent}
+                    </div>
+                  )}
+                  {sentTr && (
+                    <div
+                      className="text-xs mt-0.5 muted cursor-pointer"
+                      style={{ filter: hide ? 'blur(5px)' : 'none' }}
+                      onClick={(e) => (e.currentTarget.style.filter = 'none')}
+                    >
+                      {sentTr}
+                    </div>
+                  )}
+                  {cats[cat] && <div className="text-[10.5px] faint mt-1">{cats[cat]}</div>}
                 </div>
-                <div className="text-sm mt-1.5 italic" style={{ color: 'var(--ink)' }}>{sent}</div>
-                <div
-                  className="text-xs mt-0.5"
-                  style={{ color: 'var(--ink-soft)', filter: hide ? 'blur(5px)' : 'none' }}
-                  onClick={(e) => { e.currentTarget.style.filter = 'none'; }}
-                >
-                  {sentTr}
+                <div className="flex flex-col gap-1.5">
+                  <SpeakButton text={w} lang={lang} title="So'zni eshitish" />
+                  {sent && <SpeakButton text={sent} lang={lang} title="Gapni eshitish" />}
                 </div>
               </div>
-              <SpeakButton text={sent || w} lang={lang} />
             </div>
-          </div>
-        ))}
-        {filtered.length === 0 && (
-          <div className="text-sm text-center py-6" style={{ color: 'var(--ink-soft)' }}>Hech narsa topilmadi.</div>
-        )}
+          );
+        })}
+        {filtered.length === 0 && <div className="text-sm text-center py-6 muted">Hech narsa topilmadi.</div>}
       </div>
       {filtered.length > limit && (
-        <button
-          type="button"
-          onClick={() => setLimit((l) => l + 24)}
-          className="mt-3 w-full rounded-xl border py-2.5 text-sm font-semibold cursor-pointer"
-          style={{ borderColor: 'var(--line)', color: 'var(--pine)', background: 'var(--panel)' }}
-        >
+        <button type="button" onClick={() => setLimit((l) => l + 30)} className="btn btn-ghost btn-block mt-3">
           Yana ko'rsatish ({filtered.length - limit} ta qoldi)
         </button>
       )}
+    </div>
+  );
+}
+
+/** Aylanuvchi kartochkalar: so'z → ma'no. */
+export function Flashcards({ items, lang }) {
+  const [order, setOrder] = useState(() => items.map((_, i) => i));
+  const [pos, setPos] = useState(0);
+  const [flipped, setFlipped] = useState(false);
+  const [known, setKnown] = useState({});
+  const touchX = useRef(null);
+  if (!items.length) return null;
+  const it = items[order[pos]];
+  const hint = readingHint(it.w, lang) || it.t;
+  const go = (d) => {
+    setFlipped(false);
+    setPos((p) => (p + d + order.length) % order.length);
+  };
+  const knownCount = Object.values(known).filter(Boolean).length;
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-3 text-sm">
+        <span className="muted">
+          {pos + 1} / {order.length}
+        </span>
+        <span className="badge badge-pine">Bilaman: {knownCount}</span>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm ml-auto"
+          onClick={() => {
+            setOrder(shuffle(order));
+            setPos(0);
+            setFlipped(false);
+          }}
+        >
+          🔀 Aralashtirish
+        </button>
+      </div>
+      <div
+        className={`flip cursor-pointer select-none ${flipped ? 'flipped' : ''}`}
+        onClick={() => setFlipped((v) => !v)}
+        onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
+        onTouchEnd={(e) => {
+          if (touchX.current == null) return;
+          const dx = e.changedTouches[0].clientX - touchX.current;
+          touchX.current = null;
+          if (Math.abs(dx) > 50) {
+            e.preventDefault();
+            go(dx < 0 ? 1 : -1);
+          }
+        }}
+      >
+        <div className="flip-inner">
+          <div className="flip-face">
+            <div className="font-display text-3xl font-semibold break-words" style={{ color: 'var(--ink)' }}>
+              {it.w}
+            </div>
+            {hint && hint !== it.w && <div className="font-mono text-sm mt-1" style={{ color: 'var(--gold)' }}>{hint}</div>}
+            <div className="mt-4" onClick={(e) => e.stopPropagation()}>
+              <SpeakButton text={it.w} lang={lang} size="lg" />
+            </div>
+            <div className="text-xs faint mt-4">Ma'nosini ko'rish uchun bosing</div>
+          </div>
+          <div className="flip-face flip-back">
+            <div className="font-display text-2xl font-semibold" style={{ color: 'var(--pine)' }}>
+              {it.m}
+            </div>
+            {it.s && (
+              <div className="text-sm italic mt-3" style={{ color: 'var(--ink)' }}>
+                {it.s}
+              </div>
+            )}
+            {it.st && <div className="text-xs muted mt-1">{it.st}</div>}
+          </div>
+        </div>
+      </div>
+      <div className="grid grid-cols-4 gap-2 mt-3">
+        <button type="button" className="btn btn-ghost" onClick={() => go(-1)}>
+          ←
+        </button>
+        <button
+          type="button"
+          className="btn btn-danger col-span-1"
+          onClick={() => {
+            setKnown((k) => ({ ...k, [order[pos]]: false }));
+            go(1);
+          }}
+        >
+          ✗ <span className="hidden sm:inline">Bilmayman</span>
+        </button>
+        <button
+          type="button"
+          className="btn btn-soft col-span-1"
+          onClick={() => {
+            setKnown((k) => ({ ...k, [order[pos]]: true }));
+            go(1);
+          }}
+        >
+          ✓ <span className="hidden sm:inline">Bilaman</span>
+        </button>
+        <button type="button" className="btn btn-ghost" onClick={() => go(1)}>
+          →
+        </button>
+      </div>
     </div>
   );
 }

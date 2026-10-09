@@ -1,0 +1,204 @@
+# 2. Odamlar va oila
+2.1|человек|Он очень добрый человек.|kişi|O çok iyi kalpli bir kişi.
+2.2|мужчина|Мужчина читает газету.|adam|Adam gazete okuyor.
+2.3|женщина|Женщина работает в больнице.|kadın|Kadın hastanede çalışıyor.
+2.4|ребёнок|Ребёнок играет с мячом.|çocuk|Çocuk topla oynuyor.
+2.5|младенец|Малыш сейчас спит.|bebek|Bebek şimdi uyuyor.
+2.6|мальчик|У мальчика красный велосипед.|erkek çocuk|Erkek çocuğun kırmızı bir bisikleti var.
+2.7|девочка|Девочка поёт в хоре.|kız çocuk|Kız çocuk koroda şarkı söylüyor.
+2.8|взрослый|Взрослые должны платить за билет.|yetişkin|Yetişkinler bilet ücreti ödemeli.
+2.9|подросток|Мой брат — подросток.|genç, ergen|Erkek kardeşim bir ergen.
+2.10|друг|Она моя лучшая подруга.|arkadaş|O benim en iyi arkadaşım.
+2.11|сосед|Наш сосед очень дружелюбный.|komşu|Komşumuz çok cana yakın.
+2.12|семья|Я живу со своей семьёй.|aile|Ailemle yaşıyorum.
+2.13|родитель|Каждый родитель любит своего ребёнка.|ebeveyn|Her ebeveyn çocuğunu sever.
+2.14|мать|Моя мама готовит каждый вечер.|anne|Annem her akşam yemek yapar.
+2.15|отец|Мой отец водит грузовик.|baba|Babam kamyon kullanıyor.
+2.16|сын|Их сыну десять лет.|oğul|Oğulları on yaşında.
+2.17|дочь|Её дочь изучает медицину.|kız evlat|Kızı tıp okuyor.
+2.18|брат|Мой брат играет в футбол.|erkek kardeş, ağabey|Erkek kardeşim futbol oynuyor.
+2.19|сестра|Моя сестра старше меня.|kız kardeş, abla|Ablam benden büyük.
+2.20|бабушка|Бабушка рассказывает нам истории.|büyükanne|Büyükannem bize hikâyeler anlatır.
+2.21|дедушка|У моего дедушки большой сад.|büyükbaba, dede|Dedemin büyük bir bahçesi var.
+2.22|дядя|Мой дядя живёт в Самарканде.|amca, dayı|Amcam Semerkant'ta yaşıyor.
+2.23|тётя|Моя тётя печёт вкусные торты.|teyze, hala|Teyzem lezzetli pastalar yapar.
+2.24|двоюродный брат / сестра|Мой двоюродный брат приезжает к нам каждое лето.|kuzen|Kuzenim her yaz bizi ziyaret eder.
+2.25|муж|Её муж — инженер.|koca, eş|Kocası mühendis.
+2.26|жена|Его жена — учительница.|karı, eş|Eşi öğretmen.
+2.27|партнёр|Она мой деловой партнёр.|ortak|O benim iş ortağım.
+2.28|начальник|Мой начальник на совещании.|patron|Patronum toplantıda.
+2.29|коллега|Сегодня мне помог коллега.|meslektaş|Bugün meslektaşım bana yardım etti.
+2.30|клиент|Клиент хочет вернуть деньги.|müşteri|Müşteri para iadesi istiyor.
+2.31|гость|Сегодня вечером у нас гость.|misafir|Bu akşam bir misafirimiz var.
+2.32|незнакомец|Незнакомец спросил у меня дорогу.|yabancı|Bir yabancı bana yol sordu.
+2.33|студент, ученик|У каждого ученика есть тетрадь.|öğrenci|Her öğrencinin bir defteri var.
+2.34|учитель|Учитель пишет на доске.|öğretmen|Öğretmen tahtaya yazıyor.
+2.35|врач|Врач проверил моё сердце.|doktor|Doktor kalbimi kontrol etti.
+2.36|медсестра|Медсестра дала мне таблетку.|hemşire|Hemşire bana bir hap verdi.
+2.37|водитель|Водитель остановил автобус.|şoför|Şoför otobüsü durdurdu.
+2.38|рабочий|Рабочий ремонтирует дорогу.|işçi|İşçi yolu tamir ediyor.
+2.39|инженер|Мой дядя — инженер.|mühendis|Amcam mühendis.
+2.40|адвокат|Адвокат объяснил закон.|avukat|Avukat yasayı açıkladı.
+2.41|полицейский|Полицейский остановил машину.|polis memuru|Polis memuru arabayı durdurdu.
+2.42|солдат|Солдат стоит у ворот.|asker|Asker kapıda duruyor.
+2.43|фермер|Фермер выращивает хлопок.|çiftçi|Çiftçi pamuk yetiştiriyor.
+2.44|официант|Официант принёс меню.|garson|Garson menüyü getirdi.
+2.45|певец|У певца красивый голос.|şarkıcı|Şarkıcının güzel bir sesi var.
+2.46|художник|Художник нарисовал гору.|ressam|Ressam bir dağ resmi yaptı.
+2.47|писатель|Писатель издал новую книгу.|yazar|Yazar yeni bir kitap yayımladı.
+2.48|менеджер|Менеджер созвал собрание.|müdür, yönetici|Müdür bir toplantı düzenledi.
+2.49|владелец|Владелец магазина добрый.|sahip|Dükkânın sahibi nazik.
+2.50|лидер|Он хороший лидер.|lider|O iyi bir lider.
+2.51|член|Она член клуба.|üye|Kulübün üyesi.
+2.52|команда|Наша команда выиграла игру.|takım|Takımımız maçı kazandı.
+2.53|группа|Приехала группа туристов.|grup|Bir grup turist geldi.
+2.54|люди|В этом городе живёт много людей.|insanlar|Bu şehirde çok insan yaşıyor.
+2.55|толпа|Толпа ждала у стадиона.|kalabalık|Kalabalık stadyumun dışında bekledi.
+2.56|враг|У него нет врагов.|düşman|Hiç düşmanı yok.
+2.57|герой|Пожарный — герой.|kahraman|İtfaiyeci bir kahramandır.
+2.58|король|Король жил в большом дворце.|kral|Kral büyük bir sarayda yaşardı.
+2.59|королева|Королева носила золотую корону.|kraliçe|Kraliçe altın bir taç taktı.
+2.60|президент|Президент выступил с речью.|cumhurbaşkanı|Cumhurbaşkanı bir konuşma yaptı.
+2.61|гражданин|У каждого гражданина есть права.|vatandaş|Her vatandaşın hakları vardır.
+2.62|иностранец|Иностранец попросил меня о помощи.|yabancı (ülkeden)|Bir yabancı benden yardım istedi.
+2.63|турист|Турист сделал много фотографий.|turist|Turist çok fotoğraf çekti.
+2.64|пассажир|Каждому пассажиру нужен билет.|yolcu|Her yolcunun bir bilete ihtiyacı var.
+2.65|пациент|Пациент ждёт врача.|hasta|Hasta doktoru bekliyor.
+2.66|новичок|Я новичок в английском.|yeni başlayan|İngilizcede yeni başlayanım.
+2.67|эксперт|Он эксперт по компьютерам.|uzman|Bilgisayar uzmanı.
+# 3. Tana va salomatlik
+3.1|тело|Упражнения полезны для тела.|vücut|Egzersiz vücudun için iyidir.
+3.2|голова|У меня болит голова.|baş, kafa|Başım ağrıyor.
+3.3|лицо|Умывай лицо каждое утро.|yüz|Her sabah yüzünü yıka.
+3.4|волосы|У неё длинные чёрные волосы.|saç|Uzun siyah saçları var.
+3.5|глаз|Мне что-то попало в глаз.|göz|Gözüme bir şey kaçtı.
+3.6|ухо|У меня болит ухо.|kulak|Kulağım ağrıyor.
+3.7|нос|У него маленький нос.|burun|Küçük bir burnu var.
+3.8|рот|Откройте рот, пожалуйста.|ağız|Ağzınızı açın, lütfen.
+3.9|зуб|У меня болит зуб.|diş|Dişim ağrıyor.
+3.10|язык|Не прикуси язык.|dil|Dilini ısırma.
+3.11|губа|Она нанесла крем на губы.|dudak|Dudaklarına krem sürdü.
+3.12|шея|Он носит шарф на шее.|boyun|Boynuna atkı takıyor.
+3.13|плечо|У меня болит плечо.|omuz|Omzum ağrıyor.
+3.14|рука (от плеча)|Он сломал руку.|kol|Kolunu kırdı.
+3.15|кисть руки, рука|Мойте руки перед обедом.|el|Öğle yemeğinden önce ellerini yıka.
+3.16|палец|Она порезала палец.|parmak|Parmağını kesti.
+3.17|грудь|Врач послушал мою грудь.|göğüs|Doktor göğsümü dinledi.
+3.18|спина|У меня болит спина.|sırt|Sırtım ağrıyor.
+3.19|живот, желудок|У меня болит живот.|mide, karın|Midem ağrıyor.
+3.20|нога|Он сломал ногу.|bacak|Bacağını kırdı.
+3.21|колено|У меня болит колено, когда я бегаю.|diz|Koşunca dizim ağrıyor.
+3.22|стопа|У меня замёрзла нога.|ayak|Ayağım üşüyor.
+3.23|палец ноги|Я ушиб палец на ноге.|ayak parmağı|Ayak parmağımı incittim.
+3.24|кожа|Используй крем для сухой кожи.|cilt, deri|Kuru cilt için krem kullan.
+3.25|кость|У собаки большая кость.|kemik|Köpeğin büyük bir kemiği var.
+3.26|сердце|У него сильное сердце.|kalp|Kalbi güçlü.
+3.27|кровь|Медсестра взяла у меня кровь.|kan|Hemşire kanımı aldı.
+3.28|мозг|Мозг управляет телом.|beyin|Beyin vücudu kontrol eder.
+3.29|голос|У неё мягкий голос.|ses|Yumuşak bir sesi var.
+3.30|здоровье|Здоровье важнее денег.|sağlık|Sağlık paradan daha önemlidir.
+3.31|болезнь|Он выздоровел после болезни.|hastalık|Hastalığından iyileşti.
+3.32|боль|Я чувствую острую боль в ноге.|ağrı|Bacağımda keskin bir ağrı hissediyorum.
+3.33|температура, жар|У ребёнка высокая температура.|ateş|Çocuğun yüksek ateşi var.
+3.34|кашель|У меня сильный кашель.|öksürük|Kötü bir öksürüğüm var.
+3.35|простуда|На прошлой неделе я простудился.|soğuk algınlığı|Geçen hafta soğuk algınlığına yakalandım.
+3.36|лекарство|Принимайте это лекарство два раза в день.|ilaç|Bu ilacı günde iki kez alın.
+3.37|таблетка|Принимайте одну таблетку после обеда.|hap|Öğle yemeğinden sonra bir hap alın.
+3.38|больница|Он в больнице.|hastane|Hastanede.
+3.39|поликлиника|Поликлиника открывается в восемь.|klinik, poliklinik|Klinik sekizde açılıyor.
+3.40|аптека|Я покупаю лекарства в аптеке.|eczane|İlaçları eczaneden alırım.
+3.41|травма|У игрока травма ноги.|sakatlık|Oyuncunun bacağında sakatlık var.
+3.42|рана|Медсестра обработала рану.|yara|Hemşire yarayı temizledi.
+3.43|операция|Ему нужна операция на колене.|ameliyat|Dizinden ameliyat olması gerekiyor.
+3.44|упражнение|Упражнения помогают оставаться здоровым.|egzersiz|Egzersiz sağlıklı kalmana yardımcı olur.
+3.45|диета|Здоровая диета включает овощи.|diyet, beslenme|Sağlıklı beslenme sebzeleri içerir.
+3.46|энергия|Сегодня у меня нет сил.|enerji|Bugün hiç enerjim yok.
+3.47|сила|У него огромная сила.|güç|Büyük bir gücü var.
+3.48|вес|Какой у тебя вес?|kilo, ağırlık|Kilon kaç?
+3.49|рост, высота|Его рост — метр восемьдесят.|boy, yükseklik|Boyu bir metre seksen.
+3.50|здоровый|Ешь здоровую пищу.|sağlıklı|Sağlıklı yiyecekler ye.
+3.51|больной|Мой сын сегодня болеет.|hasta|Oğlum bugün hasta.
+3.52|уставший|Я устал после работы.|yorgun|İşten sonra yorgunum.
+3.53|голодный|Я голоден.|aç|Açım.
+3.54|испытывающий жажду|Дети хотят пить.|susamış|Çocuklar susamış.
+3.55|с головокружением|У меня кружится голова.|başı dönen|Başım dönüyor.
+3.56|слабый|Старик слаб.|zayıf, güçsüz|Yaşlı adam güçsüz.
+3.57|сильный|Он сильный и здоровый.|güçlü|Güçlü ve sağlıklı.
+# 4. Uy va jihozlar
+4.1|дом|Они купили большой дом.|ev|Büyük bir ev satın aldılar.
+4.2|дом (родной), домой|Я иду домой.|ev, yuva|Eve gidiyorum.
+4.3|квартира|Мы живём в маленькой квартире.|daire|Küçük bir dairede yaşıyoruz.
+4.4|комната|Моя комната на втором этаже.|oda|Odam ikinci katta.
+4.5|кухня|Мама на кухне.|mutfak|Annem mutfakta.
+4.6|спальня|В спальне большое окно.|yatak odası|Yatak odasının büyük bir penceresi var.
+4.7|ванная|Ванная рядом с кухней.|banyo|Banyo mutfağın yanında.
+4.8|гостиная|Гости в гостиной.|oturma odası|Misafirler oturma odasında.
+4.9|сад|В саду растут розы.|bahçe|Bahçede güller var.
+4.10|двор|Дети играют во дворе.|avlu, bahçe|Çocuklar avluda oynuyor.
+4.11|пол|Пол чистый.|zemin, yer|Yer temiz.
+4.12|стена|На стене висит картина.|duvar|Duvarda bir resim var.
+4.13|потолок|Потолок белый.|tavan|Tavan beyaz.
+4.14|крыша|Крыша красная.|çatı|Çatı kırmızı.
+4.15|дверь|Закрой дверь, пожалуйста.|kapı|Kapıyı kapat, lütfen.
+4.16|окно|Открой окно, пожалуйста.|pencere|Pencereyi aç, lütfen.
+4.17|лестница|Осторожно на лестнице.|merdiven|Merdivenlerde dikkatli ol.
+4.18|лифт|Лифт сломан.|asansör|Asansör bozuk.
+4.19|балкон|Мы пьём чай на балконе.|balkon|Balkonda çay içeriz.
+4.20|гараж|Машина в гараже.|garaj|Araba garajda.
+4.21|стол|Поставь тарелки на стол.|masa|Tabakları masaya koy.
+4.22|стул|Садись на этот стул.|sandalye|Bu sandalyeye otur.
+4.23|диван|Кошка спит на диване.|kanepe|Kedi kanepede uyuyor.
+4.24|кровать|Я ложусь спать в десять.|yatak|Saat onda yatarım.
+4.25|письменный стол|Мой стол у окна.|çalışma masası|Çalışma masam pencerenin yanında.
+4.26|полка|Книги на полке.|raf|Kitaplar rafta.
+4.27|шкаф (кухонный)|Чашки в шкафу.|dolap|Fincanlar dolapta.
+4.28|гардероб|Моя одежда в шкафу.|gardırop|Kıyafetlerim gardıropta.
+4.29|зеркало|Она смотрит в зеркало.|ayna|Aynaya bakıyor.
+4.30|лампа|Включи лампу.|lamba|Lambayı yak.
+4.31|свет|Свет слишком яркий.|ışık|Işık çok parlak.
+4.32|штора|Задёрни штору, пожалуйста.|perde|Perdeyi kapat, lütfen.
+4.33|ковёр|Ковёр очень мягкий.|halı|Halı çok yumuşak.
+4.34|подушка|Мне нужна ещё одна подушка.|yastık|Bir yastığa daha ihtiyacım var.
+4.35|одеяло|Принеси мне тёплое одеяло.|battaniye, yorgan|Bana sıcak bir battaniye getir.
+4.36|полотенце|Вот чистое полотенце.|havlu|İşte temiz bir havlu.
+4.37|мыло|Мойте с мылом и водой.|sabun|Sabun ve suyla yıka.
+4.38|зубная щётка|Мне нужна новая зубная щётка.|diş fırçası|Yeni bir diş fırçasına ihtiyacım var.
+4.39|зубная паста|У нас закончилась зубная паста.|diş macunu|Diş macunumuz bitti.
+4.40|душ|Каждое утро я принимаю душ.|duş|Her sabah duş alırım.
+4.41|ванна|Она принимает ванну.|küvet, banyo|Banyo yapıyor.
+4.42|туалет|Где туалет?|tuvalet|Tuvalet nerede?
+4.43|раковина|Помой чашку в раковине.|lavabo|Fincanı lavaboda yıka.
+4.44|холодильник|Молоко в холодильнике.|buzdolabı|Süt buzdolabında.
+4.45|плита|Суп на плите.|ocak|Çorba ocakta.
+4.46|духовка|Торт в духовке.|fırın|Pasta fırında.
+4.47|микроволновка|Разогрей суп в микроволновке.|mikrodalga fırın|Çorbayı mikrodalgada ısıt.
+4.48|чайник|Чайник кипит.|çaydanlık, su ısıtıcısı|Su ısıtıcısı kaynıyor.
+4.49|кастрюля|Положи рис в кастрюлю.|tencere|Pirinci tencereye koy.
+4.50|сковорода|Пожарь яйца на сковороде.|tava|Yumurtaları tavada kızart.
+4.51|тарелка|Положи хлеб на тарелку.|tabak|Ekmeği tabağa koy.
+4.52|миска|Он съел миску супа.|kâse|Bir kâse çorba içti.
+4.53|чашка|Я хочу чашку чая.|fincan|Bir fincan çay istiyorum.
+4.54|стакан|Дайте мне, пожалуйста, стакан воды.|bardak|Lütfen bana bir bardak su verin.
+4.55|вилка|Пользуйся вилкой и ножом.|çatal|Çatal ve bıçak kullan.
+4.56|нож|Нож острый.|bıçak|Bıçak keskin.
+4.57|ложка|Мне нужна ложка для супа.|kaşık|Çorba için bir kaşığa ihtiyacım var.
+4.58|бутылка|На столе бутылка воды.|şişe|Masada bir şişe su var.
+4.59|сумка|Её сумка очень тяжёлая.|çanta|Çantası çok ağır.
+4.60|коробка|Коробка пустая.|kutu|Kutu boş.
+4.61|ключ|Я потерял ключ.|anahtar|Anahtarımı kaybettim.
+4.62|телефон|Мой телефон на столе.|telefon|Telefonum masada.
+4.63|компьютер|Я работаю на компьютере.|bilgisayar|Bilgisayarda çalışıyorum.
+4.64|телевизор|Телевизор включён.|televizyon|Televizyon açık.
+4.65|радио|Он слушает радио.|radyo|Radyo dinliyor.
+4.66|часы (настенные)|Часы на стене отстают.|saat (duvar)|Duvardaki saat geri kalıyor.
+4.67|батарейка, аккумулятор|Батарейка села.|pil|Pil bitti.
+4.68|зарядное устройство|Я забыл зарядку.|şarj aleti|Şarj aletimi unuttum.
+4.69|утюг; гладить|Каждое утро я глажу рубашку.|ütü; ütülemek|Her sabah gömleğimi ütülerim.
+4.70|стиральная машина|Стиральная машина новая.|çamaşır makinesi|Çamaşır makinesi yeni.
+4.71|пылесос|Пожалуйста, воспользуйся пылесосом.|elektrikli süpürge|Lütfen elektrikli süpürgeyi kullan.
+4.72|веник|Возьми веник и подмети пол.|süpürge|Süpürgeyi al ve yeri süpür.
+4.73|мусор|Вынеси мусор, пожалуйста.|çöp|Çöpü çıkar, lütfen.
+4.74|мебель|Они купили новую мебель.|mobilya|Yeni mobilya aldılar.
+4.75|счёт|Счёт за электричество большой.|fatura|Elektrik faturası yüksek.
+4.76|арендная плата|Мы платим за аренду в первый день месяца.|kira|Kirayı ayın ilk günü öderiz.
+4.77|район|Наш район тихий.|mahalle|Mahallemiz sakin.

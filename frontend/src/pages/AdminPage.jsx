@@ -1,539 +1,583 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import Layout from '../components/Layout.jsx';
+import { Modal, PageHeader, StatCard, formatDate, formatDateTime } from '../components/ui.jsx';
 import { api } from '../lib/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { MEDIA_META, MEDIA_ORDER } from '../lib/media.js';
+import { formatPhone } from '../lib/identity.js';
+import UsersPanel, { ROLE_LABEL } from './admin/UsersPanel.jsx';
 
-const ROLE_LABEL = {
-  superadmin: 'Super admin',
-  admin: 'Admin',
-  user: "O'quvchi",
+
+const PROVIDERS = {
+  gemini: { label: 'Google Gemini', link: 'https://aistudio.google.com/apikey', model: 'gemini-flash-latest', note: 'Bepul kalit beriladi. Tavsiya etiladi.' },
+  openai: { label: 'OpenAI (ChatGPT)', link: 'https://platform.openai.com/api-keys', model: 'gpt-4o-mini', note: "Pullik, hisobda balans bo'lishi kerak." },
+  groq: { label: 'Groq (Llama)', link: 'https://console.groq.com/keys', model: 'llama-3.3-70b-versatile', note: 'Bepul limit bilan, juda tez.' },
+  openrouter: { label: 'OpenRouter', link: 'https://openrouter.ai/keys', model: 'openrouter/auto', note: "Ko'plab modellarga bitta kalit." },
+  deepseek: { label: 'DeepSeek', link: 'https://platform.deepseek.com/api_keys', model: 'deepseek-chat', note: 'Arzon narxlar.' },
+  custom: { label: 'Boshqa (OpenAI-mos API)', link: '', model: '', note: 'Base URL va model nomini kiriting.' },
 };
+const PROVIDER_MODES = [
+  ['auto', '🔄 Avtomatik — qaysi kalit faol bo\'lsa'],
+  ['gemini', 'Faqat Gemini'],
+  ['openai', 'Faqat OpenAI'],
+  ['groq', 'Faqat Groq'],
+  ['openrouter', 'Faqat OpenRouter'],
+  ['deepseek', 'Faqat DeepSeek'],
+  ['custom', 'Faqat boshqa (custom)'],
+  ['mock', "⛔ AI o'chiq (oddiy rejim)"],
+];
 
-export default function AdminPage() {
-  const { user } = useAuth();
-  const isSuperAdmin = user?.role === 'superadmin';
-  const [users, setUsers] = useState(null);
-  const [error, setError] = useState('');
-  const [form, setForm] = useState({ username: '', password: '', displayName: '', role: 'user' });
-  const [formError, setFormError] = useState('');
-  const [creating, setCreating] = useState(false);
-  const [aiStatus, setAiStatus] = useState(null);
-  const [aiForm, setAiForm] = useState({ provider: 'mock' });
-  const [savingAi, setSavingAi] = useState(false);
-  const [aiFormMsg, setAiFormMsg] = useState(null);
+const TABS = [
+  ['home', '🏠 Umumiy'],
+  ['users', '👥 Foydalanuvchilar'],
+  ['ai', '🤖 AI va API kalitlar'],
+  ['content', '🗂️ Materiallar'],
+  ['stats', '📊 Statistika'],
+];
+
+// =====================================================================
+// STATISTIKA
+// =====================================================================
+function StatsTab() {
   const [stats, setStats] = useState(null);
-  const [apiKeys, setApiKeys] = useState(null);
-  const [keyForm, setKeyForm] = useState({ label: '', keyValue: '' });
-  const [addingKey, setAddingKey] = useState(false);
-  const [keyFormMsg, setKeyFormMsg] = useState(null);
-
-  function refreshApiKeys() {
-    api.listApiKeys().then((r) => setApiKeys(r.keys)).catch(() => {});
-  }
-
-  function refresh() {
-    api.listAdminUsers().then((r) => setUsers(r.users)).catch((e) => setError(e.message));
-  }
-
-  useEffect(refresh, []);
+  const [content, setContent] = useState(null);
+  const [error, setError] = useState('');
   useEffect(() => {
-    api.getAdminStats().then(setStats).catch(() => {});
+    api.adminStats().then(setStats).catch((e) => setError(e.message));
+    api.getContentStats().then(setContent).catch(() => {});
   }, []);
-  useEffect(() => {
-    api.aiStatus().then((s) => {
-      setAiStatus(s);
-      setAiForm((f) => ({ ...f, provider: s.configuredProvider === 'gemini' ? 'gemini' : 'mock' }));
-    }).catch(() => {});
-  }, []);
-  useEffect(refreshApiKeys, []);
-
-  async function onSaveAiSettings(e) {
-    e.preventDefault();
-    setSavingAi(true);
-    setAiFormMsg(null);
-    try {
-      const s = await api.saveAiSettings(aiForm);
-      setAiStatus(s);
-      setAiFormMsg({
-        ok: true,
-        text: s.provider === 'gemini' ? '✅ Saqlandi — Gemini AI endi faol.' : "✅ Saqlandi (hozircha mock rejimida, faol kalit yo'q yoki provayder mock qilib qo'yildi).",
-      });
-    } catch (err) {
-      setAiFormMsg({ ok: false, text: err.message });
-    } finally {
-      setSavingAi(false);
-    }
-  }
-
-  async function onAddApiKey(e) {
-    e.preventDefault();
-    setAddingKey(true);
-    setKeyFormMsg(null);
-    try {
-      await api.addApiKey({ provider: 'gemini', label: keyForm.label || undefined, keyValue: keyForm.keyValue });
-      setKeyForm({ label: '', keyValue: '' });
-      setKeyFormMsg({ ok: true, text: '✅ Kalit qo\'shildi.' });
-      refreshApiKeys();
-      api.aiStatus().then(setAiStatus).catch(() => {});
-    } catch (err) {
-      setKeyFormMsg({ ok: false, text: err.message });
-    } finally {
-      setAddingKey(false);
-    }
-  }
-
-  async function onToggleApiKey(key) {
-    setApiKeys((prev) => prev.map((k) => (k.id === key.id ? { ...k, isActive: !k.isActive } : k)));
-    try {
-      await api.toggleApiKey(key.id, !key.isActive);
-      api.aiStatus().then(setAiStatus).catch(() => {});
-    } catch {
-      refreshApiKeys();
-    }
-  }
-
-  async function onDeleteApiKey(key) {
-    if (!confirm(`"${key.label || key.maskedKey}" kalitini o'chirasizmi?`)) return;
-    setApiKeys((prev) => prev.filter((k) => k.id !== key.id));
-    try {
-      await api.deleteApiKey(key.id);
-      api.aiStatus().then(setAiStatus).catch(() => {});
-    } catch {
-      refreshApiKeys();
-    }
-  }
-
-  if (user && user.role !== 'admin' && user.role !== 'superadmin') {
-    return (
-      <Layout>
-        <div className="max-w-lg mx-auto px-5 py-20 text-center">
-          <div className="text-4xl mb-4">🔒</div>
-          <h1 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--ink)' }}>
-            Ruxsat yo'q
-          </h1>
-          <p style={{ color: 'var(--ink-soft)' }}>
-            Bu sahifa faqat administratorlar uchun.
-          </p>
-          <Link to="/" className="inline-block mt-6 font-mono text-xs uppercase tracking-widest" style={{ color: 'var(--pine)' }}>
-            ← Panelga qaytish
-          </Link>
+  return (
+    <div>
+      {error && <div className="alert alert-warn mb-4">Statistika olinmadi: {error}</div>}
+      {stats && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+          <StatCard icon="👥" label="Foydalanuvchilar" value={stats.users} />
+          <StatCard icon="🆕" label="Shu hafta yangi" value={stats.newThisWeek} tone="gold" />
+          <StatCard icon="🟢" label="Bugun faol" value={stats.activeToday} tone="sky" />
+          <StatCard icon="🤖" label="Bugungi AI so'rovlar" value={stats.aiToday} tone="brick" />
+          <StatCard icon="👑" label="Adminlar" value={(stats.byRole?.admin || 0) + (stats.byRole?.superadmin || 0)} tone="gold" />
+          <StatCard icon="🔑" label="Faol API kalitlar" value={stats.activeKeys} />
+          <StatCard icon="🗂️" label="Yuklangan materiallar" value={Object.values(stats.mediaByKind || {}).reduce((a, b) => a + b, 0)} tone="sky" />
+          <StatCard icon="📰" label="Yangiliklar" value={stats.mediaByKind?.news || 0} tone="brick" />
         </div>
-      </Layout>
-    );
-  }
+      )}
+      {content && (
+        <div className="card p-5 overflow-x-auto">
+          <div className="h2 mb-3">Kurs kontenti</div>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-[11px] uppercase tracking-wider muted">
+                <th className="py-2 pr-3">Til</th>
+                <th className="py-2 px-2 text-right">Dars</th>
+                <th className="py-2 px-2 text-right">Kurs so'zlari</th>
+                <th className="py-2 px-2 text-right">Word: so'z</th>
+                <th className="py-2 px-2 text-right">Word: ibora</th>
+                <th className="py-2 px-2 text-right">Qo'shimcha</th>
+                <th className="py-2 px-2 text-right">Dialog</th>
+                <th className="py-2 px-2 text-right">Mashq</th>
+                <th className="py-2 pl-2 text-right">Fe'l</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(content).map(([k, s]) => (
+                <tr key={k} className="border-t" style={{ borderColor: 'var(--line)', color: 'var(--ink)' }}>
+                  <td className="py-2 pr-3 font-bold whitespace-nowrap">
+                    {s.flag} {s.title}
+                  </td>
+                  <td className="py-2 px-2 text-right">{s.lessons}</td>
+                  <td className="py-2 px-2 text-right">{s.courseVocab}</td>
+                  <td className="py-2 px-2 text-right">{s.wordbank}</td>
+                  <td className="py-2 px-2 text-right">{s.phrasebank}</td>
+                  <td className="py-2 px-2 text-right">{s.extraVocab}</td>
+                  <td className="py-2 px-2 text-right">{s.dialogs}</td>
+                  <td className="py-2 px-2 text-right">{s.exercises}</td>
+                  <td className="py-2 pl-2 text-right">{s.verbs}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
 
-  async function onCreateAdmin(e) {
+// =====================================================================
+// AI VA API KALITLAR
+// =====================================================================
+function AiTab({ me }) {
+  const isSuper = me.role === 'superadmin';
+  const [settings, setSettings] = useState(null);
+  const [form, setForm] = useState(null);
+  const [keys, setKeys] = useState(null);
+  const [msg, setMsg] = useState(null);
+  const [error, setError] = useState('');
+  const [keyForm, setKeyForm] = useState({ provider: 'gemini', label: '', keyValue: '', model: '', baseUrl: '', priority: 100 });
+  const [adding, setAdding] = useState(false);
+  const [tests, setTests] = useState({});
+  const [editKey, setEditKey] = useState(null);
+
+  const refresh = useCallback(() => {
+    api
+      .getAiSettings()
+      .then((s) => {
+        setSettings(s);
+        setForm({ provider: s.configuredProvider, geminiModel: s.models?.gemini || 'gemini-flash-latest', dailyLimit: s.dailyLimit, tutorStyle: s.tutorStyle || '' });
+      })
+      .catch((e) => setError(e.message));
+    api
+      .listApiKeys()
+      .then((r) => setKeys(r.keys))
+      .catch(() => setKeys([]));
+  }, []);
+  useEffect(refresh, [refresh]);
+
+  async function saveSettings(e) {
     e.preventDefault();
-    setFormError('');
-    setCreating(true);
+    setMsg(null);
     try {
-      const { user: created } = await api.createUser(form);
-      setUsers((prev) => [...(prev || []), created]);
-      setForm({ username: '', password: '', displayName: '', role: 'user' });
+      const s = await api.saveAiSettings(form);
+      setSettings(s);
+      setMsg({ ok: true, text: s.provider === 'mock' ? "Saqlandi — AI hozir oddiy rejimda (faol kalit yo'q yoki o'chirilgan)." : `Saqlandi — AI faol (${s.activeKeyCount} ta kalit).` });
     } catch (err) {
-      setFormError(err.message);
-    } finally {
-      setCreating(false);
+      setMsg({ ok: false, text: err.message });
     }
   }
 
-  async function onDelete(u) {
-    if (!confirm(`"${u.username}" butunlay o'chirilsinmi?`)) return;
-    setUsers((prev) => prev.filter((x) => x.id !== u.id));
+  async function addKey(e) {
+    e.preventDefault();
+    setAdding(true);
+    setError('');
     try {
-      await api.deleteUser(u.id);
+      const res = await api.addApiKey(keyForm);
+      setKeyForm({ provider: keyForm.provider, label: '', keyValue: '', model: '', baseUrl: '', priority: 100 });
+      refresh();
+      if (res.id) testKey(res.id);
     } catch (err) {
       setError(err.message);
-      refresh();
+    } finally {
+      setAdding(false);
     }
   }
 
+  async function testKey(id) {
+    setTests((t) => ({ ...t, [id]: { loading: true } }));
+    try {
+      const r = await api.aiTestKey(id);
+      setTests((t) => ({ ...t, [id]: r }));
+      api.listApiKeys().then((x) => setKeys(x.keys)).catch(() => {});
+    } catch (err) {
+      setTests((t) => ({ ...t, [id]: { ok: false, error: err.message } }));
+    }
+  }
+
+  async function keyAction(fn) {
+    setError('');
+    try {
+      await fn();
+      refresh();
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  const preset = PROVIDERS[keyForm.provider];
+
   return (
-    <Layout>
-      <div className="max-w-3xl mx-auto px-5 py-10">
-        <div className="mb-8">
-          <div className="font-mono text-xs tracking-[0.25em] uppercase mb-2" style={{ color: 'var(--gold)' }}>
-            Boshqaruv
+    <div className="space-y-5">
+      {error && <div className="alert alert-error">{error}</div>}
+      {settings && (
+        <div className="card p-5">
+          <div className="flex flex-wrap items-center gap-3 mb-1">
+            <span className="text-2xl">🤖</span>
+            <div className="flex-1 min-w-[200px]">
+              <div className="h2">AI ustoz holati</div>
+              <div className="text-sm muted">
+                {settings.provider === 'mock'
+                  ? "Oddiy rejim: AI kalit yo'q yoki o'chirilgan. Pastdan kalit qo'shing."
+                  : `Faol: ${PROVIDERS[settings.provider]?.label || settings.provider} · ${settings.activeKeyCount} ta faol kalit. Biri xato bersa, avtomatik keyingisiga o'tadi.`}
+              </div>
+            </div>
+            <span className={`badge ${settings.provider === 'mock' ? 'badge-gold' : 'badge-pine'}`}>{settings.provider === 'mock' ? 'Oddiy rejim' : 'AI faol'}</span>
           </div>
-          <h1 className="font-display text-3xl font-semibold" style={{ color: 'var(--ink)' }}>
-            Foydalanuvchilar
-          </h1>
+
+          {isSuper && form ? (
+            <form onSubmit={saveSettings} className="mt-4 pt-4 border-t grid sm:grid-cols-2 gap-3" style={{ borderColor: 'var(--line)' }}>
+              <label className="field">
+                <span className="label">Provayder rejimi</span>
+                <select className="select" value={form.provider} onChange={(e) => setForm((f) => ({ ...f, provider: e.target.value }))}>
+                  {PROVIDER_MODES.map(([k, l]) => (
+                    <option key={k} value={k}>
+                      {l}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="field !mt-0">
+                <span className="label">Gemini modeli</span>
+                <input className="input" list="gemini-models" value={form.geminiModel} onChange={(e) => setForm((f) => ({ ...f, geminiModel: e.target.value }))} />
+                <datalist id="gemini-models">
+                  <option value="gemini-flash-latest" />
+                  <option value="gemini-2.5-flash" />
+                  <option value="gemini-2.5-flash-lite" />
+                  <option value="gemini-2.5-pro" />
+                </datalist>
+              </label>
+              <label className="field !mt-0">
+                <span className="label">Kunlik limit (bir o'quvchi uchun, 0 = cheksiz)</span>
+                <input type="number" min="0" className="input" value={form.dailyLimit} onChange={(e) => setForm((f) => ({ ...f, dailyLimit: e.target.value }))} />
+              </label>
+              <label className="field !mt-0 sm:col-span-2">
+                <span className="label">Ustozga qo'shimcha ko'rsatma (ixtiyoriy)</span>
+                <textarea className="textarea !min-h-[70px]" value={form.tutorStyle} onChange={(e) => setForm((f) => ({ ...f, tutorStyle: e.target.value }))} placeholder="Masalan: Javoblarni juda qisqa yoz, har doim 2 ta misol keltir." />
+              </label>
+              <div className="sm:col-span-2 flex flex-wrap items-center gap-3">
+                <button type="submit" className="btn btn-primary">
+                  Saqlash
+                </button>
+                {msg && <span className={`text-sm ${msg.ok ? '' : ''}`} style={{ color: msg.ok ? 'var(--pine)' : 'var(--brick)' }}>{msg.text}</span>}
+              </div>
+            </form>
+          ) : (
+            <p className="text-sm muted mt-3">AI sozlamalari va API kalitlarni faqat super admin o'zgartira oladi.</p>
+          )}
+        </div>
+      )}
+
+      <div className="card p-5">
+        <div className="h2 mb-3">🔑 API kalitlar {keys ? `(${keys.length})` : ''}</div>
+        {!keys && <div className="skeleton h-24" />}
+        {keys?.length === 0 && <div className="text-sm muted mb-3">Hali kalit qo'shilmagan.</div>}
+        <div className="space-y-2.5 mb-5">
+          {keys?.map((k) => {
+            const t = tests[k.id];
+            return (
+              <div key={k.id} className="card-soft p-3.5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: k.isActive ? 'var(--pine)' : 'var(--ink-faint)' }} />
+                  <span className="badge badge-sky">{PROVIDERS[k.provider]?.label || k.provider}</span>
+                  <span className="font-bold text-sm flex-1 min-w-[120px] truncate" style={{ color: 'var(--ink)' }}>
+                    {k.label || 'Nomsiz kalit'}
+                  </span>
+                  <span className="font-mono text-xs muted">{k.maskedKey}</span>
+                </div>
+                <div className="text-xs muted mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
+                  <span>Model: {k.model || PROVIDERS[k.provider]?.model || 'standart'}</span>
+                  {k.baseUrl && <span>URL: {k.baseUrl}</span>}
+                  <span>Navbat: {k.priority}</span>
+                  <span style={{ color: 'var(--pine)' }}>✓ {k.successCount || 0}</span>
+                  {k.failureCount > 0 && <span style={{ color: 'var(--brick)' }}>✗ {k.failureCount} ketma-ket xato</span>}
+                  {k.lastUsedAt && <span>Oxirgi: {formatDateTime(k.lastUsedAt)}</span>}
+                </div>
+                {k.lastError && (
+                  <div className="text-[11px] mt-1 truncate" style={{ color: 'var(--brick)' }} title={k.lastError}>
+                    {k.lastError}
+                  </div>
+                )}
+                {t && !t.loading && (
+                  <div className={`alert mt-2 text-xs ${t.ok ? 'alert-success' : 'alert-error'}`}>
+                    {t.ok ? `✅ Ishlayapti (${t.latencyMs} ms): "${t.sample}"` : `❌ ${t.error}`}
+                  </div>
+                )}
+                {isSuper && (
+                  <div className="flex flex-wrap gap-1.5 mt-2.5">
+                    <button type="button" className="btn btn-soft btn-sm" onClick={() => testKey(k.id)} disabled={t?.loading}>
+                      {t?.loading ? <span className="spinner" /> : '🧪'} Sinash
+                    </button>
+                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => keyAction(() => api.toggleApiKey(k.id, !k.isActive))}>
+                      {k.isActive ? '⏸ O\'chirish' : '▶ Yoqish'}
+                    </button>
+                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => setEditKey({ id: k.id, label: k.label || '', model: k.model || '', baseUrl: k.baseUrl || '', priority: k.priority, keyValue: '' })}>
+                      ✏️ Tahrirlash
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger btn-sm"
+                      onClick={() => confirm(`"${k.label || k.maskedKey}" kalitini o'chirasizmi?`) && keyAction(() => api.deleteApiKey(k.id))}
+                    >
+                      🗑
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
-        {error && (
-          <div className="mb-6 text-sm px-3 py-2 rounded-lg inline-block" style={{ background: 'var(--error-bg)', color: 'var(--brick)' }}>
-            {error}
-          </div>
-        )}
-
-        {stats && (
-          <div className="rounded-xl border p-5 mb-8" style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}>
-            <div className="flex items-center gap-4 mb-4">
-              <span className="text-2xl shrink-0">📊</span>
-              <div className="flex-1 min-w-0">
-                <div className="font-display font-semibold" style={{ color: 'var(--ink)' }}>
-                  Kontent statistikasi
-                </div>
-                <div className="font-mono text-[11px] mt-0.5" style={{ color: 'var(--ink-soft)' }}>
-                  Saytdagi barcha til bo'yicha ma'lumotlar soni
-                </div>
-              </div>
+        {isSuper && (
+          <form onSubmit={addKey} className="pt-4 border-t" style={{ borderColor: 'var(--line)' }}>
+            <div className="font-bold mb-3" style={{ color: 'var(--ink)' }}>
+              + Yangi kalit qo'shish
             </div>
-
-            {/* Umumiy jami (barcha tillar bo'yicha) */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
-              {[
-                ['📘', 'Darslar', stats.totals.lessons],
-                ['📚', "Lug'at so'zlari", stats.totals.vocabTotal],
-                ['🎧', 'Dialoglar', stats.totals.dialogsTotal],
-                ['📐', 'Grammatika mavzulari', stats.totals.grammarTopics],
-                ['✏️', 'Mashqlar', stats.totals.exercises],
-                ['🔤', "Fe'llar", stats.totals.verbs],
-                ['👤', 'Foydalanuvchilar', stats.userCount],
-                ['📕', 'Kitoblar', stats.bookCount],
-              ].map(([icon, label, val]) => (
-                <div key={label} className="rounded-lg p-3 text-center" style={{ background: 'var(--paper-soft)' }}>
-                  <div className="text-lg mb-0.5">{icon}</div>
-                  <div className="font-display text-xl font-bold" style={{ color: 'var(--pine)' }}>
-                    {val}
-                  </div>
-                  <div className="font-mono text-[9px] uppercase tracking-wide" style={{ color: 'var(--ink-soft)' }}>
-                    {label}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Til bo'yicha batafsil jadval */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse">
-                <thead>
-                  <tr style={{ color: 'var(--ink-soft)' }} className="font-mono text-[10px] uppercase tracking-wide">
-                    <th className="text-left py-2 pr-3">Til</th>
-                    <th className="text-right py-2 px-3">Bosqich</th>
-                    <th className="text-right py-2 px-3">Dars</th>
-                    <th className="text-right py-2 px-3">Lug'at</th>
-                    <th className="text-right py-2 px-3">Dialog</th>
-                    <th className="text-right py-2 px-3">Grammatika</th>
-                    <th className="text-right py-2 px-3">Mashq</th>
-                    <th className="text-right py-2 pl-3">Fe'l</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Object.entries(stats.perLang).map(([code, s]) => (
-                    <tr key={code} className="border-t" style={{ borderColor: 'var(--line)' }}>
-                      <td className="py-2 pr-3 font-semibold" style={{ color: 'var(--ink)' }}>
-                        {s.title}
-                      </td>
-                      <td className="text-right py-2 px-3" style={{ color: 'var(--ink)' }}>{s.stages}</td>
-                      <td className="text-right py-2 px-3" style={{ color: 'var(--ink)' }}>{s.lessons}</td>
-                      <td className="text-right py-2 px-3" style={{ color: 'var(--ink)' }}>
-                        {s.vocabTotal}
-                        <span className="font-mono text-[10px]" style={{ color: 'var(--ink-soft)' }}>
-                          {' '}({s.courseVocab}+{s.extraVocab})
-                        </span>
-                      </td>
-                      <td className="text-right py-2 px-3" style={{ color: 'var(--ink)' }}>
-                        {s.dialogsTotal}
-                        <span className="font-mono text-[10px]" style={{ color: 'var(--ink-soft)' }}>
-                          {' '}({s.courseDialogs}+{s.extraDialogs})
-                        </span>
-                      </td>
-                      <td className="text-right py-2 px-3" style={{ color: 'var(--ink)' }}>{s.grammarTopics}</td>
-                      <td className="text-right py-2 px-3" style={{ color: 'var(--ink)' }}>{s.exercises}</td>
-                      <td className="text-right py-2 pl-3" style={{ color: 'var(--ink)' }}>{s.verbs}</td>
-                    </tr>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <label className="field">
+                <span className="label">Provayder</span>
+                <select className="select" value={keyForm.provider} onChange={(e) => setKeyForm((f) => ({ ...f, provider: e.target.value }))}>
+                  {Object.entries(PROVIDERS).map(([k, p]) => (
+                    <option key={k} value={k}>
+                      {p.label}
+                    </option>
                   ))}
-                </tbody>
-              </table>
+                </select>
+                <span className="help">
+                  {preset.note}{' '}
+                  {preset.link && (
+                    <a href={preset.link} target="_blank" rel="noreferrer" className="underline" style={{ color: 'var(--pine)' }}>
+                      Kalit olish →
+                    </a>
+                  )}
+                </span>
+              </label>
+              <label className="field !mt-0">
+                <span className="label">Nomi (ixtiyoriy)</span>
+                <input className="input" value={keyForm.label} onChange={(e) => setKeyForm((f) => ({ ...f, label: e.target.value }))} placeholder="Masalan: Asosiy Gemini" />
+              </label>
+              <label className="field !mt-0 sm:col-span-2">
+                <span className="label">API kalit</span>
+                <input className="input font-mono" value={keyForm.keyValue} onChange={(e) => setKeyForm((f) => ({ ...f, keyValue: e.target.value }))} placeholder={keyForm.provider === 'gemini' ? 'AIzaSy…' : 'sk-…'} required autoComplete="off" />
+              </label>
+              <label className="field !mt-0">
+                <span className="label">Model (ixtiyoriy)</span>
+                <input className="input" value={keyForm.model} onChange={(e) => setKeyForm((f) => ({ ...f, model: e.target.value }))} placeholder={preset.model || 'model nomi'} required={keyForm.provider === 'custom'} />
+              </label>
+              <label className="field !mt-0">
+                <span className="label">Navbat (kichik raqam — birinchi)</span>
+                <input type="number" className="input" value={keyForm.priority} onChange={(e) => setKeyForm((f) => ({ ...f, priority: e.target.value }))} />
+              </label>
+              {(keyForm.provider === 'custom' || keyForm.baseUrl) && (
+                <label className="field !mt-0 sm:col-span-2">
+                  <span className="label">Base URL</span>
+                  <input className="input" value={keyForm.baseUrl} onChange={(e) => setKeyForm((f) => ({ ...f, baseUrl: e.target.value }))} placeholder="https://…/v1" required={keyForm.provider === 'custom'} />
+                </label>
+              )}
             </div>
-            <p className="font-mono text-[10px] mt-2" style={{ color: 'var(--ink-soft)' }}>
-              Lug'at/Dialog ustunlaridagi qavs ichidagi sonlar: (dars ichidagi + qo'shimcha to'plamdagi)
+            <button type="submit" className="btn btn-primary mt-4" disabled={adding || !keyForm.keyValue.trim()}>
+              {adding ? <><span className="spinner" /> Qo'shilmoqda…</> : "+ Kalit qo'shish va sinash"}
+            </button>
+            <p className="text-xs faint mt-3">
+              Kalitlar Supabase bazasida saqlanadi va hech qachon brauzerga chiqmaydi (faqat maskalangan holda ko'rsatiladi). Bir nechta kalit qo'shsangiz, biri limitga yetganda
+              tizim avtomatik keyingisiga o'tadi.
             </p>
-          </div>
+          </form>
         )}
+      </div>
 
-        {aiStatus && (
-          <div
-            className="rounded-xl border p-5 mb-8"
-            style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}
-          >
-            <div className="flex items-center gap-4 mb-1">
-              <span className="text-2xl shrink-0">🤖</span>
-              <div className="flex-1 min-w-0">
-                <div className="font-display font-semibold" style={{ color: 'var(--ink)' }}>
-                  AI (Gemini) sozlamalari
-                </div>
-                <div className="font-mono text-[11px] mt-0.5" style={{ color: 'var(--ink-soft)' }}>
-                  {aiStatus.provider === 'gemini'
-                    ? `✅ Gemini AI faol — ${aiStatus.activeKeyCount ?? apiKeys?.filter((k) => k.isActive).length ?? ''} ta faol kalit bilan ishlamoqda. Bitta kalit limitga tegib qolsa, tizim avtomatik keyingisiga o'tadi.`
-                    : "🟡 Hozircha \"mock\" rejimida ishlayapti — faol API kalit yo'q yoki provayder mock qilib qo'yilgan."}
-                </div>
-              </div>
-              <span
-                className="font-mono text-[10px] uppercase tracking-widest px-2.5 py-1.5 rounded-full shrink-0"
-                style={{
-                  background: aiStatus.provider === 'gemini' ? 'var(--success-bg)' : 'var(--gold-soft)',
-                  color: aiStatus.provider === 'gemini' ? 'var(--pine)' : 'var(--gold)',
-                }}
-              >
-                {aiStatus.provider === 'gemini' ? 'Gemini faol' : 'Mock rejim'}
-              </span>
-            </div>
-
-            {isSuperAdmin ? (
-              <>
-                {/* Provayder tanlash */}
-                <form onSubmit={onSaveAiSettings} className="mt-4 pt-4 border-t flex flex-wrap items-center gap-2" style={{ borderColor: 'var(--line)' }}>
-                  <label className="font-mono text-[10px] uppercase tracking-widest" style={{ color: 'var(--ink-soft)' }}>
-                    Provayder:
-                  </label>
-                  <select
-                    value={aiForm.provider}
-                    onChange={(e) => setAiForm((f) => ({ ...f, provider: e.target.value }))}
-                    className="px-3 py-2 rounded-lg border outline-none font-mono text-xs"
-                    style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
-                  >
-                    <option value="mock">Mock (AI o'chiq)</option>
-                    <option value="gemini">Gemini (AI yoqilgan)</option>
-                  </select>
-                  <button
-                    type="submit"
-                    disabled={savingAi}
-                    className="font-mono text-xs uppercase tracking-widest px-4 py-2 rounded-xl cursor-pointer font-semibold disabled:opacity-60"
-                    style={{ background: 'var(--pine)', color: 'var(--paper)' }}
-                  >
-                    {savingAi ? 'Saqlanmoqda…' : 'Saqlash'}
-                  </button>
-                  {aiFormMsg && (
-                    <div className="w-full font-mono text-[11px]" style={{ color: aiFormMsg.ok ? 'var(--pine)' : 'var(--brick)' }}>
-                      {aiFormMsg.text}
-                    </div>
-                  )}
-                </form>
-
-                {/* Kalitlar ro'yxati */}
-                <div className="mt-5 pt-4 border-t" style={{ borderColor: 'var(--line)' }}>
-                  <div className="font-mono text-[10px] uppercase tracking-widest mb-2.5" style={{ color: 'var(--ink-soft)' }}>
-                    Gemini API kalitlar {apiKeys ? `(${apiKeys.length})` : ''}
-                  </div>
-                  {!apiKeys && <div className="font-mono text-xs" style={{ color: 'var(--ink-soft)' }}>Yuklanmoqda…</div>}
-                  {apiKeys?.length === 0 && (
-                    <div className="font-mono text-xs" style={{ color: 'var(--ink-soft)' }}>
-                      Hali kalit qo'shilmagan.
-                    </div>
-                  )}
-                  {apiKeys?.length > 0 && (
-                    <div className="space-y-2 mb-3">
-                      {apiKeys.map((k) => (
-                        <div
-                          key={k.id}
-                          className="flex flex-wrap items-center gap-2 px-3 py-2.5 rounded-lg border"
-                          style={{ borderColor: 'var(--line)', background: 'var(--paper)' }}
-                        >
-                          <span
-                            className="w-2 h-2 rounded-full shrink-0"
-                            style={{ background: k.isActive ? 'var(--pine)' : 'var(--ink-soft)' }}
-                            title={k.isActive ? 'Faol' : "O'chiq"}
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-semibold truncate" style={{ color: 'var(--ink)' }}>
-                              {k.label || 'Nomsiz kalit'}
-                            </div>
-                            <div className="font-mono text-[11px]" style={{ color: 'var(--ink-soft)' }}>
-                              {k.maskedKey}
-                              {k.failureCount > 0 && (
-                                <span style={{ color: 'var(--brick)' }}> · {k.failureCount} marta xato</span>
-                              )}
-                            </div>
-                            {k.lastError && (
-                              <div className="font-mono text-[10px] mt-0.5 truncate" style={{ color: 'var(--brick)' }} title={k.lastError}>
-                                {k.lastError}
-                              </div>
-                            )}
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => onToggleApiKey(k)}
-                            className="font-mono text-[10px] uppercase tracking-widest px-2.5 py-1.5 rounded-lg cursor-pointer shrink-0"
-                            style={{
-                              background: k.isActive ? 'var(--gold-soft)' : 'var(--success-bg)',
-                              color: k.isActive ? 'var(--gold)' : 'var(--pine)',
-                            }}
-                          >
-                            {k.isActive ? "O'chirish" : 'Yoqish'}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => onDeleteApiKey(k)}
-                            className="font-mono text-[10px] uppercase tracking-widest px-2.5 py-1.5 rounded-lg cursor-pointer shrink-0"
-                            style={{ background: 'var(--error-bg)', color: 'var(--brick)' }}
-                          >
-                            🗑
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Yangi kalit qo'shish */}
-                  <form onSubmit={onAddApiKey} className="flex flex-wrap gap-2">
-                    <input
-                      value={keyForm.label}
-                      onChange={(e) => setKeyForm((f) => ({ ...f, label: e.target.value }))}
-                      placeholder="Nomi (ixtiyoriy, masalan: 2-kalit)"
-                      className="w-full sm:w-40 px-3 py-2.5 rounded-lg border outline-none font-mono text-xs"
-                      style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
-                    />
-                    <input
-                      value={keyForm.keyValue}
-                      onChange={(e) => setKeyForm((f) => ({ ...f, keyValue: e.target.value }))}
-                      placeholder="AIzaSy... yangi kalitni shu yerga joylashtiring"
-                      type="text"
-                      autoComplete="off"
-                      required
-                      className="flex-1 min-w-0 w-full sm:min-w-[240px] px-3 py-2.5 rounded-lg border outline-none font-mono text-xs"
-                      style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
-                    />
-                    <button
-                      type="submit"
-                      disabled={addingKey || !keyForm.keyValue.trim()}
-                      className="font-mono text-xs uppercase tracking-widest px-4 py-2.5 rounded-xl cursor-pointer font-semibold disabled:opacity-60"
-                      style={{ background: 'var(--pine)', color: 'var(--paper)' }}
-                    >
-                      {addingKey ? 'Qo\'shilmoqda…' : '+ Kalit qo\'shish'}
-                    </button>
-                  </form>
-                  {keyFormMsg && (
-                    <div className="mt-2 font-mono text-[11px]" style={{ color: keyFormMsg.ok ? 'var(--pine)' : 'var(--brick)' }}>
-                      {keyFormMsg.text}
-                    </div>
-                  )}
-                  <p className="font-mono text-[10px] mt-2.5" style={{ color: 'var(--ink-soft)' }}>
-                    Bepul kalitlarni{' '}
-                    <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" className="underline">
-                      aistudio.google.com/apikey
-                    </a>{' '}
-                    saytidan olishingiz mumkin. Bir nechta kalit qo'shsangiz, biri kunlik/daqiqalik limitga
-                    tegib qolganda tizim avtomatik keyingisiga o'tadi — shu orqali bepul limitni "kengaytirish"
-                    mumkin. Kalitlar Supabase bazasida xavfsiz saqlanadi, hech qachon brauzerga chiqmaydi.
-                  </p>
-                </div>
-              </>
-            ) : (
-              <p className="mt-3 pt-3 border-t font-mono text-[11px]" style={{ borderColor: 'var(--line)', color: 'var(--ink-soft)' }}>
-                AI sozlamalari va API kalitlarni faqat super admin o'zgartira oladi.
-              </p>
-            )}
-          </div>
-        )}
-
-        {(isSuperAdmin || user?.role === 'admin') && (
+      <Modal open={!!editKey} onClose={() => setEditKey(null)} title="Kalitni tahrirlash">
+        {editKey && (
           <form
-            onSubmit={onCreateAdmin}
-            className="rounded-xl border p-5 mb-8"
-            style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}
+            onSubmit={async (e) => {
+              e.preventDefault();
+              await keyAction(() => api.updateApiKey(editKey));
+              setEditKey(null);
+            }}
+            className="space-y-3"
           >
-            <div className="font-mono text-[10px] uppercase tracking-widest mb-3" style={{ color: 'var(--ink-soft)' }}>
-              Yangi foydalanuvchi qo'shish
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
-              <input
-                value={form.username}
-                onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))}
-                placeholder="Login"
-                required
-                className="px-3 py-2.5 rounded-lg border outline-none"
-                style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
-              />
-              <input
-                value={form.password}
-                onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                placeholder="Parol"
-                type="password"
-                required
-                className="px-3 py-2.5 rounded-lg border outline-none"
-                style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
-              />
-              <input
-                value={form.displayName}
-                onChange={(e) => setForm((f) => ({ ...f, displayName: e.target.value }))}
-                placeholder="Ism (ixtiyoriy)"
-                className="px-3 py-2.5 rounded-lg border outline-none"
-                style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
-              />
-              <select
-                value={form.role}
-                onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
-                className="px-3 py-2.5 rounded-lg border outline-none"
-                style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
-              >
-                <option value="user">O'quvchi</option>
-                {isSuperAdmin && <option value="admin">Admin</option>}
-              </select>
-            </div>
-            {formError && (
-              <div className="mb-3 text-sm px-3 py-2 rounded-lg inline-block" style={{ background: 'var(--error-bg)', color: 'var(--brick)' }}>
-                {formError}
-              </div>
-            )}
-            <button
-              type="submit"
-              disabled={creating}
-              className="font-mono text-xs uppercase tracking-widest px-4 py-2.5 rounded-xl cursor-pointer font-semibold disabled:opacity-60"
-              style={{ background: 'var(--pine)', color: 'var(--paper)' }}
-            >
-              {creating ? 'Qo\'shilmoqda…' : '+ Qo\'shish'}
+            <label className="field">
+              <span className="label">Nomi</span>
+              <input className="input" value={editKey.label} onChange={(e) => setEditKey({ ...editKey, label: e.target.value })} />
+            </label>
+            <label className="field">
+              <span className="label">Model</span>
+              <input className="input" value={editKey.model} onChange={(e) => setEditKey({ ...editKey, model: e.target.value })} />
+            </label>
+            <label className="field">
+              <span className="label">Base URL</span>
+              <input className="input" value={editKey.baseUrl} onChange={(e) => setEditKey({ ...editKey, baseUrl: e.target.value })} />
+            </label>
+            <label className="field">
+              <span className="label">Navbat</span>
+              <input type="number" className="input" value={editKey.priority} onChange={(e) => setEditKey({ ...editKey, priority: e.target.value })} />
+            </label>
+            <label className="field">
+              <span className="label">Yangi kalit qiymati (bo'sh qoldirsangiz o'zgarmaydi)</span>
+              <input className="input font-mono" value={editKey.keyValue} onChange={(e) => setEditKey({ ...editKey, keyValue: e.target.value })} autoComplete="off" />
+            </label>
+            <button type="submit" className="btn btn-primary">
+              Saqlash
             </button>
           </form>
         )}
+      </Modal>
+    </div>
+  );
+}
 
-        {!users && <div className="font-mono text-sm" style={{ color: 'var(--ink-soft)' }}>Yuklanmoqda…</div>}
-
-        <div className="grid gap-2">
-          {users?.map((u) => (
-            <div
-              key={u.id}
-              className="rounded-xl border p-4 flex items-center gap-4"
-              style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}
-            >
-              <span
-                className="w-9 h-9 rounded-full flex items-center justify-center font-mono text-sm font-semibold shrink-0"
-                style={{ background: 'var(--paper-soft)', color: 'var(--ink)' }}
-              >
-                {(u.displayName || u.username).slice(0, 1).toUpperCase()}
-              </span>
-              <div className="flex-1 min-w-0">
-                <div className="font-display font-semibold truncate" style={{ color: 'var(--ink)' }}>
-                  {u.displayName || u.username}
-                </div>
-                <div className="font-mono text-[11px]" style={{ color: 'var(--ink-soft)' }}>
-                  @{u.username} · {new Date(u.createdAt).toLocaleDateString('uz-UZ')}
-                </div>
+// =====================================================================
+// MATERIALLAR
+// =====================================================================
+function ContentTab() {
+  const [counts, setCounts] = useState({});
+  useEffect(() => {
+    api.mediaCounts().then(setCounts).catch(() => {});
+  }, []);
+  return (
+    <div>
+      <p className="muted mb-4 text-sm">
+        Har bir bo'limga o'tib "+ Yuklash" tugmasini bosing. Yuklangan materiallar chap menyudagi "Materiallar" bo'limida ketma-ketlikda ko'rinadi; ↑↓ tugmalari bilan tartibini
+        o'zgartirish, darsga biriktirish va yashirish mumkin.
+      </p>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {MEDIA_ORDER.map((k) => (
+          <Link key={k} to={`/media/${k}`} className="card card-hover p-4 flex items-center gap-3">
+            <span className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl" style={{ background: 'var(--gold-soft)' }}>
+              {MEDIA_META[k].icon}
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="font-bold" style={{ color: 'var(--ink)' }}>
+                {MEDIA_META[k].label}
               </div>
-              <span
-                className="font-mono text-[10px] uppercase tracking-widest px-2.5 py-1.5 rounded-full shrink-0"
-                style={{
-                  background: u.role === 'superadmin' ? 'var(--gold-soft)' : u.role === 'admin' ? 'var(--success-bg)' : 'var(--paper-soft)',
-                  color: u.role === 'superadmin' ? 'var(--gold)' : u.role === 'admin' ? 'var(--pine)' : 'var(--ink-soft)',
-                }}
-              >
-                {ROLE_LABEL[u.role] || u.role}
-              </span>
-              {u.id !== user?.id && u.role !== 'superadmin' && (isSuperAdmin || u.role === 'user') && (
-                <button
-                  onClick={() => onDelete(u)}
-                  title="O'chirish"
-                  className="w-8 h-8 rounded-lg cursor-pointer shrink-0 flex items-center justify-center"
-                  style={{ color: 'var(--brick)' }}
-                >
-                  🗑
-                </button>
-              )}
+              <div className="text-xs muted">{counts[k] || 0} ta material</div>
             </div>
+            <span className="btn btn-soft btn-sm">Yuklash</span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// =====================================================================
+// BOSH KO'RINISH — katta oynalar: bosilganda tegishli bo'lim ochiladi
+// =====================================================================
+function AdminHome({ me, open }) {
+  const [stats, setStats] = useState(null);
+  const [recent, setRecent] = useState(null);
+  const [ai, setAi] = useState(null);
+  useEffect(() => {
+    api.adminStats().then(setStats).catch(() => {});
+    api.listAdminUsers().then((r) => setRecent(r.users || [])).catch(() => setRecent([]));
+    api.getAiSettings().then(setAi).catch(() => {});
+  }, []);
+
+  const users = recent || [];
+  const learners = users.filter((u) => u.role === 'user').length;
+  const staff = users.length - learners;
+  const newest = [...users].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+  const mediaTotal = stats ? Object.values(stats.mediaByKind || {}).reduce((a, b) => a + b, 0) : null;
+
+  return (
+    <div className="space-y-6">
+      <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        {/* Foydalanuvchilar oynasi — eng katta */}
+        <button
+          type="button"
+          onClick={() => open('users')}
+          className="hero-card p-5 text-left sm:col-span-2 cursor-pointer transition-transform hover:-translate-y-0.5"
+        >
+          <div className="flex items-start gap-4">
+            <span className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0" style={{ background: 'rgba(255,255,255,.16)' }}>
+              👥
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="text-xs font-bold uppercase tracking-[0.18em] opacity-80">Foydalanuvchilar</div>
+              <div className="font-display text-4xl font-semibold leading-tight">{recent ? users.length : '…'}</div>
+              <div className="text-sm opacity-90 mt-1">
+                {learners} o'quvchi · {staff} admin
+                {stats ? ` · bugun faol ${stats.activeToday} · shu hafta yangi ${stats.newThisWeek}` : ''}
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 inline-flex items-center gap-2 rounded-xl px-4 py-2 font-bold text-sm" style={{ background: '#fff', color: '#0c5444' }}>
+            Ro'yxatni ochish →
+          </div>
+        </button>
+
+        <button type="button" onClick={() => open('ai')} className="card card-hover p-5 text-left cursor-pointer">
+          <div className="text-3xl mb-2">🤖</div>
+          <div className="font-bold" style={{ color: 'var(--ink)' }}>
+            AI va API kalitlar
+          </div>
+          <div className="text-sm muted">
+            {ai ? (ai.provider === 'mock' ? 'Oddiy rejim — kalit qo\'shing' : `Faol · ${ai.activeKeyCount} ta kalit`) : '…'}
+          </div>
+          {stats && <div className="text-xs faint mt-1">Bugun {stats.aiToday} ta so'rov</div>}
+        </button>
+
+        <button type="button" onClick={() => open('content')} className="card card-hover p-5 text-left cursor-pointer">
+          <div className="text-3xl mb-2">🗂️</div>
+          <div className="font-bold" style={{ color: 'var(--ink)' }}>
+            Materiallar
+          </div>
+          <div className="text-sm muted">{mediaTotal == null ? '…' : `${mediaTotal} ta yuklangan`}</div>
+          <div className="text-xs faint mt-1">Musiqa, video, matn, dialog…</div>
+        </button>
+      </div>
+
+      <div className="grid lg:grid-cols-[1.4fr_1fr] gap-5">
+        <div className="card p-5">
+          <div className="flex items-center justify-between mb-3">
+            <div className="h2">🆕 So'nggi ro'yxatdan o'tganlar</div>
+            <button type="button" className="text-sm font-bold" style={{ color: 'var(--pine)' }} onClick={() => open('users')}>
+              Barchasi →
+            </button>
+          </div>
+          {!recent && <div className="skeleton h-32" />}
+          {recent && newest.length === 0 && <div className="text-sm muted">Hali foydalanuvchi yo'q.</div>}
+          <div className="space-y-1.5">
+            {newest.map((u) => (
+              <button key={u.id} type="button" onClick={() => open('users')} className="w-full card-soft px-3 py-2.5 flex items-center gap-3 text-left">
+                <span className="w-9 h-9 rounded-full flex items-center justify-center font-bold shrink-0" style={{ background: 'var(--paper-soft)', color: 'var(--ink)' }}>
+                  {(u.displayName || u.username || '?').slice(0, 1).toUpperCase()}
+                </span>
+                <span className="flex-1 min-w-0">
+                  <span className="block font-bold text-sm truncate" style={{ color: 'var(--ink)' }}>
+                    {u.displayName || u.username}
+                  </span>
+                  <span className="block text-xs muted truncate">{u.email || (u.phone ? formatPhone(u.phone) : `@${u.username}`)}</span>
+                </span>
+                <span className="text-xs faint whitespace-nowrap">{formatDate(u.createdAt)}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="card p-5">
+          <div className="h2 mb-3">⚡ Tezkor amallar</div>
+          <div className="grid gap-2">
+            <button type="button" className="btn btn-gold btn-block" onClick={() => open('users', { add: '1' })}>
+              + {me.role === 'superadmin' ? "Foydalanuvchi yoki admin qo'shish" : "Foydalanuvchi qo'shish"}
+            </button>
+            <Link to="/media/news" className="btn btn-ghost btn-block">
+              📰 Yangilik e'lon qilish
+            </Link>
+            <Link to="/media/audio" className="btn btn-ghost btn-block">
+              🎵 Musiqa / audio yuklash
+            </Link>
+            <button type="button" className="btn btn-ghost btn-block" onClick={() => open('stats')}>
+              📊 To'liq statistika
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function AdminPage() {
+  const { user } = useAuth();
+  const [params, setParams] = useSearchParams();
+  const tab = params.get('tab') || 'home';
+  const open = (k, extra = {}) => {
+    setParams({ tab: k, ...extra });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
+    <Layout>
+      <div className="page-wide">
+        <PageHeader eyebrow="Boshqaruv" title="Admin panel" subtitle={`${ROLE_LABEL[user.role]} · ${user.displayName || user.username}`} />
+        <div className="tabs mb-6">
+          {TABS.map(([k, l]) => (
+            <button key={k} type="button" className={`chip ${tab === k ? 'chip-active' : ''}`} onClick={() => open(k)}>
+              {l}
+            </button>
           ))}
         </div>
+        {tab === 'home' && <AdminHome me={user} open={open} />}
+        {tab === 'users' && <UsersPanel me={user} openForm={params.get('add') === '1'} />}
+        {tab === 'stats' && <StatsTab />}
+        {tab === 'ai' && <AiTab me={user} />}
+        {tab === 'content' && <ContentTab />}
       </div>
     </Layout>
   );

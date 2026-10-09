@@ -1,6 +1,5 @@
-# Netlify sozlamasi (repo ildizida). Netlify'da qo'shimcha hech narsa kiritish shart emas,
-# faqat Site settings → Environment variables ga 2 ta o'zgaruvchini qo'shing:
-#   VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
+# Netlify sozlamasi (repo ildizida). Netlify'da faqat Site settings → Environment variables ga
+# 2 ta o'zgaruvchini qo'shing:  VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
 [build]
   base    = "frontend"
   command = "npm ci && npm run build"
@@ -8,6 +7,25 @@
 
 [build.environment]
   NODE_VERSION = "20"
+
+# Kurs kontenti: brauzer har safar ETag bilan tekshiradi (yangilansa darhol ko'rinadi)
+[[headers]]
+  for = "/content/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Vite build'dagi fayllar nomida hash bor — uzoq muddat keshlash xavfsiz
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "microphone=(self), camera=()"
 
 # React Router (SPA): barcha yo'llar index.html ga yo'naltiriladi
 [[redirects]]

@@ -1,130 +1,103 @@
-import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import Layout from '../components/Layout.jsx';
-import SpeakButton from '../components/SpeakButton.jsx';
 import AiTaskWidget from '../components/AiTaskWidget.jsx';
-import { api } from '../lib/api.js';
+import { DialogView } from '../components/LessonExtras.jsx';
+import { PageHeader, PageLoading } from '../components/ui.jsx';
+import { useContent } from '../lib/hooks.js';
 
 export default function DialogsPage() {
   const { lang } = useParams();
-  const [data, setData] = useState(null);
-  const [error, setError] = useState('');
+  const { data, error } = useContent(lang);
   const [openKey, setOpenKey] = useState(null);
+  const [filter, setFilter] = useState('all');
+  const [query, setQuery] = useState('');
 
-  useEffect(() => {
-    setData(null);
-    api.content(lang).then(setData).catch((e) => setError(e.message));
-  }, [lang]);
+  const all = useMemo(() => {
+    if (!data) return [];
+    const list = [];
+    data.modules.forEach((mod) =>
+      mod.months.forEach((month) => {
+        if (month.dialog) list.push({ key: `m-${month.id}`, group: 'course', title: month.dialog.title, sub: `${month.label} · ${month.topic}`, lines: month.dialog.lines });
+        if (month.dialog2) list.push({ key: `m2-${month.id}`, group: 'course', title: month.dialog2.title, sub: `${month.label} · 2-dialog`, lines: month.dialog2.lines });
+      })
+    );
+    (data.dialogsExtra || []).forEach((d, i) => list.push({ key: `x-${i}`, group: 'extra', title: d.title, sub: [d.subtitle, d.level].filter(Boolean).join(' · '), lines: d.lines }));
+    (data.uploadedDialogs || []).forEach((d) =>
+      list.push({ key: `u-${d.id}`, group: 'uploaded', title: d.title, sub: d.description || 'Yuklangan dialog', lines: d.content?.lines || [], audioUrl: d.fileUrl })
+    );
+    return list;
+  }, [data]);
+
+  const filtered = all.filter((d) => (filter === 'all' || d.group === filter) && (!query.trim() || `${d.title} ${d.sub} ${d.lines.map((l) => l[1]).join(' ')}`.toLowerCase().includes(query.trim().toLowerCase())));
 
   if (error) {
     return (
       <Layout>
-        <div className="max-w-3xl mx-auto px-5 py-16 text-center" style={{ color: 'var(--brick)' }}>
-          {error}
+        <div className="page-narrow">
+          <div className="alert alert-error">{error}</div>
         </div>
       </Layout>
     );
   }
+  if (!data) return <Layout><PageLoading /></Layout>;
 
-  if (!data) {
-    return (
-      <Layout>
-        <div className="max-w-3xl mx-auto px-5 py-16 font-mono text-sm" style={{ color: 'var(--ink-soft)' }}>
-          Yuklanmoqda…
-        </div>
-      </Layout>
-    );
-  }
-
-  const monthDialogs = [];
-  data.modules.forEach((mod) => {
-    mod.months.forEach((month) => {
-      if (month.dialog) {
-        monthDialogs.push({
-          key: `m-${month.id}`,
-          title: month.dialog.title,
-          sub: `${month.label} · ${month.topic}`,
-          lines: month.dialog.lines,
-        });
-      }
-    });
-  });
-
-  const extraDialogs = (data.dialogsExtra || []).map((d, i) => ({
-    key: `x-${i}`,
-    title: d.title,
-    sub: `${d.subtitle} · ${d.level}`,
-    lines: d.lines,
-  }));
-
-  const all = [...monthDialogs, ...extraDialogs];
+  const counts = { all: all.length, course: all.filter((d) => d.group === 'course').length, extra: all.filter((d) => d.group === 'extra').length, uploaded: all.filter((d) => d.group === 'uploaded').length };
 
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto px-5 py-10">
-        <Link to={`/lang/${lang}`} className="font-mono text-xs uppercase tracking-widest" style={{ color: 'var(--ink-soft)' }}>
-          ← {data.meta.title}
-        </Link>
-
-        <div className="mt-4 mb-8">
-          <div className="font-mono text-xs tracking-[0.25em] uppercase mb-2" style={{ color: 'var(--gold)' }}>
-            Dialog mashqi
-          </div>
-          <h1 className="font-display text-3xl font-semibold" style={{ color: 'var(--ink)' }}>
-            Barcha dialoglar · {all.length} ta
-          </h1>
+      <div className="page-narrow">
+        <PageHeader
+          back={{ to: `/lang/${lang}`, label: data.meta.title }}
+          eyebrow={`${data.meta.flag} Dialog mashqi`}
+          title={`Barcha dialoglar · ${all.length}`}
+          subtitle="Dialogni ovoz bilan tinglang, har bir gapni takrorlang va AI ustoz beradigan vazifani bajaring."
+        />
+        <div className="tabs mb-3">
+          {[
+            ['all', 'Barchasi'],
+            ['course', 'Darslardan'],
+            ['extra', "Qo'shimcha"],
+            ['uploaded', 'Yuklanganlar'],
+          ].map(([k, l]) =>
+            counts[k] || k === 'all' ? (
+              <button key={k} type="button" className={`chip ${filter === k ? 'chip-active' : ''}`} onClick={() => setFilter(k)}>
+                {l} · {counts[k]}
+              </button>
+            ) : null
+          )}
         </div>
+        <input className="input mb-4" placeholder="🔍 Dialog qidirish…" value={query} onChange={(e) => setQuery(e.target.value)} />
 
         <div className="space-y-3">
-          {all.map((d) => {
+          {filtered.map((d, i) => {
             const isOpen = openKey === d.key;
             return (
-              <div key={d.key} className="rounded-xl border overflow-hidden" style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}>
-                <button
-                  onClick={() => setOpenKey(isOpen ? null : d.key)}
-                  className="w-full text-left p-4 flex items-center justify-between gap-4 cursor-pointer"
-                >
-                  <div>
-                    <div className="font-display font-semibold" style={{ color: 'var(--ink)' }}>
+              <div key={d.key} className="card overflow-hidden">
+                <button type="button" onClick={() => setOpenKey(isOpen ? null : d.key)} className="w-full text-left p-4 flex items-center gap-3">
+                  <span className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold shrink-0" style={{ background: 'var(--pine-soft)', color: 'var(--pine)' }}>
+                    {i + 1}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-display font-semibold truncate" style={{ color: 'var(--ink)' }}>
                       {d.title}
                     </div>
-                    <div className="font-mono text-[11px]" style={{ color: 'var(--ink-soft)' }}>
-                      {d.sub}
+                    <div className="text-xs muted truncate">
+                      {d.sub} · {d.lines.length} qator
                     </div>
                   </div>
-                  <span className="font-mono text-xs shrink-0" style={{ color: 'var(--pine)' }}>
-                    {isOpen ? '▲' : '▼'}
-                  </span>
+                  <span className="muted text-sm">{isOpen ? '▲' : '▼'}</span>
                 </button>
                 {isOpen && (
-                  <div className="px-4 pb-4 space-y-3 border-t pt-4" style={{ borderColor: 'var(--line)' }}>
-                    {d.lines.map(([speaker, line, tr], i) => (
-                      <div key={i} className="flex gap-3 items-start">
-                        <span
-                          className="font-mono text-xs w-6 h-6 rounded-full flex items-center justify-center shrink-0"
-                          style={{ background: 'var(--paper-soft)', color: 'var(--ink-soft)' }}
-                        >
-                          {speaker}
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <div style={{ color: 'var(--ink)' }}>{line}</div>
-                          <div className="text-sm" style={{ color: 'var(--ink-soft)' }}>
-                            {tr}
-                          </div>
-                        </div>
-                        <SpeakButton text={line} lang={lang} />
-                      </div>
-                    ))}
-                    <AiTaskWidget
-                      type="dialog"
-                      content={d.lines.map(([speaker, line, tr]) => `${speaker}: ${line} (${tr})`).join('\n')}
-                      lang={lang}
-                    />
+                  <div className="px-4 pb-5 border-t pt-4" style={{ borderColor: 'var(--line)' }}>
+                    <DialogView lines={d.lines} lang={lang} audioUrl={d.audioUrl} />
+                    <AiTaskWidget type="dialog" content={d.lines.map(([s, l, t]) => `${s}: ${l}${t ? ` (${t})` : ''}`).join('\n')} lang={lang} title="Dialog bo'yicha AI vazifa" />
                   </div>
                 )}
               </div>
             );
           })}
+          {filtered.length === 0 && <div className="text-center muted py-12">Dialog topilmadi.</div>}
         </div>
       </div>
     </Layout>

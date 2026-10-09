@@ -1,0 +1,188 @@
+10.125|чудесный|Мы чудесно провели время.|harika|Harika zaman geçirdik.
+10.126|отличный|Твоя работа отличная.|mükemmel|Çalışman mükemmel.
+10.127|удивительный|Вид потрясающий.|muhteşem, şaşırtıcı|Manzara muhteşem.
+10.128|ужасный|Погода ужасная.|berbat|Hava berbat.
+10.129|огромный|Слон огромный.|devasa|Fil devasa.
+10.130|крошечный|У малыша крошечные ручки.|minicik|Bebeğin minicik elleri var.
+10.131|острый|Нож острый.|keskin|Bıçak keskin.
+10.132|гладкий|Стол гладкий.|pürüzsüz|Masa pürüzsüz.
+10.133|неровный, грубый|Дорога неровная.|engebeli, pürüzlü|Yol engebeli.
+10.134|прямой; прямо|Идите прямо.|düz; dümdüz|Dümdüz ilerleyin.
+10.135|круглый|Стол круглый.|yuvarlak|Masa yuvarlak.
+10.136|плоский, ровный|Дорога ровная.|düz|Yol düz.
+10.137|глубокий|Озеро глубокое.|derin|Göl derin.
+10.138|мелкий|Здесь река мелкая.|sığ|Nehir burada sığ.
+10.139|с пустыми руками|Он вернулся с пустыми руками.|eli boş|Eli boş döndü.
+10.140|живой|Рыба ещё жива.|canlı, hayatta|Balık hâlâ canlı.
+10.141|мёртвый, севший|Батарейка села.|ölü, bitmiş|Pil bitti.
+10.142|бодрствующий|Ты не спишь?|uyanık|Uyanık mısın?
+10.143|спящий|Малыш спит.|uykuda|Bebek uykuda.
+10.144|один, в одиночку|Он живёт один.|yalnız|Yalnız yaşıyor.
+10.145|одинокий|Ей одиноко.|yalnız (kendini yalnız hisseden)|Kendini yalnız hissediyor.
+10.146|женатый, замужняя|Они женаты.|evli|Evliler.
+10.147|недавний|Это недавняя фотография.|yeni, son zamanlardaki|Bu yeni bir fotoğraf.
+10.148|текущий|Который сейчас час?|şimdiki, güncel|Şu an saat kaç?
+10.149|будущее; будущий|Я думаю о своём будущем.|gelecek|Geleceğimi düşünüyorum.
+10.150|прошлое; прошлый|Он живёт прошлым.|geçmiş|Geçmişte yaşıyor.
+10.151|следующий|Увидимся на следующей неделе.|gelecek, sonraki|Gelecek hafta görüşürüz.
+10.152|последний|Это последний автобус.|son|Bu son otobüs.
+10.153|итоговый, финальный|Итоговый экзамен в понедельник.|final, son|Final sınavı pazartesi.
+10.154|первый|Это мой первый день на работе.|ilk, birinci|Bu işteki ilk günüm.
+10.155|второй; секунда|Она была второй в забеге.|ikinci; saniye|Yarışta ikinci oldu.
+10.156|третий|Это моя третья чашка чая.|üçüncü|Bu üçüncü fincan çayım.
+# 11. Ranglar va shakllar
+11.1|цвет|Какого цвета твоя сумка?|renk|Çantan ne renk?
+11.2|красный|У неё красная сумка.|kırmızı|Kırmızı bir çantası var.
+11.3|синий, голубой|Небо голубое.|mavi|Gökyüzü mavi.
+11.4|зелёный|Трава зелёная.|yeşil|Çimen yeşil.
+11.5|жёлтый|Солнце жёлтое.|sarı|Güneş sarı.
+11.6|фиолетовый|Она в фиолетовом платье.|mor|Mor bir elbise giyiyor.
+11.7|розовый|Цветы розовые.|pembe|Çiçekler pembe.
+11.8|чёрный|У него чёрная кошка.|siyah|Siyah bir kedisi var.
+11.9|белый|Снег белый.|beyaz|Kar beyaz.
+11.10|серый|Сегодня небо серое.|gri|Bugün gökyüzü gri.
+11.11|коричневый|Лошадь коричневая.|kahverengi|At kahverengi.
+11.12|золотой|Она носит золотые серьги.|altın rengi|Altın küpeler takıyor.
+11.13|серебряный|У него серебряные часы.|gümüş rengi|Gümüş bir saati var.
+11.14|голубой|Стены голубые.|açık mavi|Duvarlar açık mavi.
+11.15|круг|Нарисуй круг.|daire|Bir daire çiz.
+11.16|треугольник|У треугольника три стороны.|üçgen|Üçgenin üç kenarı vardır.
+11.17|линия|Проведи прямую линию.|çizgi|Düz bir çizgi çiz.
+11.18|точка|Поставь здесь точку.|nokta|Buraya bir nokta koy.
+11.19|форма|Какой это формы?|şekil|Bu ne şekil?
+# 12. Raqamlar va miqdor
+12.1|ноль|Сегодня ноль градусов.|sıfır|Bugün hava sıfır derece.
+12.2|один|У меня один брат.|bir|Bir erkek kardeşim var.
+12.3|два|У нас две кошки.|iki|İki kedimiz var.
+12.4|три|Ей три года.|üç|O üç yaşında.
+12.5|четыре|Здесь четыре стула.|dört|Burada dört sandalye var.
+12.6|пять|Я просыпаюсь в пять.|beş|Beşte uyanırım.
+12.7|шесть|Занятие начинается в шесть.|altı|Ders altıda başlıyor.
+12.8|семь|В неделе семь дней.|yedi|Bir haftada yedi gün vardır.
+12.9|восемь|Он спит восемь часов.|sekiz|Sekiz saat uyuyor.
+12.10|девять|Магазин открывается в девять.|dokuz|Dükkân dokuzda açılıyor.
+12.11|десять|У меня десять книг.|on|On kitabım var.
+12.12|одиннадцать|Ему одиннадцать лет.|on bir|On bir yaşında.
+12.13|двенадцать|В году двенадцать месяцев.|on iki|Bir yılda on iki ay vardır.
+12.14|тринадцать|У неё тринадцать карандашей.|on üç|On üç kalemi var.
+12.15|четырнадцать|Моему брату четырнадцать.|on dört|Erkek kardeşim on dört yaşında.
+12.16|пятнадцать|Урок длится пятнадцать минут.|on beş|Ders on beş dakika sürüyor.
+12.17|шестнадцать|Ей шестнадцать лет.|on altı|On altı yaşında.
+12.18|семнадцать|Здесь семнадцать студентов.|on yedi|Burada on yedi öğrenci var.
+12.19|восемнадцать|Вчера ему исполнилось восемнадцать.|on sekiz|Dün on sekiz yaşına girdi.
+12.20|девятнадцать|Моему двоюродному брату девятнадцать.|on dokuz|Kuzenim on dokuz yaşında.
+12.21|двадцать|У нас двадцать учеников.|yirmi|Yirmi öğrencimiz var.
+12.22|тридцать|Ему тридцать лет.|otuz|Otuz yaşında.
+12.23|сорок|В автобусе сорок мест.|kırk|Otobüste kırk koltuk var.
+12.24|пятьдесят|Книга стоит пятьдесят долларов.|elli|Kitap elli dolar.
+12.25|шестьдесят|В часе шестьдесят минут.|altmış|Bir saatte altmış dakika vardır.
+12.26|семьдесят|Моему дедушке семьдесят.|yetmiş|Dedem yetmiş yaşında.
+12.27|восемьдесят|Длина дороги — восемьдесят километров.|seksen|Yol seksen kilometre uzunluğunda.
+12.28|девяносто|Фильм длится девяносто минут.|doksan|Film doksan dakika sürüyor.
+12.29|сто|В книге сто страниц.|yüz|Kitap yüz sayfa.
+12.30|тысяча|Телефон стоит тысячу долларов.|bin|Telefon bin dolar.
+12.31|миллион|В городе живёт миллион человек.|milyon|Şehirde bir milyon insan yaşıyor.
+12.32|миллиард|Компания заработала миллиард долларов.|milyar|Şirket bir milyar dolar kazandı.
+12.33|половина|Разрежь яблоко пополам.|yarım|Elmayı ikiye böl.
+12.34|четверть|Сейчас четверть седьмого.|çeyrek|Saat altıyı çeyrek geçiyor.
+12.35|пара|Я купил пару туфель.|çift|Bir çift ayakkabı aldım.
+12.36|дюжина|Она купила дюжину яиц.|düzine|Bir düzine yumurta aldı.
+12.37|номер, число|Какой у тебя номер телефона?|numara, sayı|Telefon numaran ne?
+12.38|сумма, количество|Сумма слишком мала.|miktar|Miktar çok az.
+12.39|количество|Количества недостаточно.|miktar, adet|Miktar yeterli değil.
+12.40|много (исчисл.)|Здесь много книг.|çok (sayılabilen)|Burada çok kitap var.
+12.41|много (неисчисл.)|У меня не так много времени.|çok (sayılamayan)|Çok vaktim yok.
+12.42|мало, немногие|Пришло мало людей.|az, birkaç|Az kişi geldi.
+12.43|немного, некоторые|Я хочу немного воды.|biraz|Biraz su istiyorum.
+12.44|какой-нибудь, любой|У вас есть вопросы?|herhangi bir|Herhangi bir sorunuz var mı?
+12.45|каждый|У каждого ученика есть книга.|her|Her öğrencinin bir kitabı var.
+12.46|каждый (в отдельности)|Каждый ребёнок получает подарок.|her biri|Her çocuk bir hediye alır.
+12.47|все, весь|Все ученики здесь.|hepsi, bütün|Bütün öğrenciler burada.
+12.48|оба|Оба брата играют в футбол.|ikisi de|İki kardeş de futbol oynuyor.
+12.49|никто, ни один|Никто из них не пришёл.|hiçbiri|Hiçbiri gelmedi.
+12.50|несколько|Несколько человек ждали.|birkaç|Birkaç kişi bekliyordu.
+12.51|больше|Я хочу ещё чаю.|daha fazla|Daha fazla çay istiyorum.
+12.52|меньше|Ешь меньше сахара.|daha az|Daha az şeker ye.
+12.53|большинство|Большинство людей любят музыку.|çoğu|Çoğu insan müziği sever.
+12.54|наименьший, хотя бы|По крайней мере, помой руки.|en az|En azından ellerini yıka.
+12.55|много|У нас много работы.|çok, bir sürü|Bir sürü işimiz var.
+12.56|множество, изобилие|Еды предостаточно.|bol|Bol yiyecek var.
+12.57|процент|Пятьдесят процентов студентов сдали экзамен.|yüzde|Öğrencilerin yüzde ellisi geçti.
+12.58|средний|Средний возраст — двадцать лет.|ortalama|Ortalama yaş yirmi.
+12.59|максимум|Максимальная скорость — девяносто.|maksimum, azami|Azami hız doksan.
+12.60|минимум|Минимальная цена — пять долларов.|minimum, asgari|Asgari fiyat beş dolar.
+# 13. Vaqt
+13.1|время|Который час?|zaman, saat|Saat kaç?
+13.2|минута|Подожди минутку.|dakika|Bir dakika bekle.
+13.3|час|Урок длится один час.|saat|Ders bir saat sürüyor.
+13.4|день|Прекрасный день.|gün|Güzel bir gün.
+13.5|неделя|Я работаю пять дней в неделю.|hafta|Haftada beş gün çalışırım.
+13.6|месяц|Январь — первый месяц.|ay|Ocak ilk aydır.
+13.7|год|Я родился в этом году.|yıl|Bu yıl doğdum.
+13.8|десятилетие|За десятилетие город изменился.|on yıl|Şehir on yılda değişti.
+13.9|век|Этому зданию сто лет.|yüzyıl|Bu bina bir asırlık.
+13.10|утро|Утром я пью чай.|sabah|Sabahları çay içerim.
+13.11|полдень|Давай встретимся в полдень.|öğle|Öğlen buluşalım.
+13.12|день (после полудня)|После обеда я отдыхаю.|öğleden sonra|Öğleden sonra dinlenirim.
+13.13|вечер|Вечером мы гуляем.|akşam|Akşamları yürüyüş yaparız.
+13.14|ночь|Ночью сияют звёзды.|gece|Geceleri yıldızlar parlar.
+13.15|полночь|Он лёг спать в полночь.|gece yarısı|Gece yarısı yattı.
+13.16|сегодня|Сегодня понедельник.|bugün|Bugün pazartesi.
+13.17|завтра|Я позвоню тебе завтра.|yarın|Seni yarın arayacağım.
+13.18|вчера|Вчера было холодно.|dün|Dün hava soğuktu.
+13.19|сегодня вечером|Сегодня вечером мы идём гулять.|bu gece, bu akşam|Bu akşam dışarı çıkıyoruz.
+13.20|сейчас|Сейчас я занят.|şimdi|Şimdi meşgulüm.
+13.21|потом, тогда|Сначала прочитай, потом пиши.|sonra, o zaman|Önce oku, sonra yaz.
+13.22|скоро|Он скоро придёт.|yakında|Yakında gelecek.
+13.23|позже|Я позвоню тебе позже.|daha sonra|Seni daha sonra arayacağım.
+13.24|раньше|Завтра приходи пораньше.|daha erken|Yarın daha erken gel.
+13.25|перед, до|Мойте руки перед едой.|önce|Yemekten önce ellerini yıka.
+13.26|после|Позвони мне после обеда.|sonra|Öğle yemeğinden sonra beni ara.
+13.27|во время|Он спал во время фильма.|sırasında|Film sırasında uyudu.
+13.28|пока|Он читал книгу, пока ждал.|-ken, iken|Beklerken kitap okudu.
+13.29|до (какого-то времени)|Подожди здесь до десяти.|-e kadar|Saat ona kadar burada bekle.
+13.30|с (какого-то времени)|Я живу здесь с 2020 года.|-den beri|2020'den beri burada yaşıyorum.
+13.31|уже|Я уже поел.|zaten, çoktan|Ben çoktan yedim.
+13.32|ещё (не)|Я ещё не закончил.|henüz|Henüz bitirmedim.
+13.33|всё ещё|Всё ещё идёт дождь.|hâlâ|Hâlâ yağmur yağıyor.
+13.34|снова|Пожалуйста, скажи это ещё раз.|tekrar|Lütfen tekrar söyle.
+13.35|всегда|Он всегда приходит рано.|her zaman|Her zaman erken gelir.
+13.36|обычно|Обычно я хожу на работу пешком.|genellikle|Genellikle işe yürüyerek giderim.
+13.37|часто|Мы часто едим дома.|sık sık|Sık sık evde yemek yeriz.
+13.38|иногда|Иногда я готовлю ужин.|bazen|Bazen akşam yemeğini ben yaparım.
+13.39|редко|Он редко выходит из дома.|nadiren|Nadiren dışarı çıkar.
+13.40|редко, изредка|Я изредка пью кофе.|pek az, seyrek|Seyrek kahve içerim.
+13.41|никогда|Я никогда не курю.|asla, hiç|Asla sigara içmem.
+13.42|когда-либо|Ты когда-нибудь был в Самарканде?|hiç (soru)|Hiç Semerkant'a gittin mi?
+13.43|однажды, один раз|Я навещаю тётю раз в месяц.|bir kez|Teyzemi ayda bir kez ziyaret ederim.
+13.44|дважды|Он звонит два раза в неделю.|iki kez|Haftada iki kez arıyor.
+13.45|недавно|Я недавно переехал сюда.|yakın zamanda|Buraya yakın zamanda taşındım.
+13.46|в последнее время|В последнее время я устаю.|son zamanlarda|Son zamanlarda yorgunum.
+13.47|вдруг|Вдруг погас свет.|aniden|Işıklar aniden söndü.
+13.48|наконец|Наконец мы приехали.|sonunda|Sonunda vardık.
+13.49|немедленно|Позвони мне немедленно.|hemen|Beni hemen ara.
+13.50|в наши дни|В наши дни у всех есть телефон.|günümüzde|Günümüzde herkesin telefonu var.
+13.51|выходные|В выходные мы отдыхаем.|hafta sonu|Hafta sonu dinleniriz.
+13.52|праздник, отпуск|Праздники начинаются завтра.|tatil, bayram|Tatil yarın başlıyor.
+13.53|день рождения|Сегодня мой день рождения.|doğum günü|Bugün benim doğum günüm.
+13.54|календарь|Посмотри на календарь.|takvim|Takvime bak.
+13.55|дата|Какое сегодня число?|tarih|Bugünün tarihi ne?
+13.56|понедельник|Я работаю в понедельник.|pazartesi|Pazartesi çalışırım.
+13.57|вторник|Собрание во вторник.|salı|Toplantı salı günü.
+13.58|среда|По средам у нас английский.|çarşamba|Çarşamba günü İngilizce dersimiz var.
+13.59|четверг|По четвергам я играю в футбол.|perşembe|Perşembe günü futbol oynarım.
+13.60|пятница|Пятница — короткий день.|cuma|Cuma kısa bir gün.
+13.61|суббота|В субботу мы отдыхаем.|cumartesi|Cumartesi dinleniriz.
+13.62|воскресенье|По воскресеньям мы навещаем бабушку и дедушку.|pazar|Pazar günü büyükanne ve büyükbabamızı ziyaret ederiz.
+13.63|январь|Январь холодный.|ocak|Ocak ayı soğuktur.
+13.64|февраль|Февраль — самый короткий месяц.|şubat|Şubat en kısa aydır.
+13.65|март|Весна начинается в марте.|mart|İlkbahar martta başlar.
+13.66|апрель|В апреле идут дожди.|nisan|Nisanda yağmur yağar.
+13.67|май|В мае тепло.|mayıs|Mayıs ılıktır.
+13.68|июнь|Школа заканчивается в июне.|haziran|Okul haziranda biter.
+13.69|июль|Июль очень жаркий.|temmuz|Temmuz çok sıcaktır.
+13.70|август|В августе мы едем на море.|ağustos|Ağustosta denize gideriz.
+13.71|сентябрь|Школа начинается в сентябре.|eylül|Okul eylülde başlar.
+13.72|октябрь|Октябрь прохладный.|ekim|Ekim serindir.
+13.73|ноябрь|В ноябре холодно.|kasım|Kasımda hava soğuktur.
+13.74|декабрь|Зима начинается в декабре.|aralık|Kış aralıkta başlar.

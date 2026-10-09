@@ -1,174 +1,64 @@
-# Til sayohati — Supabase asosidagi versiya
+# Til sayohati v2 — ingliz, rus va turk tillari (o'zbek tilida)
 
-Bu loyiha endi alohida Node.js/Express backend talab qilmaydi. Butun backend
-qismi **Supabase** (Postgres baza + Auth + Edge Functions) orqali ishlaydi.
-Frontend (React + Vite) to'g'ridan-to'g'ri Supabase'ga ulanadi.
+Bosqichma-bosqich til o'rganish platformasi: 33 tadan dars (A1 → C1), lug'at mashqi, dialoglar,
+grammatika, yuklanadigan materiallar (musiqa, video, rasm, matn, dialog, lug'at, yangiliklar) va AI ustoz.
+Telefonga to'liq moslashgan (pastki menyu, ilova sifatida o'rnatish — PWA).
 
-## 📁 Tuzilma
+**Ishga tushirish bo'yicha qo'llanma:** [DEPLOY.md](DEPLOY.md) · **Texnik topshiriq:** [TEXNIK_TOPSHIRIQ.md](TEXNIK_TOPSHIRIQ.md)
+
+Super admin (avtomatik yaratiladi): **login `quvonchbek` · parol `admin123`** — birinchi kirishdan keyin parolni almashtiring.
+
+## Imkoniyatlar
+
+| Bo'lim | Nima qiladi |
+|---|---|
+| Ro'yxatdan o'tish | **Email va telefon bir vaqtda** (yoki faqat bittasi) + parol; kirish — email, telefon yoki login, qaysi biri qulay bo'lsa; profilda email/telefonni keyin qo'shish; "meni eslab qol"; email orqali parolni tiklash; ko'p noto'g'ri urinishdan himoya |
+| Darslar | Har bir dars 7 bosqichli stepper: Grammatika → Lug'at (ro'yxat + kartochkalar) → Dialog (+ 2-dialog va o'qish matni) → Mashqlar (AI tekshiruvi bilan) → Javoblar → Tavsiya → Test. Darsga biriktirilgan materiallar |
+| Dialoglar | Butun dialogni tinglash; **🎭 Rolli o'qish** — rolni tanlaysiz, ilova suhbatdosh gaplarini o'qiydi, siz o'z gapingizni mikrofonga aytasiz va talaffuz foizda baholanadi |
+| Word fayldagi ma'lumotlar | 2161 so'z (24 mavzu) va 297 ibora — misol gap va tarjimasi bilan — **uchala tilga** (ingliz, rus, turk) tarjima qilinib, darslarga taqsimlangan. Ikkinchi dialog va o'qish matni (savollari bilan) uchala kursning 33 tadan darsida |
+| Lug'at mashqi | Manba (hamma so'zlar, dars, mavzu, iboralar, yuklangan lug'at, xatolarim), 5 xil savol turi (tanlash, teskari, yozish, tinglash, aralash), soni. **"To'xtatish"** bosilsa — natija va xatolar alohida ko'rsatiladi |
+| Natijalar | Har bir mashq tarixi, xatolar ro'yxati (sizning javobingiz va to'g'ri javob), xatolar banki — xato qilingan so'zlar ustida qayta mashq |
+| Materiallar (chap menyu) | 🎵 Musiqa · 🎬 Video · 💬 Dialoglar · 📚 Lug'atlar · 📄 Matnlar · 🖼 Rasmlar · 📰 Yangiliklar — ketma-ketlikda ochiladi (pleylist, galereya, o'qish rejimi) |
+| AI ustoz | Istalgan sahifada ochiladigan chat (Ctrl/⌘+K), dars kontekstini biladi, ovoz bilan yozish, vazifa berish va javobni baholash (0–100) |
+| Admin panel | Bosh ko'rinish (katta oynalar); **👥 Foydalanuvchilar** oynasi — jadval/kartochka ko'rinishidagi ro'yxat, qidiruv, filtr, saralash, qo'shish (login/email + telefon), rol berish, parolni tiklash, bloklash, o'chirish, foydalanuvchi progressi; AI provayderlar va API kalitlar (sinash tugmasi bilan); materiallar; statistika |
+| Qo'shimcha | Kunlik maqsad (XP), streak, haftalik faollik grafigi, tungi rejim, talaffuz ovozi sozlamalari |
+
+## Tuzilma
 
 ```
 til-sayohati/
-├── frontend/                    React + Vite ilova (o'zgarishsiz UI, ichki API qatlami Supabase'ga ulangan)
-│   ├── public/content.json      Kurs kontenti (statik fayl — DB shart emas)
-│   ├── src/lib/supabase.js      Supabase klient
-│   ├── src/lib/api.js           Eski `api.*` interfeysi, endi Supabase orqali ishlaydi
-│   └── .env.example
+├── frontend/                React 19 + Vite + Tailwind 4
+│   ├── public/content/      Kurs kontenti: meta.json, en.json, ru.json, tr.json (skript yaratadi)
+│   └── src/
+│       ├── pages/           Sahifalar (Dashboard, MonthPage, VocabPracticeFull, MediaPage, AdminPage …)
+│       ├── components/      Layout, Sidebar, AiTutorPanel, PracticeSession, PracticeResult, MediaUploader …
+│       ├── context/         AuthContext (sessiya, progress), TutorContext (AI ustoz)
+│       └── lib/             api.js (Supabase), practice.js, lessonProgress.js, identity.js, translit.js …
 ├── supabase/
-│   ├── migrations/0001_init.sql Baza sxemasi + RLS siyosatlari + trigger
-│   ├── migrations/0002_multi_api_keys.sql  Bir nechta AI API kalitini qo'llab-quvvatlash
-│   ├── functions/admin/         Edge Function: admin yaratish/o'chirish, AI sozlamalari va API kalitlar
-│   ├── functions/ai/            Edge Function: AI vazifa/tekshirish (Gemini yoki mock)
-│   └── config.toml              Lokal Supabase CLI konfiguratsiyasi (ixtiyoriy)
-└── _deprecated_express_backend/ Eski Express backend — ENDI ISHLATILMAYDI, faqat ma'lumotnoma
+│   ├── setup_full.sql       Yangi o'rnatish uchun yagona SQL fayl (0001…0006 birlashtirilgan)
+│   ├── migrations/          Bosqichma-bosqich migratsiyalar
+│   └── functions/           Edge Functions: admin (boshqaruv), ai (AI ustoz)
+├── data-src/                Manba ma'lumotlar (Word fayllardan) va i18n/ — rus/turk tarjimalari (so'zlar, iboralar, dialog va o'qish matnlari)
+├── scripts/build-content.mjs  data-src → frontend/public/content
+├── DEPLOY.md · TEXNIK_TOPSHIRIQ.md · netlify.toml
 ```
 
-## 🧠 Nima uchun shunday qurildi
+## Lokal ishga tushirish
 
-| Avvalgi (Express+SQLite) | Endi (Supabase) |
-|---|---|
-| `backend/src/db.js` (SQLite) | Supabase Postgres jadvallari + RLS |
-| `backend/src/middleware/auth.js` (JWT) | Supabase Auth (sessiya avtomatik boshqariladi) |
-| `backend/src/routes/*.js` | To'g'ridan-to'g'ri Supabase so'rovlari (`frontend/src/lib/api.js` ichida) |
-| `backend/src/ai/provider.js` + `/ai` route | `supabase/functions/ai` (Edge Function, Gemini kaliti xavfsiz saqlanadi) |
-| Admin yaratish/o'chirish (`requireRole`) | `supabase/functions/admin` (service-role, superadmin tekshiruvi) |
-| `backend/data/content.json` (fayldan o'qiladi) | `frontend/public/content.json` (statik, bevosita frontenddan) |
-
-**Muhim:** `frontend/src/lib/api.js` dagi `api` obyektining barcha metod nomlari
-va qaytaradigan natija shakli **avvalgidek saqlangan** — shuning uchun boshqa
-hech qanday sahifa yoki komponentni (Library, AdminPage, MonthPage va h.k.)
-o'zgartirish shart bo'lmadi.
-
----
-
-## 🚀 SOZLASH — qadam-baqadam
-
-### 1) Supabase loyihasini yarating
-
-1. https://supabase.com → **New Project**.
-2. Loyiha yaratilgach, **Project Settings → API** bo'limidan quyidagilarni oling:
-   - `Project URL`
-   - `anon public` kalit
-   - `service_role` kalit (⚠️ **maxfiy**, hech qachon frontendga qo'ymang)
-
-### 2) Bazani sozlang
-
-**SQL Editor** bo'limini oching va `supabase/migrations/0001_init.sql` faylining
-**butun matnini** ko'chirib, ishga tushiring (bir marta yetarli). Bu jadvallar,
-RLS siyosatlari va trigger'larni yaratadi.
-
-Shundan so'ng **`supabase/migrations/0002_multi_api_keys.sql`** faylini ham xuddi
-shu tarzda ishga tushiring — bu bir nechta AI API kalitini saqlash imkonini
-beruvchi `api_keys` jadvalini qo'shadi (agar avval bitta Gemini kalit
-saqlagan bo'lsangiz, u avtomatik shu yangi jadvalga ko'chiriladi, yo'qolib
-qolmaydi).
-
-### 3) Edge Functions'ni deploy qiling
-
-Kompyuteringizda [Supabase CLI](https://supabase.com/docs/guides/cli) o'rnating, so'ng:
-
-```bash
-supabase login
-supabase link --project-ref <sizning-loyiha-ref>
-supabase functions deploy admin
-supabase functions deploy ai
 ```
-
-Edge Function'lar ichida ishlatiladigan environment o'zgaruvchilari (`SUPABASE_URL`,
-`SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`) Supabase tomonidan **avtomatik**
-beriladi — qo'lda sozlash shart emas. Faqat ixtiyoriy ravishda modelni
-o'zgartirmoqchi bo'lsangiz:
-
-```bash
-supabase secrets set GEMINI_MODEL=gemini-2.0-flash
-```
-
-### 4) Frontendni sozlang
-
-```bash
 cd frontend
 npm install
-cp .env.example .env
+cp .env.example .env      # Supabase URL va anon kalitni yozing
+npm run dev               # http://localhost:5173
 ```
+`.env` bo'lmasa, `npm run dev` rejimida dizaynni ko'rib chiqish uchun **demo foydalanuvchi** bilan ochiladi
+(progress brauzerda saqlanadi; production build'da bu rejim yo'q).
 
-`.env` faylini oching va Supabase'dan olgan `Project URL` va `anon public`
-kalitni qo'ying:
+Kontentni qayta yig'ish: `node scripts/build-content.mjs`
 
-```
-VITE_SUPABASE_URL=https://xxxxxxxxxxxx.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOi...
-```
+## Xavfsizlik
 
-Ishga tushiring:
-
-```bash
-npm run dev
-```
-
-`http://localhost:5173` da ochiladi.
-
-### 5) Birinchi super admin'ni yarating
-
-1. Saytda **"Ro'yxatdan o'tish"** orqali login=`Quvonchbek`, parol=`admin123`
-   bilan oddiy foydalanuvchi sifatida ro'yxatdan o'ting.
-2. Supabase **SQL Editor**'da ishga tushiring:
-   ```sql
-   update public.profiles set role = 'superadmin' where username = 'Quvonchbek';
-   ```
-3. Saytga qayta kiring — endi admin panelga kirish imkoniyati paydo bo'ladi.
-
-### 6) (Ixtiyoriy) Gemini AI'ni yoqish
-
-Admin panel → **AI sozlamalari** bo'limida:
-1. Provayderni **"Gemini (AI yoqilgan)"** ga o'zgartirib, "Saqlash"ni bosing.
-2. Pastdagi **"+ Kalit qo'shish"** formasi orqali Gemini API kalitingizni
-   (https://aistudio.google.com/apikey — bepul) kiriting.
-
-**Bir nechta kalit qo'shish mumkin** — masalan bir nechta Google akkauntdan
-olingan bepul kalitlarni qo'shsangiz, tizim ulardan birini ishlatadi va
-agar u kunlik/daqiqalik limitga (quota) tegib qolsa, **avtomatik ravishda**
-keyingi faol kalitga o'tadi. Har bir kalit qancha marta xato bergani va
-oxirgi xatosi admin panelida ko'rinadi; xohlagan vaqtda kalitni vaqtincha
-o'chirib qo'yish yoki butunlay o'chirish mumkin.
-
-API kalit(lar) **hech qachon** frontendga chiqmaydi — ular faqat
-`api_keys` jadvalida (RLS orqali klientdan butunlay yopiq) saqlanadi va
-faqat Edge Function (service-role) orqali o'qiladi.
-
-**AI-ustoz endi quyidagi barcha joylarda ishlaydi:**
-- 📖 Darslar (har bir oyning "Grammatika" va "Dialog" bosqichlarida)
-- 📐 Grammatika sahifasi
-- 🎧 Dialoglar sahifasi
-- 📕 Kutubxona (yuklangan kitob/matnlar)
-
-Har birida AI foydalanuvchiga o'sha mavzu bo'yicha shaxsiy vazifa beradi va
-javobini tekshirib, fikr-mulohaza (feedback) qaytaradi.
-
----
-
-## ☁️ Productionga chiqarish
-
-- **Frontend** — Netlify yoki Vercel'ga oddiy statik React/Vite loyihasi
-  sifatida deploy qilinadi (`npm run build` → `dist/` papkasi). Environment
-  o'zgaruvchilarga (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) e'tibor bering.
-- **Backend** — alohida hech narsa deploy qilish shart emas! Supabase allaqachon
-  bulutda ishlaydi (Postgres + Auth + Edge Functions). Faqat yuqoridagi
-  `supabase functions deploy` qadamini bajarganingizga ishonch hosil qiling.
-
-## 🔐 Xavfsizlik haqida qisqacha
-
-- Barcha jadvallarda **Row Level Security (RLS)** yoqilgan — foydalanuvchi
-  faqat o'z progressini, hamma esa kutubxona/lug'atlarni o'qiy oladi, faqat
-  admin/superadmin yoza oladi.
-- `secure_settings` jadvaliga (Gemini kaliti saqlanadigan joy) **hech qanday**
-  RLS siyosati yozilmagan — bu ataylab shunday, chunki policy yo'q = RLS uni
-  klientdan butunlay yopib qo'yadi. Faqat Edge Function ichidagi
-  `service_role` kaliti RLS'ni chetlab o'tadi.
-- Admin yaratish/o'chirish va AI sozlamalarini o'zgartirish — bularning
-  barchasi Edge Function ichida, so'rov yuborgan foydalanuvchining haqiqiy
-  rolini **bazadan qayta tekshirib** (JWT'dagi eski ma'lumotga ishonmasdan)
-  amalga oshiriladi.
-
-## Yangilanish: kengaytirilgan darslar va yangi dizayn
-- Ingliz tili darslariga 2161 so'z va 297 ibora (gap + tarjima bilan) taqsimlangan; har darsga 2-dialog, qo'shimcha grammatika, o'qish matni va savollar qo'shilgan.
-- Kontentni qayta yig'ish: `python3 scripts/enrich_content.py` (`data-src/` dagi fayllardan `frontend/public/content.json` yaratadi).
-- Yangi dizayn: gradient hero, kartalar, tungi rejim (chap menyuda tugma).
+- Barcha jadvallarda Row Level Security; o'quvchi faqat o'z progressini ko'radi, materiallarni faqat adminlar yozadi.
+- Rol hech qachon ro'yxatdan o'tish ma'lumotidan olinmaydi (doim `user`); o'z rolini o'zgartirish trigger bilan bloklangan.
+- API kalitlar `api_keys` jadvalida — klientdan butunlay yopiq, faqat Edge Function (service-role) o'qiydi, panelda faqat maskalangan ko'rinadi.
+- AI uchun har bir o'quvchiga kunlik limit (admin panelda sozlanadi).

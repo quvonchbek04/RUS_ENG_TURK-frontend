@@ -1,23 +1,41 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import AuthShell, { PasswordInput } from './AuthShell.jsx';
 
 export default function Register() {
-  const { register } = useAuth();
+  const { register, user, booting } = useAuth();
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('+998 ');
   const [password, setPassword] = useState('');
+  const [password2, setPassword2] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [confirmSent, setConfirmSent] = useState('');
+
+  if (!booting && user) return <Navigate to="/" replace />;
+
+  const hasEmail = email.trim().length > 0;
+  const hasPhone = phone.replace(/\D/g, '').length > 3;
 
   async function onSubmit(e) {
     e.preventDefault();
     setError('');
+    if (!hasEmail && !hasPhone) {
+      setError('Email yoki telefon raqamidan kamida bittasini kiriting');
+      return;
+    }
+    if (password !== password2) {
+      setError('Parollar bir xil emas');
+      return;
+    }
     setLoading(true);
     try {
-      await register(username, password, displayName);
-      navigate('/');
+      const res = await register({ email, phone, password, displayName });
+      if (res.needsConfirmation) setConfirmSent(res.email);
+      else navigate('/', { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -25,107 +43,91 @@ export default function Register() {
     }
   }
 
+  if (confirmSent) {
+    return (
+      <AuthShell eyebrow="Deyarli tayyor" title="Emailingizni tasdiqlang">
+        <div className="alert alert-success mb-5">
+          📧 <b>{confirmSent}</b> manziliga tasdiqlash xati yuborildi. Xatdagi havolani bosing, so'ng tizimga kiring.
+        </div>
+        <Link to="/login" className="btn btn-primary btn-block">
+          Kirish sahifasiga o'tish
+        </Link>
+      </AuthShell>
+    );
+  }
+
   return (
-    <div className="min-h-screen grid md:grid-cols-2 app-bg">
-      <div
-        className="hidden md:flex flex-col justify-between p-12"
-        style={{ background: 'var(--grad-brand)', color: '#fff' }}
-      >
-        <div className="font-mono text-xs tracking-[0.3em] uppercase opacity-80">Yangi bilet · Ro'yxatdan o'tish</div>
-        <div>
-          <div className="font-display text-5xl font-semibold leading-[1.05] mb-4">
-            Birinchi bekatga<br />xush kelibsiz.
-          </div>
-          <p className="max-w-sm opacity-85 leading-relaxed">
-            Hisob yarating va sayohatingiz — o'zlashtirgan so'zlar, tugatilgan darslar va
-            streak natijalari — avtomatik saqlanib boradi.
+    <AuthShell
+      eyebrow="Yangi bilet · Ro'yxatdan o'tish"
+      title="Hisob yarating"
+      footer={
+        <>
+          Hisobingiz bormi?{' '}
+          <Link to="/login" className="font-bold underline" style={{ color: 'var(--pine)' }}>
+            Kirish
+          </Link>
+        </>
+      }
+    >
+      <form onSubmit={onSubmit} className="space-y-4">
+        <label className="field">
+          <span className="label">Ismingiz</span>
+          <input value={displayName} onChange={(e) => setDisplayName(e.target.value)} className="input" placeholder="Masalan: Dilnoza" autoComplete="name" required />
+        </label>
+
+        <div className="rounded-2xl p-4 space-y-3" style={{ background: 'var(--panel-2)', border: '1px solid var(--line)' }}>
+          <label className="field">
+            <span className="label flex items-center gap-2">
+              📧 Email
+              {hasEmail && <span className="badge badge-pine">✓</span>}
+            </span>
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              autoCapitalize="off"
+              className="input"
+              placeholder="ism@gmail.com"
+            />
+          </label>
+          <label className="field">
+            <span className="label flex items-center gap-2">
+              📱 Telefon raqami
+              {hasPhone && <span className="badge badge-pine">✓</span>}
+            </span>
+            <input
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
+              className="input"
+              placeholder="+998 90 123 45 67"
+            />
+          </label>
+          <p className="text-xs muted leading-relaxed">
+            Kamida bittasini kiriting. <b>Ikkalasini ham kiritsangiz</b>, keyin email yoki telefon — qaysi biri qulay bo'lsa, shu bilan kirasiz.
+            Email parolni unutganda tiklash uchun ham kerak bo'ladi.
           </p>
         </div>
-        <div className="flex items-center gap-3 font-mono text-xs opacity-80">
-          <span>A1</span>
-          <span className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.35)' }} />
-          <span>C1</span>
-        </div>
-      </div>
 
-      <div className="flex items-center justify-center p-6 sm:p-12">
-        <div className="w-full max-w-sm">
-          <div className="mb-8">
-            <div className="font-mono text-xs tracking-[0.25em] uppercase mb-2" style={{ color: 'var(--gold)' }}>
-              Ro'yxatdan o'tish
-            </div>
-            <h1 className="font-display text-3xl font-semibold" style={{ color: 'var(--ink)' }}>
-              Hisob yarating
-            </h1>
-          </div>
+        <label className="field">
+          <span className="label">Parol (kamida 6 belgi)</span>
+          <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" minLength={6} />
+        </label>
+        <label className="field">
+          <span className="label">Parolni takrorlang</span>
+          <input type="password" value={password2} onChange={(e) => setPassword2(e.target.value)} required minLength={6} autoComplete="new-password" className="input" placeholder="••••••" />
+        </label>
 
-          <form onSubmit={onSubmit} className="space-y-4">
-            <div>
-              <label className="block font-mono text-xs uppercase tracking-widest mb-1.5" style={{ color: 'var(--ink-soft)' }}>
-                Ism (ixtiyoriy)
-              </label>
-              <input
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border outline-none focus:shadow-[0_0_0_3px_var(--gold-soft)]"
-                style={{ borderColor: 'var(--line)', background: 'var(--panel)', color: 'var(--ink)' }}
-                placeholder="Anvar Anvarov"
-              />
-            </div>
-            <div>
-              <label className="block font-mono text-xs uppercase tracking-widest mb-1.5" style={{ color: 'var(--ink-soft)' }}>
-                Login
-              </label>
-              <input
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                minLength={3}
-                className="w-full px-4 py-3 rounded-xl border outline-none focus:shadow-[0_0_0_3px_var(--gold-soft)]"
-                style={{ borderColor: 'var(--line)', background: 'var(--panel)', color: 'var(--ink)' }}
-                placeholder="kamida 3 ta belgi"
-              />
-            </div>
-            <div>
-              <label className="block font-mono text-xs uppercase tracking-widest mb-1.5" style={{ color: 'var(--ink-soft)' }}>
-                Parol
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={4}
-                className="w-full px-4 py-3 rounded-xl border outline-none focus:shadow-[0_0_0_3px_var(--gold-soft)]"
-                style={{ borderColor: 'var(--line)', background: 'var(--panel)', color: 'var(--ink)' }}
-                placeholder="kamida 4 ta belgi"
-              />
-            </div>
+        {error && <div className="alert alert-error">{error}</div>}
 
-            {error && (
-              <div className="text-sm px-3 py-2 rounded-lg" style={{ background: 'var(--error-bg)', color: 'var(--brick)' }}>
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 rounded-xl font-mono text-sm uppercase tracking-widest font-semibold transition-transform active:scale-[0.98] cursor-pointer disabled:opacity-60"
-              style={{ background: 'var(--pine)', color: 'var(--paper)' }}
-            >
-              {loading ? 'Yaratilmoqda…' : 'Biletni olish →'}
-            </button>
-          </form>
-
-          <p className="mt-6 text-sm" style={{ color: 'var(--ink-soft)' }}>
-            Hisobingiz bormi?{' '}
-            <Link to="/login" className="font-semibold underline" style={{ color: 'var(--pine)' }}>
-              Kirish
-            </Link>
-          </p>
-        </div>
-      </div>
-    </div>
+        <button type="submit" disabled={loading} className="btn btn-brand btn-lg btn-block">
+          {loading ? <><span className="spinner" /> Yaratilmoqda…</> : 'Biletni olish →'}
+        </button>
+      </form>
+    </AuthShell>
   );
 }

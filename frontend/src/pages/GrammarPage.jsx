@@ -1,93 +1,105 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Layout from '../components/Layout.jsx';
 import AiTaskWidget from '../components/AiTaskWidget.jsx';
-import { api } from '../lib/api.js';
+import SpeakButton from '../components/SpeakButton.jsx';
+import { GrammarMore } from '../components/LessonExtras.jsx';
+import { PageHeader, PageLoading } from '../components/ui.jsx';
+import { useContent } from '../lib/hooks.js';
+import { useTutor } from '../context/TutorContext.jsx';
 
 export default function GrammarPage() {
   const { lang } = useParams();
-  const [data, setData] = useState(null);
-  const [error, setError] = useState('');
+  const { data, error } = useContent(lang);
+  const { ask } = useTutor();
+  const [openId, setOpenId] = useState(null);
+  const [query, setQuery] = useState('');
 
-  useEffect(() => {
-    setData(null);
-    api.content(lang).then(setData).catch((e) => setError(e.message));
-  }, [lang]);
+  const topics = useMemo(() => {
+    if (!data) return [];
+    const list = [];
+    data.modules.forEach((mod) => mod.months.forEach((month) => month.grammar && list.push({ mod, month, grammar: month.grammar })));
+    return list;
+  }, [data]);
 
   if (error) {
     return (
       <Layout>
-        <div className="max-w-3xl mx-auto px-5 py-16 text-center" style={{ color: 'var(--brick)' }}>
-          {error}
+        <div className="page-narrow">
+          <div className="alert alert-error">{error}</div>
         </div>
       </Layout>
     );
   }
+  if (!data) return <Layout><PageLoading /></Layout>;
 
-  if (!data) {
-    return (
-      <Layout>
-        <div className="max-w-3xl mx-auto px-5 py-16 font-mono text-sm" style={{ color: 'var(--ink-soft)' }}>
-          Yuklanmoqda…
-        </div>
-      </Layout>
-    );
-  }
-
-  const topics = [];
-  data.modules.forEach((mod) => {
-    mod.months.forEach((month) => {
-      if (month.grammar) {
-        topics.push({ month, grammar: month.grammar });
-      }
-    });
-  });
+  const q = query.trim().toLowerCase();
+  const filtered = topics.filter(({ month, grammar }) => !q || `${grammar.title} ${grammar.text} ${month.topic}`.toLowerCase().includes(q));
 
   return (
     <Layout>
-      <div className="max-w-3xl mx-auto px-5 py-10">
-        <Link to={`/lang/${lang}`} className="font-mono text-xs uppercase tracking-widest" style={{ color: 'var(--ink-soft)' }}>
-          ← {data.meta.title}
-        </Link>
-
-        <div className="mt-4 mb-8">
-          <div className="font-mono text-xs tracking-[0.25em] uppercase mb-2" style={{ color: 'var(--gold)' }}>
-            Grammatika ko'rib chiqish
-          </div>
-          <h1 className="font-display text-3xl font-semibold" style={{ color: 'var(--ink)' }}>
-            Barcha mavzular · {topics.length} ta
-          </h1>
-        </div>
-
-        <div className="space-y-4">
-          {topics.map(({ month, grammar }) => (
-            <div key={month.id} className="rounded-xl border p-5" style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}>
-              <div className="font-mono text-[10px] uppercase tracking-widest mb-1" style={{ color: 'var(--gold)' }}>
-                {month.label} · {month.topic}
-              </div>
-              <h3 className="font-display text-xl font-semibold mb-2" style={{ color: 'var(--ink)' }}>
-                {grammar.title}
-              </h3>
-              <p className="leading-relaxed mb-4" style={{ color: 'var(--ink)' }}>
-                {grammar.text}
-              </p>
-              {grammar.examples?.length > 0 && (
-                <div className="space-y-1.5">
-                  {grammar.examples.map((ex, i) => (
-                    <div key={i} className="font-mono text-sm flex gap-2">
-                      <span style={{ color: 'var(--pine)' }}>{ex[0]}</span>
-                      <span style={{ color: 'var(--ink-soft)' }}>— {ex[1]}</span>
+      <div className="page-narrow">
+        <PageHeader
+          back={{ to: `/lang/${lang}`, label: data.meta.title }}
+          eyebrow={`${data.meta.flag} Grammatika`}
+          title={`Barcha mavzular · ${topics.length}`}
+          subtitle="Darslardagi barcha grammatik qoidalar bir joyda. Tushunmagan joyingizni AI ustozdan so'rang."
+        />
+        <input className="input mb-4" placeholder="🔍 Mavzu qidirish…" value={query} onChange={(e) => setQuery(e.target.value)} />
+        <div className="space-y-3">
+          {filtered.map(({ mod, month, grammar }) => {
+            const isOpen = openId === month.id || !!q;
+            return (
+              <div key={month.id} className="card overflow-hidden">
+                <button type="button" className="w-full text-left p-4 flex items-center gap-3" onClick={() => setOpenId(isOpen && !q ? null : month.id)}>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--gold)' }}>
+                      {month.label} · {month.topic}
                     </div>
-                  ))}
-                </div>
-              )}
-              <AiTaskWidget
-                type="text"
-                content={`${grammar.title}\n${grammar.text}\n${(grammar.examples || []).map((ex) => ex.join(' — ')).join('\n')}`}
-                lang={lang}
-              />
-            </div>
-          ))}
+                    <div className="font-display text-lg font-semibold" style={{ color: 'var(--ink)' }}>
+                      {grammar.title}
+                    </div>
+                  </div>
+                  <span className="muted text-sm">{isOpen ? '▲' : '▼'}</span>
+                </button>
+                {isOpen && (
+                  <div className="px-4 pb-5 border-t pt-4" style={{ borderColor: 'var(--line)' }}>
+                    <p className="leading-relaxed mb-4 text-[15px]" style={{ color: 'var(--ink)' }}>
+                      {grammar.text}
+                    </p>
+                    <div className="space-y-2">
+                      {(grammar.examples || []).map((ex, i) => (
+                        <div key={i} className="flex items-center gap-3 rounded-xl px-3.5 py-2.5" style={{ background: 'var(--pine-soft)' }}>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-semibold" style={{ color: 'var(--ink)' }}>
+                              {ex[0]}
+                            </div>
+                            <div className="text-sm muted">{ex[1]}</div>
+                          </div>
+                          <SpeakButton text={ex[0]} lang={lang} />
+                        </div>
+                      ))}
+                    </div>
+                    <GrammarMore items={grammar.more} />
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      <button type="button" className="btn btn-soft btn-sm" onClick={() => ask(`"${grammar.title}" mavzusini sodda misollar bilan tushuntirib ber`)}>
+                        🤖 Ustozdan tushuntirish
+                      </button>
+                      <Link to={`/lang/${lang}/month/${mod.id}/${month.id}`} className="btn btn-ghost btn-sm">
+                        📘 Darsga o'tish
+                      </Link>
+                    </div>
+                    <AiTaskWidget
+                      type="text"
+                      content={`${grammar.title}\n${grammar.text}\n${(grammar.examples || []).map((ex) => ex.join(' — ')).join('\n')}`}
+                      lang={lang}
+                      title="Grammatika bo'yicha AI vazifa"
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </Layout>

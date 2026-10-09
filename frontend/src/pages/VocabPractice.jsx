@@ -1,228 +1,149 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Layout from '../components/Layout.jsx';
-import SpeakButton from '../components/SpeakButton.jsx';
-import { api } from '../lib/api.js';
+import PracticeSession from '../components/PracticeSession.jsx';
+import PracticeResult from '../components/PracticeResult.jsx';
+import { PageLoading } from '../components/ui.jsx';
+import { useContent } from '../lib/hooks.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { flattenMonths, isMonthDone, QUIZ_PASS_THRESHOLD, withActivity, withPracticeSession } from '../lib/lessonProgress.js';
+import { shuffle } from '../lib/practice.js';
 
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
+/** Dars testi: dars so'zlari + Word fayldagi so'zlardan aralash savollar. To'xtatilsa ham
+ *  javob berilmagan savollar xato hisoblanadi (umumiy son o'zgarmaydi). */
 export default function VocabPractice() {
   const { lang, moduleId, monthId } = useParams();
-  const { updateProgress } = useAuth();
-  const [data, setData] = useState(null);
-  const [error, setError] = useState('');
-  const [questions, setQuestions] = useState(null);
-  const [index, setIndex] = useState(0);
-  const [selected, setSelected] = useState(null);
-  const [correct, setCorrect] = useState(0);
-  const [finished, setFinished] = useState(false);
+  const { updateProgress, progress } = useAuth();
+  const { data, error } = useContent(lang);
+  const [round, setRound] = useState(0);
+  const [result, setResult] = useState(null);
+  const [retryItems, setRetryItems] = useState(null);
 
-  useEffect(() => {
-    api.content(lang).then(setData).catch((e) => setError(e.message));
-  }, [lang]);
+  const month = useMemo(() => data?.modules.find((m) => m.id === moduleId)?.months.find((mo) => mo.id === monthId), [data, moduleId, monthId]);
 
-  const month = useMemo(() => {
-    if (!data) return null;
-    const mod = data.modules.find((m) => m.id === moduleId);
-    return mod?.months.find((mo) => mo.id === monthId);
-  }, [data, moduleId, monthId]);
-
-  useEffect(() => {
-    if (!month) return;
-    // Bir xil so'z takror kelsa, faqat birinchi uchrashuvi qoldiriladi.
-    const seen = new Set();
-    // Asosiy lug'at + kengaytirilgan so'zlardan (Word fayldan) tasodifiy 25 tasi
-    const extra = shuffle(month.words || []).slice(0, 25).map((w) => [w[0], '', w[1]]);
-    const pool = [...(month.vocab || []), ...extra].filter(([word]) => {
-      const key = word.trim().toLowerCase();
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-    const qs = shuffle(pool).map(([word, translit, meaning]) => {
-      const wrongPool = shuffle(pool.filter((v) => v[2] !== meaning)).slice(0, 3);
-      const options = shuffle([meaning, ...wrongPool.map((w) => w[2])]);
-      return { word, translit, meaning, options };
-    });
-    setQuestions(qs);
-    setIndex(0);
-    setCorrect(0);
-    setSelected(null);
-    setFinished(false);
+  const { items, pool } = useMemo(() => {
+    if (!month) return { items: [], pool: [] };
+    const base = (month.vocab || []).map(([w, t, m]) => ({ w, t: t !== w ? t : '', m }));
+    const extra = shuffle(month.words || []).slice(0, 14).map(([w, m, s, st]) => ({ w, m, s, st }));
+    const pool = [...base, ...(month.words || []).map(([w, m]) => ({ w, m }))];
+    return { items: [...base, ...extra], pool };
   }, [month]);
 
-  function choose(option) {
-    if (selected) return;
-    setSelected(option);
-    const isCorrect = option === questions[index].meaning;
-    if (isCorrect) setCorrect((c) => c + 1);
-  }
+  const onFinish = useCallback(
+    (record) => {
+      setResult(record);
+      if (retryItems) {
+        updateProgress((prev) => withActivity(withPracticeSession(prev, record), record.correct, { answers: record.answered }));
+        return;
+      }
+      updateProgress((prev) => {
+        const wasDone = isMonthDone(prev, lang, monthId);
+        const testResults = { ...(prev.testResults || {}) };
+        const langResults = { ...(testResults[lang] || {}) };
+        const old = langResults[monthId];
+        const pct = record.total ? record.correct / record.total : 0;
+        const oldPct = old?.total ? old.correct / old.total : -1;
+        // Eng yaxshi natija saqlanadi
+        langResults[monthId] = pct >= oldPct ? { correct: record.correct, total: record.total, at: record.at } : old;
+        testResults[lang] = langResults;
 
-  function next() {
-    if (index + 1 >= questions.length) {
-      finish();
-      return;
-    }
-    setIndex((i) => i + 1);
-    setSelected(null);
-  }
+        const reviewFlags = { ...(prev.reviewFlags || {}) };
+        const langMap = { ...(reviewFlags[lang] || {}) };
+        langMap[monthId] = { ...(langMap[monthId] || {}), vocab: true };
+        reviewFlags[lang] = langMap;
 
-  function finish() {
-    setFinished(true);
-    updateProgress((prev) => {
-      const vocabStats = { ...(prev.vocabStats || {}) };
-      const langStats = { ...(vocabStats[lang] || { attempts: 0, correct: 0 }) };
-      langStats.attempts += questions.length;
-      langStats.correct += correct;
-      vocabStats[lang] = langStats;
-
-      const testResults = { ...(prev.testResults || {}) };
-      const langResults = { ...(testResults[lang] || {}) };
-      langResults[monthId] = { correct, total: questions.length, at: Date.now() };
-      testResults[lang] = langResults;
-
-      // Lug'at mashqi (test) topshirilgach, dars bosqichlari ichidagi
-      // "Lug'atni ko'rib chiqdim" bandi ham avtomatik bajarilgan deb belgilanadi —
-      // bu band shu mashqni majburiy topshirishga bog'liq.
-      const reviewFlagsAll = { ...(prev.reviewFlags || {}) };
-      const langMap = { ...(reviewFlagsAll[lang] || {}) };
-      const monthFlags = { ...(langMap[monthId] || {}) };
-      monthFlags.vocab = true;
-      langMap[monthId] = monthFlags;
-      reviewFlagsAll[lang] = langMap;
-
-      return { ...prev, vocabStats, testResults, reviewFlags: reviewFlagsAll };
-    });
-  }
+        let next = withPracticeSession({ ...prev, testResults, reviewFlags }, record);
+        const nowDone = isMonthDone(next, lang, monthId);
+        next = withActivity(next, record.correct + (nowDone && !wasDone ? 20 : 0), { answers: record.answered, lessons: nowDone && !wasDone ? 1 : 0 });
+        return next;
+      });
+    },
+    [lang, monthId, updateProgress, retryItems]
+  );
 
   if (error) {
     return (
       <Layout>
-        <div className="max-w-2xl mx-auto px-5 py-16 text-center" style={{ color: 'var(--brick)' }}>
-          {error}
+        <div className="page-narrow">
+          <div className="alert alert-error">{error}</div>
+        </div>
+      </Layout>
+    );
+  }
+  if (!data) return <Layout><PageLoading /></Layout>;
+  if (!month) {
+    return (
+      <Layout>
+        <div className="page-narrow">
+          <div className="alert alert-error">Dars topilmadi.</div>
         </div>
       </Layout>
     );
   }
 
-  if (!month || !questions) {
-    return (
-      <Layout>
-        <div className="max-w-2xl mx-auto px-5 py-16 font-mono text-sm" style={{ color: 'var(--ink-soft)' }}>
-          Yuklanmoqda…
-        </div>
-      </Layout>
-    );
-  }
+  const pct = result?.total ? Math.round((result.correct / result.total) * 100) : 0;
+  const flat = flattenMonths(data.modules);
+  const nextLesson = flat[flat.findIndex((m) => m.id === monthId) + 1];
+  const done = isMonthDone(progress, lang, monthId);
 
   return (
     <Layout>
-      <div className="max-w-2xl mx-auto px-5 py-10">
-        <Link
-          to={`/lang/${lang}/month/${moduleId}/${monthId}`}
-          className="font-mono text-xs uppercase tracking-widest"
-          style={{ color: 'var(--ink-soft)' }}
-        >
+      <div className="page-narrow">
+        <Link to={`/lang/${lang}/month/${moduleId}/${monthId}`} className="back-link mb-4">
           ← {month.topic}
         </Link>
 
-        <div className="mt-6">
-          {!finished ? (
-            <>
-              <div className="flex items-center justify-between mb-4 font-mono text-xs uppercase tracking-widest" style={{ color: 'var(--ink-soft)' }}>
-                <span>
-                  Savol {index + 1}/{questions.length}
-                </span>
-                <span>To'g'ri: {correct}</span>
+        {!result ? (
+          <PracticeSession
+            key={round}
+            items={retryItems || items}
+            pool={pool}
+            lang={lang}
+            mode="mixed"
+            count={retryItems ? 0 : 25}
+            title={retryItems ? `Xatolar ustida ishlash · ${month.topic}` : `Dars testi · ${month.topic}`}
+            source={retryItems ? 'mistakes' : 'lesson-test'}
+            label={retryItems ? `Xatolar: ${month.topic}` : `Dars testi: ${month.label} · ${month.topic}`}
+            strict={!retryItems}
+            extra={{ lessonId: monthId }}
+          onFinish={onFinish}
+          />
+        ) : (
+          <>
+            {!retryItems && (
+              <div className={`alert mb-4 ${pct >= QUIZ_PASS_THRESHOLD ? 'alert-success' : 'alert-warn'}`}>
+                {pct >= QUIZ_PASS_THRESHOLD
+                  ? `✅ ${pct}% — dars testi topshirildi!${done ? ' Dars to\'liq yakunlandi.' : ' Darsning qolgan bosqichlarini ham yakunlang.'}`
+                  : `${pct}% — darsni yakunlash uchun kamida ${QUIZ_PASS_THRESHOLD}% kerak. Xatolarni takrorlab, qayta urinib ko'ring.`}
               </div>
-              <div className="h-1.5 rounded-full mb-8 overflow-hidden" style={{ background: 'var(--paper-soft)' }}>
-                <div
-                  className="h-full transition-all"
-                  style={{ width: `${((index + 1) / questions.length) * 100}%`, background: 'var(--gold)' }}
-                />
-              </div>
-
-              <div className="ticket-edge rounded-2xl border p-8 text-center mb-6" style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}>
-                <div className="font-mono text-[10px] uppercase tracking-widest mb-3" style={{ color: 'var(--ink-soft)' }}>
-                  Bu so'z nimani anglatadi?
-                </div>
-                <div className="font-display text-3xl font-semibold mb-1" style={{ color: 'var(--ink)' }}>
-                  {questions[index].word}
-                </div>
-                <div className="font-mono text-sm mb-3" style={{ color: 'var(--gold)' }}>
-                  {questions[index].translit}
-                </div>
-                <SpeakButton text={questions[index].word} lang={lang} size="lg" className="mx-auto" />
-              </div>
-
-              <div className="grid gap-3">
-                {questions[index].options.map((opt, i) => {
-                  const isSelected = selected === opt;
-                  const isCorrectOpt = opt === questions[index].meaning;
-                  let style = { borderColor: 'var(--line)', background: 'var(--panel)', color: 'var(--ink)' };
-                  if (selected) {
-                    if (isCorrectOpt) style = { borderColor: 'var(--pine)', background: 'var(--pine)', color: 'var(--paper)' };
-                    else if (isSelected) style = { borderColor: 'var(--brick)', background: 'var(--error-bg)', color: 'var(--brick)' };
-                  }
-                  return (
-                    <button
-                      key={i}
-                      onClick={() => choose(opt)}
-                      className="text-left px-5 py-3.5 rounded-xl border transition-colors cursor-pointer"
-                      style={style}
-                    >
-                      {opt}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {selected && (
-                <button
-                  onClick={next}
-                  className="mt-6 w-full py-3 rounded-xl font-mono text-sm uppercase tracking-widest font-semibold cursor-pointer"
-                  style={{ background: 'var(--pine)', color: 'var(--paper)' }}
-                >
-                  {index + 1 >= questions.length ? 'Natijani ko\'rish' : 'Keyingisi →'}
-                </button>
-              )}
-            </>
-          ) : (
-            <div className="text-center py-10">
-              <div className="text-6xl mb-4">{correct === questions.length ? '🏆' : '🎫'}</div>
-              <h2 className="font-display text-3xl font-semibold mb-2" style={{ color: 'var(--ink)' }}>
-                {correct}/{questions.length} to'g'ri javob
-              </h2>
-              <p className="mb-2" style={{ color: 'var(--ink-soft)' }}>
-                Natijangiz saqlandi.
-              </p>
-              <p
-                className="mb-8 font-mono text-xs uppercase tracking-widest"
-                style={{ color: Math.round((correct / questions.length) * 100) >= 60 ? 'var(--pine)' : 'var(--brick)' }}
-              >
-                {Math.round((correct / questions.length) * 100)}%{' '}
-                {Math.round((correct / questions.length) * 100) >= 60
-                  ? "— dars uchun test o'tildi (60%+)"
-                  : '— darsni yakunlash uchun kamida 60% kerak'}
-              </p>
-              <Link
-                to={`/lang/${lang}/month/${moduleId}/${monthId}`}
-                className="inline-block px-6 py-3 rounded-xl font-mono text-sm uppercase tracking-widest font-semibold"
-                style={{ background: 'var(--pine)', color: 'var(--paper)' }}
-              >
-                Darsga qaytish
-              </Link>
-            </div>
-          )}
-        </div>
+            )}
+            <PracticeResult
+              record={result}
+              onRetryMistakes={(list) => {
+                setRetryItems(list.map((x) => ({ w: x.w, t: x.t, m: x.m, s: x.s, st: x.st })));
+                setResult(null);
+                setRound((r) => r + 1);
+              }}
+              onRestart={() => {
+                setRetryItems(null);
+                setResult(null);
+                setRound((r) => r + 1);
+              }}
+              extraActions={
+                <>
+                  <Link to={`/lang/${lang}/month/${moduleId}/${monthId}`} className="btn btn-ghost">
+                    Darsga qaytish
+                  </Link>
+                  {done && nextLesson && (
+                    <Link to={`/lang/${lang}/month/${nextLesson.moduleId}/${nextLesson.id}`} className="btn btn-brand">
+                      Keyingi dars →
+                    </Link>
+                  )}
+                </>
+              }
+            />
+          </>
+        )}
       </div>
     </Layout>
   );

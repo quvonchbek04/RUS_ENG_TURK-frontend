@@ -1,40 +1,64 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Layout from '../components/Layout.jsx';
-import { GrammarMore, DialogExtra, ReadingBlock, WordsExplorer } from '../components/LessonExtras.jsx';
+import { GrammarMore, DialogExtra, DialogView, ReadingBlock, WordsExplorer, Flashcards } from '../components/LessonExtras.jsx';
 import SpeakButton from '../components/SpeakButton.jsx';
 import AiTaskWidget from '../components/AiTaskWidget.jsx';
+import MediaViewer from '../components/MediaViewer.jsx';
+import { Modal, PageLoading, ProgressBar } from '../components/ui.jsx';
 import { api } from '../lib/api.js';
+import { useContent } from '../lib/hooks.js';
 import { useAuth } from '../context/AuthContext.jsx';
-import { getQuizPct, getQuizResult, getReviewFlags, isMonthDone, isQuizPassed, isAdminRole, STEP_KEYS } from '../lib/lessonProgress.js';
-
-// Dars bosqichlari — qat'iy ketma-ketlikda: har biri oldingisi TO'LIQ bajarilgach ochiladi.
-// (Kalitlar tartibi lessonProgress.js dagi STEP_KEYS bilan bir xil bo'lishi shart.)
-const STEP_ORDER = STEP_KEYS;
+import { useTutor, useTutorContext } from '../context/TutorContext.jsx';
+import { MEDIA_META } from '../lib/media.js';
+import { readingHint } from '../lib/translit.js';
+import {
+  flattenMonths,
+  getQuizPct,
+  getReviewFlags,
+  isAdminRole,
+  isMonthDone,
+  isQuizPassed,
+  monthProgressRatio,
+  QUIZ_PASS_THRESHOLD,
+  STEP_KEYS,
+  withActivity,
+} from '../lib/lessonProgress.js';
 
 const STEPS = [
-  { key: 'grammar', icon: '📐', label: 'Grammatika bilan tanishdim' },
-  { key: 'vocab', icon: '📚', label: "Lug'atni ko'rib chiqdim" },
-  { key: 'dialog', icon: '🎧', label: "Dialogni ko'rib chiqdim" },
-  { key: 'exercises', icon: '✏️', label: 'Mashqlarni bajardim' },
-  { key: 'answers', icon: '🗝️', label: 'Javoblarni tekshirdim' },
-  { key: 'teacher', icon: '🧑\u200d🏫', label: "O'qituvchi tavsiyasini o'qidim" },
+  { key: 'grammar', icon: '📐', label: 'Grammatika', done: 'Grammatikani o\'rgandim' },
+  { key: 'vocab', icon: '📚', label: "Lug'at", done: "So'zlarni o'rgandim" },
+  { key: 'dialog', icon: '🎧', label: 'Dialog', done: "Dialogni tingladim" },
+  { key: 'exercises', icon: '✏️', label: 'Mashqlar', done: 'Mashqlarni bajardim' },
+  { key: 'answers', icon: '🗝️', label: 'Javoblar', done: 'Javoblarni tekshirdim' },
+  { key: 'teacher', icon: '🧑‍🏫', label: 'Tavsiya', done: "O'qidim" },
+  { key: 'test', icon: '🧪', label: 'Test', done: '' },
 ];
 
-// Har bir bosqich tugagach ko'rinadigan "Keyingisi →" tugmasi — bosilganda shu bosqich
-// bajarilgan deb belgilanadi va navbatdagi ochiq bosqichga avtomatik o'tiladi.
-// Har bir mashqni saytning o'zida bajarish uchun: foydalanuvchi javobini yozadi,
-// so'ng "Javobni ko'rsatish" tugmasi bilan to'g'ri javobni solishtirib ko'radi.
-// Yozilgan javob progress ichida saqlanadi (sahifani yangilasa ham yo'qolmaydi).
-function ExerciseItem({ index, question, answer, savedValue, onSave }) {
+function ExerciseItem({ index, question, answer, savedValue, onSave, lang }) {
   const [value, setValue] = useState(savedValue || '');
   const [revealed, setRevealed] = useState(false);
+  const [ai, setAi] = useState(null);
+  const [checking, setChecking] = useState(false);
+
+  async function aiCheck() {
+    if (!value.trim()) return;
+    setChecking(true);
+    try {
+      const res = await api.aiCheck({ context: question, question, answer: value, lang, sample: answer });
+      setAi(res);
+    } catch (e) {
+      setAi({ correct: false, feedback: e.message });
+    } finally {
+      setChecking(false);
+    }
+  }
 
   return (
-    <li className="rounded-xl border p-3.5" style={{ borderColor: 'var(--line)', background: 'var(--paper)' }}>
-      <div className="flex gap-3 text-sm mb-2.5">
-        <span className="font-mono shrink-0" style={{ color: 'var(--gold)' }}>
-          {String(index + 1).padStart(2, '0')}
+    <li className="card-soft p-4">
+      <div className="flex gap-3 text-[15px] mb-2.5">
+        <span className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0" style={{ background: 'var(--gold-soft)', color: 'var(--gold)' }}>
+          {index + 1}
         </span>
         <span style={{ color: 'var(--ink)' }}>{question}</span>
       </div>
@@ -44,493 +68,433 @@ function ExerciseItem({ index, question, answer, savedValue, onSave }) {
         onBlur={() => onSave(value)}
         placeholder="Javobingizni shu yerga yozing…"
         rows={2}
-        className="w-full rounded-lg border p-2.5 text-sm mb-2"
-        style={{ marginLeft: '1.75rem', width: 'calc(100% - 1.75rem)', borderColor: 'var(--line)', background: 'var(--paper-soft)', color: 'var(--ink)' }}
+        className="textarea !min-h-[64px] mb-2"
       />
-      <div style={{ marginLeft: '1.75rem' }} className="flex flex-wrap items-start gap-2">
-        <button
-          type="button"
-          onClick={() => setRevealed((v) => !v)}
-          className="font-mono text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-lg cursor-pointer"
-          style={{ background: revealed ? 'var(--success-bg)' : 'var(--paper-soft)', color: revealed ? 'var(--pine)' : 'var(--ink-soft)' }}
-        >
-          {revealed ? '🙈 Javobni yashirish' : "👁 To'g'ri javobni ko'rsatish"}
+      <div className="flex flex-wrap items-start gap-2">
+        <button type="button" onClick={() => setRevealed((v) => !v)} className="btn btn-ghost btn-sm">
+          {revealed ? '🙈 Yashirish' : "👁 To'g'ri javob"}
         </button>
-        {revealed && answer && (
-          <div className="text-sm px-3 py-1.5 rounded-lg flex-1 min-w-[160px]" style={{ background: 'var(--success-bg)', color: 'var(--ink)' }}>
-            {answer}
-          </div>
-        )}
+        <button type="button" onClick={aiCheck} disabled={checking || !value.trim()} className="btn btn-soft btn-sm">
+          {checking ? <span className="spinner" /> : '🤖'} AI tekshirsin
+        </button>
       </div>
+      {revealed && answer && <div className="alert alert-success mt-2 text-sm">{answer}</div>}
+      {ai && (
+        <div className={`alert mt-2 text-sm ${ai.correct ? 'alert-success' : 'alert-error'}`} style={{ color: 'var(--ink)' }}>
+          {ai.correct ? '✅ ' : '❌ '}
+          {ai.feedback}
+          {ai.corrected && <div className="mt-1 font-semibold">To'g'ri: {ai.corrected}</div>}
+        </div>
+      )}
     </li>
-  );
-}
-
-function NextStepButton({ label = 'Keyingisi →', onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      className="mt-4 w-full py-3 rounded-xl font-mono text-sm uppercase tracking-widest font-semibold cursor-pointer transition-colors"
-      style={{ background: 'var(--pine)', color: 'var(--paper)' }}
-    >
-      {label}
-    </button>
   );
 }
 
 export default function MonthPage() {
   const { lang, moduleId, monthId } = useParams();
+  const navigate = useNavigate();
   const { progress, updateProgress, user } = useAuth();
+  const { ask } = useTutor();
   const isAdmin = isAdminRole(user?.role);
-  const [data, setData] = useState(null);
-  const [openKey, setOpenKey] = useState(null);
-  const [error, setError] = useState('');
-  const autoOpenedForRef = useRef(null);
+  const { data, error } = useContent(lang);
+  const [stepKey, setStepKey] = useState(null);
+  const [vocabView, setVocabView] = useState('list');
+  const [materials, setMaterials] = useState([]);
+  const [openMaterial, setOpenMaterial] = useState(null);
+  const topRef = useRef(null);
 
-  useEffect(() => {
-    setData(null);
-    setOpenKey(null);
-    autoOpenedForRef.current = null;
-    api.content(lang).then(setData).catch((e) => setError(e.message));
-  }, [lang, monthId]);
-
-  const { mod, month } = useMemo(() => {
+  const { mod, month, flat } = useMemo(() => {
     if (!data) return {};
     const mod = data.modules.find((m) => m.id === moduleId);
     const month = mod?.months.find((mo) => mo.id === monthId);
-    return { mod, month };
+    return { mod, month, flat: flattenMonths(data.modules) };
   }, [data, moduleId, monthId]);
 
+  useTutorContext(
+    month
+      ? {
+          lang,
+          title: `${month.label}: ${month.topic}`,
+          text: [
+            month.grammar ? `Grammatika: ${month.grammar.title}. ${month.grammar.text}` : '',
+            `So'zlar: ${(month.vocab || []).map((v) => `${v[0]} — ${v[2]}`).join('; ')}`,
+            month.dialog ? `Dialog: ${month.dialog.lines.map((l) => l[1]).join(' ')}` : '',
+          ]
+            .filter(Boolean)
+            .join('\n'),
+        }
+      : null
+  );
+
   const reviewFlags = getReviewFlags(progress, lang, monthId);
-  const quizResult = getQuizResult(progress, lang, monthId);
   const quizPct = getQuizPct(progress, lang, monthId);
   const quizPassed = isQuizPassed(progress, lang, monthId);
   const done = isMonthDone(progress, lang, monthId);
 
-  function isStepUnlocked(key) {
+  function isUnlocked(key) {
     if (isAdmin) return true;
-    const idx = STEP_ORDER.indexOf(key);
-    if (idx <= 0) return true;
-    return !!reviewFlags[STEP_ORDER[idx - 1]];
+    if (key === 'test') return STEP_KEYS.every((k) => reviewFlags[k]);
+    const idx = STEP_KEYS.indexOf(key);
+    return idx <= 0 || !!reviewFlags[STEP_KEYS[idx - 1]];
   }
-  const quizUnlocked = isAdmin || !!reviewFlags[STEP_ORDER[STEP_ORDER.length - 1]];
 
-  // Dars birinchi marta ochilganda (yoki foydalanuvchi "Lug'at mashqi"dan qaytganda) —
-  // hali bajarilmagan birinchi ochiq bosqichni avtomatik ochib qo'yadi, shunda
-  // foydalanuvchi har safar qo'lda qidirib o'tirmasin.
+  // Dars ochilganda — birinchi bajarilmagan bosqichni avtomatik tanlaymiz
   useEffect(() => {
     if (!month) return;
-    if (autoOpenedForRef.current === monthId) return;
-    autoOpenedForRef.current = monthId;
-    const firstIncomplete = STEP_ORDER.find((k) => !reviewFlags[k]);
-    setOpenKey(firstIncomplete || null);
+    const first = STEP_KEYS.find((k) => !reviewFlags[k]);
+    setStepKey(first || 'test');
+    setVocabView('list');
+    api.listMedia({ lang, lessonRef: monthId }).then(setMaterials).catch(() => setMaterials([]));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [month, monthId]);
+  }, [month?.id]);
 
-  function toggleStep(key) {
-    if (!isStepUnlocked(key)) return;
-    setOpenKey((cur) => (cur === key ? null : key));
+  function goto(key) {
+    if (!isUnlocked(key)) return;
+    setStepKey(key);
+    topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // Bosqichni "bajarildi" deb belgilaydi va navbatdagi hali bajarilmagan bosqichga
-  // avtomatik o'tadi (agar hammasi bajarilgan bo'lsa — akkordionni yopadi).
-  function advanceToNext(key) {
-    const newFlags = { ...reviewFlags, [key]: true };
-    updateProgress((prev) => {
-      const reviewFlagsAll = { ...(prev.reviewFlags || {}) };
-      const langMap = { ...(reviewFlagsAll[lang] || {}) };
-      const monthFlags = { ...(langMap[monthId] || {}) };
-      monthFlags[key] = true;
-      langMap[monthId] = monthFlags;
-      reviewFlagsAll[lang] = langMap;
-      return { ...prev, reviewFlags: reviewFlagsAll };
-    });
-    const idx = STEP_ORDER.indexOf(key);
-    const next = STEP_ORDER.slice(idx + 1).find((k) => !newFlags[k]);
-    setOpenKey(next || null);
+  function completeAndNext(key) {
+    if (!reviewFlags[key]) {
+      updateProgress((prev) => {
+        const all = { ...(prev.reviewFlags || {}) };
+        const langMap = { ...(all[lang] || {}) };
+        langMap[monthId] = { ...(langMap[monthId] || {}), [key]: true };
+        all[lang] = langMap;
+        return withActivity({ ...prev, reviewFlags: all }, 10);
+      });
+    }
+    const idx = STEPS.findIndex((s) => s.key === key);
+    const next = STEPS[idx + 1];
+    if (next) {
+      setStepKey(next.key);
+      topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }
 
   if (error) {
     return (
       <Layout>
-        <div className="max-w-3xl mx-auto px-5 py-16 text-center" style={{ color: 'var(--brick)' }}>
-          {error}
+        <div className="page-narrow">
+          <div className="alert alert-error">{error}</div>
         </div>
       </Layout>
     );
   }
-
-  if (!data || !month) {
+  if (!data || !stepKey) return <Layout><PageLoading /></Layout>;
+  if (!month) {
     return (
       <Layout>
-        <div className="max-w-3xl mx-auto px-5 py-16 font-mono text-sm" style={{ color: 'var(--ink-soft)' }}>
-          Yuklanmoqda…
+        <div className="page-narrow">
+          <div className="alert alert-error">Dars topilmadi.</div>
         </div>
       </Layout>
     );
   }
 
-  function renderStepBody(key) {
-    if (key === 'grammar' && month.grammar) {
+  const flatIdx = flat.findIndex((m) => m.id === monthId);
+  const nextLesson = flat[flatIdx + 1];
+  const ratio = monthProgressRatio(progress, lang, monthId);
+  const stepIdx = STEPS.findIndex((s) => s.key === stepKey);
+  const step = STEPS[stepIdx];
+  const prevStep = STEPS[stepIdx - 1];
+  const nextStep = STEPS[stepIdx + 1];
+  const lessonItems = [
+    ...(month.vocab || []).map(([w, t, m]) => ({ w, t: t !== w ? t : '', m })),
+    ...(month.words || []).slice(0, 40).map(([w, m, s, st]) => ({ w, m, s, st })),
+  ];
+
+  function renderStep() {
+    if (stepKey === 'grammar') {
       return (
-        <div className="pt-1 pb-4 px-1">
-          <h3 className="font-display text-lg font-semibold mb-2" style={{ color: 'var(--ink)' }}>
-            {month.grammar.title}
-          </h3>
-          <p className="leading-relaxed mb-4 text-sm" style={{ color: 'var(--ink)' }}>
-            {month.grammar.text}
-          </p>
-          {month.grammar.examples?.length > 0 && (
-            <div className="space-y-1.5">
-              {month.grammar.examples.map((ex, i) => (
-                <div key={i} className="font-mono text-sm flex gap-2">
-                  <span style={{ color: 'var(--pine)' }}>{ex[0]}</span>
-                  <span style={{ color: 'var(--ink-soft)' }}>— {ex[1]}</span>
+        <>
+          {month.tasks?.length > 0 && (
+            <div className="card-soft p-4 mb-5">
+              <div className="text-[11px] font-bold uppercase tracking-wider muted mb-2">🎯 Dars maqsadlari</div>
+              <ul className="space-y-1.5">
+                {month.tasks.map((t, i) => (
+                  <li key={i} className="flex gap-2 text-sm" style={{ color: 'var(--ink)' }}>
+                    <span style={{ color: 'var(--gold)' }}>●</span>
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {month.grammar && (
+            <>
+              <h3 className="h2 mb-2">{month.grammar.title}</h3>
+              <p className="leading-relaxed mb-4 text-[15px]" style={{ color: 'var(--ink)' }}>
+                {month.grammar.text}
+              </p>
+              {month.grammar.examples?.length > 0 && (
+                <div className="space-y-2">
+                  {month.grammar.examples.map((ex, i) => (
+                    <div key={i} className="flex items-center gap-3 rounded-xl px-3.5 py-2.5" style={{ background: 'var(--pine-soft)' }}>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold" style={{ color: 'var(--ink)' }}>
+                          {ex[0]}
+                        </div>
+                        {readingHint(ex[0], lang) && <div className="font-mono text-[11px] faint">{readingHint(ex[0], lang)}</div>}
+                        <div className="text-sm muted">{ex[1]}</div>
+                      </div>
+                      <SpeakButton text={ex[0].replace(/[A-ZА-Я]{2,}/g, (s) => s.toLowerCase())} lang={lang} />
+                    </div>
+                  ))}
+                </div>
+              )}
+              <GrammarMore items={month.grammar.more} />
+              <AiTaskWidget
+                type="text"
+                content={`${month.grammar.title}\n${month.grammar.text}\n${(month.grammar.examples || []).map((ex) => ex.join(' — ')).join('\n')}`}
+                lang={lang}
+                title="Grammatika bo'yicha AI vazifa"
+              />
+            </>
+          )}
+        </>
+      );
+    }
+
+    if (stepKey === 'vocab') {
+      return (
+        <>
+          <div className="tabs mb-4">
+            {[
+              ['list', "📋 Ro'yxat"],
+              ['cards', '🃏 Kartochkalar'],
+            ].map(([k, l]) => (
+              <button key={k} type="button" className={`chip ${vocabView === k ? 'chip-active' : ''}`} onClick={() => setVocabView(k)}>
+                {l}
+              </button>
+            ))}
+            <Link to={`/lang/${lang}/practice-full?source=lesson&lesson=${monthId}`} className="chip">
+              🔀 Mashq qilish
+            </Link>
+          </div>
+          {vocabView === 'cards' ? (
+            <Flashcards items={lessonItems} lang={lang} />
+          ) : (
+            <div className="grid sm:grid-cols-2 gap-2.5">
+              {month.vocab.map(([word, translit, meaning], i) => (
+                <div key={i} className="card-soft p-3.5 flex items-start gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-display font-semibold text-[17px]" style={{ color: 'var(--ink)' }}>
+                      {word}
+                    </div>
+                    {translit && translit !== word && (
+                      <div className="font-mono text-xs mb-0.5" style={{ color: 'var(--gold)' }}>
+                        {translit}
+                      </div>
+                    )}
+                    <div className="text-sm muted">{meaning}</div>
+                  </div>
+                  <SpeakButton text={word} lang={lang} />
                 </div>
               ))}
             </div>
           )}
-          <GrammarMore items={month.grammar.more} />
-          <AiTaskWidget
-            type="text"
-            content={`${month.grammar.title}\n${month.grammar.text}\n${(month.grammar.examples || []).map((ex) => ex.join(' — ')).join('\n')}`}
-            lang={lang}
-          />
-          {!reviewFlags.grammar && (
-            <NextStepButton onClick={() => advanceToNext('grammar')} label="Grammatikani o'rgandim, keyingisi →" />
-          )}
-        </div>
+          <WordsExplorer words={month.words} phrases={month.phrases} lang={lang} wordCats={data.wordCats} phraseCats={data.phraseCats} />
+          <AiTaskWidget type="text" content={`Bu darsning so'zlari:\n${month.vocab.map(([w, , m]) => `${w} — ${m}`).join('\n')}`} lang={lang} title="So'zlar bo'yicha AI vazifa" />
+        </>
       );
     }
 
-    if (key === 'vocab') {
-      const attempted = !!quizResult;
+    if (stepKey === 'dialog') {
       return (
-        <div className="pt-1 pb-4 px-1">
-          <div className="grid sm:grid-cols-2 gap-3 mb-4">
-            {month.vocab.map(([word, translit, meaning], i) => (
-              <div
-                key={i}
-                className="rounded-xl border p-3.5 flex items-start gap-3"
-                style={{ borderColor: 'var(--line)', background: 'var(--paper)' }}
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="font-display font-semibold" style={{ color: 'var(--ink)' }}>
-                    {word}
-                  </div>
-                  <div className="font-mono text-xs mb-1" style={{ color: 'var(--gold)' }}>
-                    {translit}
-                  </div>
-                  <div className="text-sm" style={{ color: 'var(--ink-soft)' }}>
-                    {meaning}
-                  </div>
-                </div>
-                <SpeakButton text={word} lang={lang} />
-              </div>
-            ))}
-          </div>
-
-          <WordsExplorer words={month.words} phrases={month.phrases} lang={lang} />
-          <AiTaskWidget
-            type="text"
-            content={`Bu oyning so'zlari:\n${month.vocab.map(([w, , m]) => `${w} — ${m}`).join('\n')}`}
-            lang={lang}
-          />
-
-          {!attempted ? (
-            <div className="rounded-xl border p-4 text-center" style={{ borderColor: 'var(--gold)', background: 'var(--gold-soft)' }}>
-              <div className="font-mono text-[11px] uppercase tracking-widest mb-2" style={{ color: 'var(--gold)' }}>
-                Majburiy qadam
-              </div>
-              <p className="text-sm mb-4" style={{ color: 'var(--ink)' }}>
-                Davom etishdan oldin, yuqoridagi so'zlarni yodda saqlab, lug'at mashqini bajaring.
-              </p>
-              <Link
-                to={`/lang/${lang}/practice/${moduleId}/${monthId}`}
-                className="inline-block px-6 py-3 rounded-xl font-mono text-sm uppercase tracking-widest font-semibold cursor-pointer"
-                style={{ background: 'var(--gold)', color: 'var(--panel)' }}
-              >
-                🔀 Lug'at mashqini boshlash
-              </Link>
-            </div>
-          ) : (
-            <div className="rounded-xl border p-4" style={{ borderColor: 'var(--pine)', background: 'var(--success-bg)' }}>
-              <div className="flex items-center justify-between gap-3 flex-wrap">
-                <div className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>
-                  ✅ Lug'at mashqi bajarildi — natija: {quizPct}%
-                </div>
-                <Link
-                  to={`/lang/${lang}/practice/${moduleId}/${monthId}`}
-                  className="font-mono text-xs uppercase tracking-widest px-3 py-2 rounded-lg cursor-pointer"
-                  style={{ background: 'var(--panel)', color: 'var(--ink-soft)', border: '1px solid var(--line)' }}
-                >
-                  Qayta mashq qilish
-                </Link>
-              </div>
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    if (key === 'dialog' && month.dialog) {
-      return (
-        <div className="pt-1 pb-4 px-1">
-          <h3 className="font-display text-lg font-semibold mb-3" style={{ color: 'var(--ink)' }}>
-            {month.dialog.title}
-          </h3>
-          <div className="space-y-3">
-            {month.dialog.lines.map(([speaker, line, tr], i) => (
-              <div key={i} className="flex gap-3 items-start">
-                <span
-                  className="font-mono text-xs w-6 h-6 rounded-full flex items-center justify-center shrink-0"
-                  style={{ background: 'var(--paper-soft)', color: 'var(--ink-soft)' }}
-                >
-                  {speaker}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <div style={{ color: 'var(--ink)' }}>{line}</div>
-                  <div className="text-sm" style={{ color: 'var(--ink-soft)' }}>
-                    {tr}
-                  </div>
-                </div>
-                <SpeakButton text={line} lang={lang} />
-              </div>
-            ))}
-          </div>
+        <>
+          {month.dialog && <DialogView title={month.dialog.title} lines={month.dialog.lines} lang={lang} />}
           <DialogExtra dialog={month.dialog2} lang={lang} />
           <ReadingBlock reading={month.reading} lang={lang} />
-          <AiTaskWidget
-            type="dialog"
-            content={`${month.dialog.title}\n${month.dialog.lines.map(([s, l, tr]) => `${s}: ${l} (${tr})`).join('\n')}`}
-            lang={lang}
-          />
-          {!reviewFlags.dialog && (
-            <NextStepButton onClick={() => advanceToNext('dialog')} label="Dialogni ko'rib chiqdim, keyingisi →" />
+          {month.dialog && (
+            <AiTaskWidget
+              type="dialog"
+              content={`${month.dialog.title}\n${month.dialog.lines.map(([s, l, tr]) => `${s}: ${l} (${tr})`).join('\n')}`}
+              lang={lang}
+              title="Dialog bo'yicha AI vazifa"
+            />
           )}
-        </div>
+        </>
       );
     }
 
-    if (key === 'exercises') {
-      const savedAnswers = progress.exerciseAnswers?.[lang]?.[monthId] || {};
-      function saveAnswer(i, text) {
+    if (stepKey === 'exercises') {
+      const saved = progress.exerciseAnswers?.[lang]?.[monthId] || {};
+      const saveAnswer = (i, text) =>
         updateProgress((prev) => {
           const all = { ...(prev.exerciseAnswers || {}) };
           const langMap = { ...(all[lang] || {}) };
-          const monthMap = { ...(langMap[monthId] || {}) };
-          monthMap[i] = text;
-          langMap[monthId] = monthMap;
+          langMap[monthId] = { ...(langMap[monthId] || {}), [i]: text };
           all[lang] = langMap;
           return { ...prev, exerciseAnswers: all };
         });
-      }
       return (
-        <div className="pt-1 pb-4 px-1">
-          <ol className="space-y-3">
-            {month.exercises?.map((ex, i) => (
-              <ExerciseItem
-                key={i}
-                index={i}
-                question={ex}
-                answer={month.answers?.[i]}
-                savedValue={savedAnswers[i]}
-                onSave={(text) => saveAnswer(i, text)}
-              />
-            ))}
-          </ol>
-          <AiTaskWidget
-            type="text"
-            content={`Mashqlar:\n${(month.exercises || []).join('\n')}`}
-            lang={lang}
-          />
-          {!reviewFlags.exercises && (
-            <NextStepButton onClick={() => advanceToNext('exercises')} label="Mashqlarni bajardim, keyingisi →" />
-          )}
-        </div>
+        <ol className="space-y-3">
+          {month.exercises?.map((ex, i) => (
+            <ExerciseItem key={i} index={i} question={ex} answer={month.answers?.[i]} savedValue={saved[i]} onSave={(t) => saveAnswer(i, t)} lang={lang} />
+          ))}
+        </ol>
       );
     }
 
-    if (key === 'answers') {
+    if (stepKey === 'answers') {
       return (
-        <div className="pt-1 pb-4 px-1">
-          <ol className="space-y-2">
-            {month.answers?.map((a, i) => (
-              <li
-                key={i}
-                className="rounded-xl border p-3.5 flex gap-3 text-sm"
-                style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
-              >
-                <span className="font-mono shrink-0" style={{ color: 'var(--pine)' }}>
-                  {String(i + 1).padStart(2, '0')}
-                </span>
+        <ol className="space-y-2">
+          {month.answers?.map((a, i) => (
+            <li key={i} className="card-soft p-3.5 flex gap-3 text-[15px]" style={{ color: 'var(--ink)' }}>
+              <span className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0" style={{ background: 'var(--pine-soft)', color: 'var(--pine)' }}>
+                {i + 1}
+              </span>
+              <div className="flex-1">
+                <div className="text-xs muted mb-0.5">{month.exercises?.[i]}</div>
                 {a}
-              </li>
-            ))}
-          </ol>
-          {!reviewFlags.answers && (
-            <NextStepButton onClick={() => advanceToNext('answers')} label="Javoblarni tekshirdim, keyingisi →" />
-          )}
-        </div>
+              </div>
+            </li>
+          ))}
+        </ol>
       );
     }
 
-    if (key === 'teacher') {
+    if (stepKey === 'teacher') {
       return (
-        <div className="pt-1 pb-4 px-1">
-          <div
-            className="rounded-xl border p-4 leading-relaxed text-sm"
-            style={{ borderColor: 'var(--line)', background: 'var(--paper)', color: 'var(--ink)' }}
-          >
+        <>
+          <div className="card-soft p-4 leading-relaxed text-[15px]" style={{ color: 'var(--ink)' }}>
             {month.teacher}
           </div>
-          <AiTaskWidget type="text" content={month.teacher || ''} lang={lang} />
-          {!reviewFlags.teacher && (
-            <NextStepButton onClick={() => advanceToNext('teacher')} label="O'qidim, testga o'tish →" />
-          )}
-        </div>
+          <button type="button" className="btn btn-soft mt-4" onClick={() => ask(`"${month.topic}" mavzusi bo'yicha qanday qilib samarali mashq qilsam bo'ladi? Menga reja tuzib ber.`)}>
+            🤖 AI ustozdan shaxsiy reja so'rash
+          </button>
+        </>
       );
     }
 
-    return null;
+    // TEST
+    return (
+      <div className="text-center py-4">
+        <div className="text-5xl mb-3">{quizPassed ? '🏆' : '🧪'}</div>
+        <h3 className="h2 mb-2">{quizPassed ? 'Test topshirildi!' : 'Yakuniy test'}</h3>
+        <p className="muted max-w-md mx-auto mb-5">
+          Dars so'zlari bo'yicha aralash test (tanlash, tinglash, yozish). Darsni yakunlash uchun kamida {QUIZ_PASS_THRESHOLD}% to'g'ri javob kerak.
+          {quizPct !== null && (
+            <>
+              <br />
+              Oxirgi natija: <b style={{ color: quizPassed ? 'var(--pine)' : 'var(--brick)' }}>{quizPct}%</b>
+            </>
+          )}
+        </p>
+        <div className="flex flex-wrap justify-center gap-2">
+          <Link to={`/lang/${lang}/practice/${moduleId}/${monthId}`} className="btn btn-brand btn-lg">
+            {quizPct === null ? 'Testni boshlash →' : '↺ Qayta topshirish'}
+          </Link>
+          {done && nextLesson && (
+            <button type="button" className="btn btn-primary btn-lg" onClick={() => navigate(`/lang/${lang}/month/${nextLesson.moduleId}/${nextLesson.id}`)}>
+              Keyingi dars: {nextLesson.topic} →
+            </button>
+          )}
+        </div>
+        {done && <div className="alert alert-success mt-6 inline-block">🎉 Dars to'liq yakunlandi — keyingi dars ochildi!</div>}
+      </div>
+    );
   }
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto px-5 py-10">
-        <Link to={`/lang/${lang}`} className="font-mono text-xs uppercase tracking-widest" style={{ color: 'var(--ink-soft)' }}>
+      <div className="page" ref={topRef}>
+        <Link to={`/lang/${lang}`} className="back-link mb-3">
           ← {mod.title}
         </Link>
 
-        <div className="mt-4 mb-6">
-          <div className="font-mono text-xs tracking-widest uppercase mb-1" style={{ color: 'var(--gold)' }}>
-            {month.label}
+        <div className="flex flex-wrap items-start gap-4 mb-5">
+          <div className="flex-1 min-w-[220px]">
+            <div className="eyebrow mb-1">
+              {data.meta.flag} {month.label}
+            </div>
+            <h1 className="h1">{month.topic}</h1>
           </div>
-          <h1 className="font-display text-3xl font-semibold" style={{ color: 'var(--ink)' }}>
-            {month.topic}
-          </h1>
+          <button type="button" className="btn btn-soft" onClick={() => ask('')}>
+            🤖 Ustozdan so'rash
+          </button>
+        </div>
+        <div className="flex items-center gap-3 mb-4">
+          <ProgressBar value={ratio * 100} className="flex-1" />
+          <span className="text-xs font-bold" style={{ color: 'var(--pine)' }}>
+            {Math.round(ratio * 100)}%
+          </span>
         </div>
 
-        {done ? (
-          <div
-            className="rounded-xl border p-4 mb-6 text-center font-mono text-xs uppercase tracking-widest"
-            style={{ borderColor: 'var(--pine)', background: 'var(--pine)', color: 'var(--paper)' }}
-          >
-            🎉 Dars to'liq yakunlandi — keyingi dars ochildi!
-          </div>
-        ) : (
-          <div
-            className="rounded-xl border p-4 mb-6 text-sm"
-            style={{ borderColor: 'var(--line)', background: 'var(--panel)', color: 'var(--ink-soft)' }}
-          >
-            Dars bosqichlari qat'iy ketma-ketlikda ochiladi: grammatika → lug'at (+ majburiy
-            lug'at mashqi) → dialog → mashqlar → javoblar → o'qituvchiga. Har birini to'liq
-            ko'rib chiqib, "Keyingisi" tugmasini bosing — keyingi bosqich avtomatik ochiladi.
-            Oxirida testdan kamida 60% ball oling.
-          </div>
-        )}
-
-        {month.tasks?.length > 0 && (
-          <div className="rounded-xl border p-4 mb-6" style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}>
-            <div className="font-mono text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--ink-soft)' }}>
-              Oy vazifalari
-            </div>
-            <ul className="space-y-1.5">
-              {month.tasks.map((t, i) => (
-                <li key={i} className="flex gap-2 text-sm" style={{ color: 'var(--ink)' }}>
-                  <span className="font-mono" style={{ color: 'var(--gold)' }}>
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  {t}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* Ketma-ket, majburiy tartibda ochiladigan bosqichlar — akkordion */}
-        <div className="space-y-3">
-          {STEPS.map((item) => {
-            const on = !!reviewFlags[item.key];
-            const unlocked = isStepUnlocked(item.key);
-            const open = openKey === item.key;
+        {/* Bosqichlar navigatsiyasi */}
+        <div className="tabs mb-5 -mx-1 px-1">
+          {STEPS.map((s, i) => {
+            const isDone = s.key === 'test' ? quizPassed : !!reviewFlags[s.key];
+            const unlocked = isUnlocked(s.key);
+            const active = s.key === stepKey;
             return (
-              <div
-                key={item.key}
-                className="rounded-xl border overflow-hidden transition-colors"
+              <button
+                key={s.key}
+                type="button"
+                disabled={!unlocked}
+                onClick={() => goto(s.key)}
+                className="flex items-center gap-2 rounded-2xl px-3 py-2 shrink-0 border transition-colors disabled:cursor-not-allowed"
                 style={{
-                  borderColor: open ? 'var(--pine)' : on ? 'var(--pine)' : 'var(--line)',
-                  background: on ? 'var(--success-bg)' : 'var(--panel)',
+                  background: active ? 'var(--pine)' : isDone ? 'var(--pine-soft)' : 'var(--panel)',
+                  color: active ? '#fff' : isDone ? 'var(--pine)' : unlocked ? 'var(--ink)' : 'var(--ink-faint)',
+                  borderColor: active ? 'var(--pine)' : 'var(--line)',
+                  opacity: unlocked ? 1 : 0.6,
                 }}
               >
-                <button
-                  disabled={!unlocked}
-                  onClick={() => toggleStep(item.key)}
-                  className="w-full p-3.5 flex items-center gap-3 text-left transition-colors"
-                  style={{ opacity: unlocked ? 1 : 0.5, cursor: unlocked ? 'pointer' : 'not-allowed' }}
-                >
-                  <span className="text-xl shrink-0">{unlocked ? item.icon : '🔒'}</span>
-                  <span className="flex-1 min-w-0 text-sm font-semibold" style={{ color: 'var(--ink)' }}>
-                    {item.label}
-                  </span>
-                  <span
-                    className="w-6 h-6 rounded-full flex items-center justify-center font-mono text-xs shrink-0"
-                    style={{ background: on ? 'var(--pine)' : 'var(--paper-soft)', color: on ? 'var(--paper)' : 'var(--ink-soft)' }}
-                  >
-                    {on ? '✓' : '○'}
-                  </span>
-                  <span className="font-mono text-xs shrink-0" style={{ color: 'var(--ink-soft)' }}>
-                    {unlocked ? (open ? '▲' : '▼') : ''}
-                  </span>
-                </button>
-                {open && unlocked && (
-                  <div className="border-t" style={{ borderColor: 'var(--line)' }}>
-                    {renderStepBody(item.key)}
-                  </div>
-                )}
-              </div>
+                <span className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold" style={{ background: active ? 'rgba(255,255,255,.2)' : 'var(--paper-soft)' }}>
+                  {isDone ? '✓' : unlocked ? i + 1 : '🔒'}
+                </span>
+                <span className="text-sm font-bold whitespace-nowrap">
+                  {s.icon} {s.label}
+                </span>
+              </button>
             );
           })}
-
-          {quizUnlocked ? (
-            <Link
-              to={`/lang/${lang}/practice/${moduleId}/${monthId}`}
-              className="rounded-xl border p-3.5 flex items-center gap-3 text-left cursor-pointer transition-colors"
-              style={{
-                borderColor: quizPassed ? 'var(--pine)' : 'var(--line)',
-                background: quizPassed ? 'var(--success-bg)' : 'var(--panel)',
-              }}
-            >
-              <span className="text-xl shrink-0">🧪</span>
-              <span className="flex-1 min-w-0 text-sm font-semibold" style={{ color: 'var(--ink)' }}>
-                Test (kamida 60%)
-                <span className="block font-mono text-[11px] font-normal mt-0.5" style={{ color: 'var(--ink-soft)' }}>
-                  {quizPct === null ? 'Hali topshirilmagan' : `Oxirgi natija: ${quizPct}%`}
-                </span>
-              </span>
-              <span
-                className="w-6 h-6 rounded-full flex items-center justify-center font-mono text-xs shrink-0"
-                style={{ background: quizPassed ? 'var(--pine)' : 'var(--paper-soft)', color: quizPassed ? 'var(--paper)' : 'var(--ink-soft)' }}
-              >
-                {quizPassed ? '✓' : '○'}
-              </span>
-            </Link>
-          ) : (
-            <div
-              className="rounded-xl border p-3.5 flex items-center gap-3 text-left opacity-50"
-              style={{ borderColor: 'var(--line)', background: 'var(--panel)', cursor: 'not-allowed' }}
-            >
-              <span className="text-xl shrink-0">🔒</span>
-              <span className="flex-1 min-w-0 text-sm font-semibold" style={{ color: 'var(--ink)' }}>
-                Test (kamida 60%)
-                <span className="block font-mono text-[11px] font-normal mt-0.5" style={{ color: 'var(--ink-soft)' }}>
-                  Avval barcha bosqichlarni yakunlang
-                </span>
-              </span>
-            </div>
-          )}
         </div>
+
+        {materials.length > 0 && (
+          <div className="card-soft p-3 mb-5 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold uppercase tracking-wider muted mr-1">📎 Dars materiallari:</span>
+            {materials.map((m) => (
+              <button key={m.id} type="button" className="chip !py-1.5" onClick={() => setOpenMaterial(m)}>
+                {MEDIA_META[m.kind]?.icon} {m.title}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="card p-4 sm:p-6 anim-rise" key={stepKey}>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-2xl">{step.icon}</span>
+            <h2 className="h2 flex-1">{step.label}</h2>
+            <span className="text-xs muted">
+              {stepIdx + 1}/{STEPS.length}
+            </span>
+          </div>
+          {renderStep()}
+        </div>
+
+        {/* Pastki navigatsiya */}
+        {stepKey !== 'test' && (
+          <div className="sticky-actions -mx-5 px-5 py-3 mt-5">
+            <div className="flex gap-2 max-w-[1120px] mx-auto">
+              {prevStep && (
+                <button type="button" className="btn btn-ghost btn-lg" onClick={() => goto(prevStep.key)}>
+                  ←<span className="hidden sm:inline"> {prevStep.label}</span>
+                </button>
+              )}
+              <button type="button" className="btn btn-brand btn-lg flex-1" onClick={() => completeAndNext(stepKey)}>
+                {reviewFlags[stepKey] ? `Keyingisi: ${nextStep?.label} →` : `✓ ${step.done}, keyingisi →`}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
+
+      <Modal open={!!openMaterial} onClose={() => setOpenMaterial(null)} title={openMaterial?.title} wide>
+        {openMaterial && <MediaViewer item={openMaterial} />}
+      </Modal>
     </Layout>
   );
 }
