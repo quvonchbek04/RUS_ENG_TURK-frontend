@@ -202,51 +202,30 @@ let countsCache = null;
 export const api = {
   // ---------------- AUTH ----------------
   /** Email va/yoki telefon bilan ro'yxatdan o'tish (kamida bittasi kerak).
+   *  Email kiritilsa — emailga yuborilgan 6 xonali kod (`code`) majburiy; faqat telefon bilan o'tilsa kod so'ralmaydi.
    *  Ikkalasi kiritilsa — keyin istalgani bilan kirish mumkin. */
-  register: async ({ email, phone, password, displayName }) => {
+  register: async ({ email, phone, password, displayName, code }) => {
     if (String(password || '').length < 6) throw new Error("Parol kamida 6 belgidan iborat bo'lishi kerak");
     const e = String(email || '').trim().toLowerCase();
     const phoneRaw = String(phone || '').trim();
     const hasPhone = phoneRaw.replace(/\D/g, '').length > 3; // "+998 " yolg'iz qolsa — bo'sh hisoblanadi
     if (!e && !hasPhone) throw new Error('Email yoki telefon raqamidan kamida bittasini kiriting');
 
-    const meta = {};
-    let d = null;
-    if (hasPhone) {
-      d = normalizePhone(phoneRaw);
-      if (!d) throw new Error("Telefon raqamini to'g'ri kiriting (masalan: +998 90 123 45 67)");
-      meta.phone = '+' + d;
-      const { data: available, error: rpcErr } = await supabase.rpc('phone_available', { p_phone: meta.phone });
-      if (!rpcErr && available === false) {
-        throw new Error("Bu telefon raqami allaqachon ro'yxatdan o'tgan. Kirish sahifasidan foydalaning.");
-      }
-    }
-    let authEmail;
-    if (e) {
-      if (!isValidEmail(e)) throw new Error("Email manzilini to'g'ri kiriting (masalan: ism@gmail.com)");
-      if (isSyntheticEmail(e)) throw new Error("Bu email manzilidan foydalanib bo'lmaydi");
-      authEmail = e;
-      meta.username = e.split('@')[0].replace(/[^a-zA-Z0-9_.-]/g, '').slice(0, 30) || 'user';
-    } else {
-      authEmail = `tel${d}@${SYNTH_DOMAIN}`;
-      meta.username = d;
-    }
-    meta.display_name = String(displayName || '').trim() || (d ? formatPhone(d) : meta.username);
+    if (hasPhone && !normalizePhone(phoneRaw)) throw new Error("Telefon raqamini to'g'ri kiriting (masalan: +998 90 123 45 67)");
+    if (e && !isValidEmail(e)) throw new Error("Email manzilini to'g'ri kiriting (masalan: ism@gmail.com)");
+    if (e && isSyntheticEmail(e)) throw new Error("Bu email manzilidan foydalanib bo'lmaydi");
+
+    // Hisob server tomonda yaratiladi: email bo'lsa — kod tekshiriladi, faqat telefon bo'lsa — kodsiz
+    const res = await callFunction('admin', { action: 'register', email: e, phone: hasPhone ? phoneRaw : '', password, displayName, code });
     setRemember(true);
-    const { data, error } = await supabase.auth.signUp({
-      email: authEmail,
-      password,
-      options: { data: meta, emailRedirectTo: `${window.location.origin}/login` },
-    });
-    if (error) throw new Error(authErrorMessage(error));
-    // Email tasdiqlash yoqilgan bo'lsa va email band bo'lsa Supabase "bo'sh" user qaytaradi
-    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
-      throw new Error("Bu email allaqachon ro'yxatdan o'tgan. Kirish sahifasidan foydalaning.");
-    }
-    if (!data.session) return { needsConfirmation: true, email: authEmail };
+    const { data, error } = await supabase.auth.signInWithPassword({ email: res.email, password });
+    if (error) throw new Error(authErrorMessage(error, "Hisob yaratildi, lekin kirishda xatolik. Kirish sahifasidan kiring."));
     const profile = await fetchProfile(data.user.id);
     return { user: publicProfile(profile) };
   },
+
+  /** Emailga 6 xonali tasdiqlash kodini yuboradi. purpose: 'register' | 'reset' | 'change-email' */
+  sendEmailCode: (email, purpose) => callFunction('admin', { action: 'send-email-code', email: String(email || '').trim().toLowerCase(), purpose }),
 
   login: async ({ identifier, password, remember = true }) => {
     const ident = resolveIdentifier(identifier);
@@ -305,14 +284,18 @@ export const api = {
     return { user: publicProfile(profile) };
   },
 
+  /** Parolni tiklash: 1) emailga kod yuboriladi; 2) kod + yangi parol bilan parol almashtiriladi. */
   requestPasswordReset: async (email) => {
     const e = String(email || '').trim().toLowerCase();
     if (!isValidEmail(e) || isSyntheticEmail(e)) {
       throw new Error("Parolni tiklash faqat email bilan ro'yxatdan o'tganlar uchun. Telefon orqali o'tgan bo'lsangiz, administratorga murojaat qiling.");
     }
-    const { error } = await supabase.auth.resetPasswordForEmail(e, { redirectTo: `${window.location.origin}/reset-password` });
-    if (error) throw new Error(authErrorMessage(error));
-    return { ok: true };
+    return callFunction('admin', { action: 'send-email-code', email: e, purpose: 'reset' });
+  },
+
+  resetPasswordWithCode: async ({ email, code, password }) => {
+    if (String(password || '').length < 6) throw new Error("Parol kamida 6 belgidan iborat bo'lishi kerak");
+    return callFunction('admin', { action: 'reset-with-code', email: String(email || '').trim().toLowerCase(), code, password });
   },
 
   updatePassword: async (password) => {
@@ -323,9 +306,10 @@ export const api = {
   },
 
   /** O'z email/telefonini qo'shish yoki almashtirish (server tomonda tekshiriladi). */
-  updateContact: async ({ email, phone }) => {
+  updateContact: async ({ email, phone, emailCode }) => {
     const payload = { action: 'update-my-contact' };
     if (email !== undefined) payload.email = email;
+    if (email !== undefined && emailCode) payload.emailCode = emailCode;
     if (phone !== undefined) payload.phone = phone;
     return callFunction('admin', payload);
   },
@@ -589,6 +573,9 @@ export const api = {
   aiChat: (payload) => callFunction('ai', { action: 'chat', ...payload }),
   aiExplain: (payload) => callFunction('ai', { action: 'explain', ...payload }),
   aiTestKey: (id) => callFunction('ai', { action: 'test-key', id }),
+  getMailSettings: () => callFunction('admin', { action: 'get-mail-settings' }),
+  saveMailSettings: (payload) => callFunction('admin', { action: 'save-mail-settings', ...payload }),
+  testMail: (to) => callFunction('admin', { action: 'test-mail', to }),
   getAiSettings: () => callFunction('admin', { action: 'get-ai-settings' }),
   saveAiSettings: (payload) => callFunction('admin', { action: 'save-ai-settings', ...payload }),
   listApiKeys: () => callFunction('admin', { action: 'list-api-keys' }),

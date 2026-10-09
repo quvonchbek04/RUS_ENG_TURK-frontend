@@ -1,7 +1,7 @@
 -- ============================================================================
 -- "Til sayohati" — TO'LIQ O'RNATISH (bitta fayl)
 -- Yangi Supabase loyihasida: SQL Editor → shu faylning butun matnini joylang → Run.
--- Ichida migrations/0001…0006 fayllar ketma-ket birlashtirilgan. Qayta ishga
+-- Ichida migrations/0001…0008 fayllar ketma-ket birlashtirilgan. Qayta ishga
 -- tushirish xavfsiz (barcha buyruqlar "if not exists" / "on conflict").
 -- Super admin yaratiladi: login = quvonchbek, parol = admin123
 -- ============================================================================
@@ -774,3 +774,74 @@ create table if not exists public.login_attempts (
 );
 alter table public.login_attempts enable row level security;
 -- Policy ataylab yozilmagan — klientdan butunlay yopiq.
+
+-- >>>>>>>>>>>>>>>>>>>> 0007_email_codes.sql <<<<<<<<<<<<<<<<<<<<
+-- ============================================================================
+-- "Til sayohati" — Email tasdiqlash kodlari (6 xonali, 10 daqiqa)
+-- 0006 dan KEYIN ishga tushiring (qayta ishga tushirish xavfsiz).
+--
+-- • Email bilan ro'yxatdan o'tganda, emailni almashtirganda va parolni
+--   tiklaganda emailga 6 xonali kod yuboriladi (Edge Function "admin").
+-- • Telefon bilan ro'yxatdan o'tishda kod so'ralmaydi.
+-- • Kodning o'zi bazada saqlanmaydi — faqat HMAC-xesh (maxfiy kalit bilan).
+-- • Jadvalga klientdan kirish butunlay yopiq (RLS yoqilgan, policy yo'q).
+-- ============================================================================
+
+create table if not exists public.email_codes (
+  email text not null,
+  purpose text not null check (purpose in ('register', 'reset', 'change-email')),
+  code_hash text not null,
+  attempts integer not null default 0,
+  expires_at timestamptz not null,
+  created_at timestamptz not null default now(),
+  primary key (email, purpose)
+);
+create index if not exists email_codes_expires_idx on public.email_codes (expires_at);
+alter table public.email_codes enable row level security;
+-- Policy ataylab yozilmagan — faqat service-role (Edge Function) kira oladi.
+
+-- Pochta xizmati sozlamalari (admin panel → "✉️ Email xizmati"). secure_settings klientdan yopiq.
+insert into public.secure_settings (key, value) values
+  ('mail_provider', 'brevo'),
+  ('mail_api_key', ''),
+  ('mail_from', ''),
+  ('mail_from_name', 'Til sayohati')
+on conflict (key) do nothing;
+
+-- >>>>>>>>>>>>>>>>>>>> 0008_users_super_only.sql <<<<<<<<<<<<<<<<<<<<
+-- ============================================================================
+-- "Til sayohati" — Foydalanuvchilar ma'lumoti FAQAT super adminga ko'rinadi
+-- 0007 dan KEYIN ishga tushiring (qayta ishga tushirish xavfsiz).
+--
+-- Oldin adminlar ham barcha profillar va o'quvchilar progressini o'qiy olardi.
+-- Endi: o'quvchi — faqat o'zinikini, super admin — hammasini ko'radi.
+-- Oddiy admin (o'qituvchi) materiallar va AI bilan ishlaydi, lekin boshqa
+-- foydalanuvchilar ma'lumotiga (hatto to'g'ridan-to'g'ri API so'rovi bilan ham) kira olmaydi.
+-- ============================================================================
+
+create or replace function public.is_super()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select coalesce((select role = 'superadmin' from public.profiles where id = auth.uid()), false);
+$$;
+
+-- profiles: o'zi yoki super admin
+drop policy if exists "profiles_select_self_or_admin" on public.profiles;
+drop policy if exists "profiles_select_self_or_super" on public.profiles;
+create policy "profiles_select_self_or_super" on public.profiles
+  for select using ((select auth.uid()) = id or (select public.is_super()));
+
+-- progress: o'zi (progress_select_own saqlanadi) yoki super admin
+drop policy if exists "progress_select_staff" on public.progress;
+drop policy if exists "progress_select_super" on public.progress;
+create policy "progress_select_super" on public.progress
+  for select using ((select public.is_super()));
+
+-- AI foydalanish hisobi: o'zi yoki super admin
+drop policy if exists "ai_usage_select" on public.ai_usage;
+create policy "ai_usage_select" on public.ai_usage
+  for select using ((select auth.uid()) = user_id or (select public.is_super()));

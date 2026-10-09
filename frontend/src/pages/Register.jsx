@@ -1,24 +1,43 @@
 import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { api } from '../lib/api.js';
+import CodeField, { useCooldown } from '../components/CodeField.jsx';
 import AuthShell, { PasswordInput } from './AuthShell.jsx';
 
 export default function Register() {
   const { register, user, booting } = useAuth();
   const navigate = useNavigate();
+  const [step, setStep] = useState('form'); // form | code
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('+998 ');
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
+  const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [confirmSent, setConfirmSent] = useState('');
+  const [resending, setResending] = useState(false);
+  const [cooldown, setCooldown] = useCooldown(0);
 
   if (!booting && user) return <Navigate to="/" replace />;
 
-  const hasEmail = email.trim().length > 0;
+  const cleanEmail = email.trim().toLowerCase();
+  const hasEmail = cleanEmail.length > 0;
   const hasPhone = phone.replace(/\D/g, '').length > 3;
+
+  async function finish(withCode) {
+    setLoading(true);
+    setError('');
+    try {
+      await register({ email: cleanEmail, phone, password, displayName, code: withCode });
+      navigate('/', { replace: true });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -31,11 +50,18 @@ export default function Register() {
       setError('Parollar bir xil emas');
       return;
     }
+    if (!hasEmail) {
+      // Faqat telefon — tasdiqlash kodi kerak emas
+      await finish('');
+      return;
+    }
+    // Email bor — avval emailga kod yuboramiz
     setLoading(true);
     try {
-      const res = await register({ email, phone, password, displayName });
-      if (res.needsConfirmation) setConfirmSent(res.email);
-      else navigate('/', { replace: true });
+      const res = await api.sendEmailCode(cleanEmail, 'register');
+      setCooldown(res?.cooldown || 60);
+      setCode('');
+      setStep('code');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -43,15 +69,51 @@ export default function Register() {
     }
   }
 
-  if (confirmSent) {
+  async function resend() {
+    setResending(true);
+    setError('');
+    try {
+      const res = await api.sendEmailCode(cleanEmail, 'register');
+      setCooldown(res?.cooldown || 60);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setResending(false);
+    }
+  }
+
+  if (step === 'code') {
     return (
-      <AuthShell eyebrow="Deyarli tayyor" title="Emailingizni tasdiqlang">
-        <div className="alert alert-success mb-5">
-          📧 <b>{confirmSent}</b> manziliga tasdiqlash xati yuborildi. Xatdagi havolani bosing, so'ng tizimga kiring.
-        </div>
-        <Link to="/login" className="btn btn-primary btn-block">
-          Kirish sahifasiga o'tish
-        </Link>
+      <AuthShell
+        eyebrow="Emailni tasdiqlang"
+        title="Kodni kiriting"
+        footer={
+          <button
+            type="button"
+            className="font-bold underline"
+            style={{ color: 'var(--pine)' }}
+            onClick={() => {
+              setStep('form');
+              setError('');
+            }}
+          >
+            ← Ma'lumotlarni o'zgartirish
+          </button>
+        }
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            finish(code);
+          }}
+          className="space-y-4"
+        >
+          <CodeField value={code} onChange={setCode} email={cleanEmail} cooldown={cooldown} onResend={resend} resending={resending} />
+          {error && <div className="alert alert-error">{error}</div>}
+          <button type="submit" disabled={loading || code.length !== 6} className="btn btn-brand btn-lg btn-block">
+            {loading ? <><span className="spinner" /> Tekshirilmoqda…</> : 'Tasdiqlash va hisob yaratish →'}
+          </button>
+        </form>
       </AuthShell>
     );
   }
@@ -79,7 +141,7 @@ export default function Register() {
           <label className="field">
             <span className="label flex items-center gap-2">
               📧 Email
-              {hasEmail && <span className="badge badge-pine">✓</span>}
+              {hasEmail && <span className="badge badge-gold">kod yuboriladi</span>}
             </span>
             <input
               value={email}
@@ -108,8 +170,8 @@ export default function Register() {
             />
           </label>
           <p className="text-xs muted leading-relaxed">
-            Kamida bittasini kiriting. <b>Ikkalasini ham kiritsangiz</b>, keyin email yoki telefon — qaysi biri qulay bo'lsa, shu bilan kirasiz.
-            Email parolni unutganda tiklash uchun ham kerak bo'ladi.
+            Kamida bittasini kiriting. <b>Email</b> kiritsangiz, unga 6 xonali tasdiqlash kodi yuboriladi; <b>telefon</b> uchun kod kerak emas.
+            Ikkalasini ham kiritsangiz, keyin qaysi biri qulay bo'lsa, shu bilan kirasiz.
           </p>
         </div>
 
@@ -125,7 +187,7 @@ export default function Register() {
         {error && <div className="alert alert-error">{error}</div>}
 
         <button type="submit" disabled={loading} className="btn btn-brand btn-lg btn-block">
-          {loading ? <><span className="spinner" /> Yaratilmoqda…</> : 'Biletni olish →'}
+          {loading ? <><span className="spinner" /> {hasEmail ? 'Kod yuborilmoqda…' : 'Yaratilmoqda…'}</> : hasEmail ? 'Kodni yuborish →' : 'Biletni olish →'}
         </button>
       </form>
     </AuthShell>

@@ -25,7 +25,9 @@ export function AuthProvider({ children }) {
     } catch {
       /* e'tiborsiz */
     }
-    setUser({ id: 'demo', username: 'demo', displayName: 'Demo foydalanuvchi', role: 'superadmin', createdAt: new Date().toISOString() });
+    // ?role=admin — oddiy admin ko'rinishini tekshirish uchun (faqat dev demo rejimida)
+    const role = /[?&]role=admin/.test(window.location.search) ? 'admin' : 'superadmin';
+    setUser({ id: 'demo', username: 'demo', displayName: 'Demo foydalanuvchi', role, createdAt: new Date().toISOString() });
     setProgress(saved);
     setBooting(false);
   }, [demo]);

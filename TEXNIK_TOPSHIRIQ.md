@@ -31,8 +31,8 @@ jihozlangan veb-platforma yaratish.
 |---|---|
 | Mehmon | Faqat kirish/ro'yxatdan o'tish sahifalarini ko'radi |
 | O'quvchi (`user`) | Darslar, mashqlar, materiallar, AI ustoz, o'z natijalari |
-| Admin (`admin`) | O'quvchi imkoniyatlari + o'quvchi qo'shish/o'chirish/bloklash, materiallarni yuklash va boshqarish, statistika |
-| Super admin (`superadmin`) | Admin imkoniyatlari + adminlarni qo'shish/o'chirish, rol berish, AI sozlamalari va API kalitlar |
+| Admin (`admin`) | O'quvchi imkoniyatlari + materiallarni yuklash va boshqarish, AI/Email holatini ko'rish, kontent statistikasi. **Foydalanuvchilarni ko'rmaydi** va boshqarmaydi (ro'yxat, email/telefon, progress, qo'shish, o'chirish, bloklash — hammasi yopiq) |
+| Super admin (`superadmin`) | Admin imkoniyatlari + **foydalanuvchilar bo'limi (faqat shu rol)**: ro'yxat, qo'shish/o'chirish, bloklash, parolni tiklash, admin tayinlash; AI sozlamalari, API kalitlar va Email xizmati |
 
 ---
 
@@ -50,11 +50,13 @@ jihozlangan veb-platforma yaratish.
  Brauzer / telefon (React SPA, Netlify)
    │  statik kontent: /content/meta.json, en.json, ru.json, tr.json
    │
-   ├── Supabase Auth ........ kirish, ro'yxatdan o'tish, sessiya, parol tiklash
-   ├── Supabase Postgres .... profiles, progress, media_items, settings, ai_usage (RLS bilan)
+   ├── Supabase Auth ........ kirish, sessiya (hisoblar `admin` funksiyasi orqali yaratiladi)
+   ├── Supabase Postgres .... profiles, progress, media_items, settings, ai_usage, email_codes (RLS bilan)
    ├── Supabase Storage ..... "media" bucket (audio, video, rasm)
    └── Edge Functions
-         ├── admin ......... foydalanuvchilar, rollar, bloklash, AI sozlamalari, API kalitlar
+         ├── admin ......... ro'yxatdan o'tish + email kodlari, kirish, foydalanuvchilar (faqat super admin),
+         │                   rollar, AI sozlamalari, API kalitlar, Email xizmati
+         │                     └──> Brevo / Resend (HTTP API) — tasdiqlash kodlarini yuboradi
          └── ai ............ AI ustoz: vazifa, tekshiruv, chat, tushuntirish, kalitni sinash
                                └──> Gemini / OpenAI / Groq / OpenRouter / DeepSeek
 ```
@@ -70,12 +72,16 @@ sahifalarni tez ochadi. Foydalanuvchi progressi bitta `progress.state` (jsonb) m
 | № | Talab |
 |---|---|
 | F-1.1 | Ro'yxatdan o'tish formasida **email va telefon raqami bir vaqtda** kiritiladi (kamida bittasi majburiy, ikkalasi ham mumkin). Boshqa maydonlar: ism, parol (≥ 6 belgi), parolni takrorlash |
+| F-1.1a | **Email kiritilgan bo'lsa** (email yoki email + telefon): hisob ochilishidan oldin emailga **6 xonali tasdiqlash kodi** yuboriladi; foydalanuvchi kodni kiritgandan keyingina hisob yaratiladi. Kod 10 daqiqa amal qiladi, 5 marta noto'g'ri kiritish mumkin, qayta yuborish 60 soniyadan keyin |
+| F-1.1b | **Faqat telefon kiritilgan bo'lsa**: tasdiqlash kodi **talab qilinmaydi** (SMS yuborilmaydi) — hisob darhol ochiladi |
+| F-1.1c | Kodni **server o'zi avtomatik** yaratadi (kriptografik tasodifiy raqam) va yuboradi — admin yoki AI ishtiroki shart emas, admin tizimda bo'lmasa ham 24 soat ishlaydi. Kod bazada faqat HMAC-xesh ko'rinishida saqlanadi. Himoya: bitta IP dan soatiga ≤ 15 ta kod so'rovi, bitta emailga soatiga ≤ 5 ta kod; ro'yxatdan o'tish va parol tiklash urinishlari IP bo'yicha soatiga ≤ 20 |
+| F-1.1d | Yuborish xizmati (Brevo yoki Resend, HTTP API) super admin tomonidan «✉️ Email xizmati» bo'limida bir marta sozlanadi; sozlanmaguncha email bilan ro'yxatdan o'tish o'chiq, telefon bilan esa ishlaydi. API kalit klientga chiqmaydi (faqat maskalangan ko'rinadi) |
 | F-1.2 | Telefon raqami normallashtiriladi (9 xonali raqamga `998` qo'shiladi, `+998XXXXXXXXX` ko'rinishida saqlanadi). Bitta raqam faqat bitta hisobga biriktiriladi (band bo'lsa formada darhol aytiladi). Faqat telefon kiritilgan bo'lsa, ichki email `tel998XXXXXXXXX@til-sayohati.app` yaratiladi |
 | F-1.3 | Kirish bitta maydon orqali: **email, telefon raqami yoki login — qaysi biri qulay bo'lsa**. Email bilan ochilgan hisobga telefon/login bilan kirilganda, server (`admin` funksiyasi, `login` amali) telefon/login bo'yicha emailni topadi va kirishni o'zi bajaradi — emaillar klientga oshkor bo'lmaydi |
-| F-1.3a | Profil sahifasida foydalanuvchi email va telefonni keyin ham qo'shishi yoki almashtirishi mumkin (kamida bitta kirish usuli qolishi shart) |
+| F-1.3a | Profil sahifasida foydalanuvchi email va telefonni keyin ham qo'shishi yoki almashtirishi mumkin (kamida bitta kirish usuli qolishi shart). Email qo'shish/almashtirish ham emailga yuborilgan kod bilan tasdiqlanadi; telefon kodsiz |
 | F-1.3b | Bitta login/email/telefon uchun 15 daqiqada 10 marta noto'g'ri parol kiritilsa, 15 daqiqaga vaqtincha qulflanadi |
 | F-1.4 | «Meni eslab qol» — belgilansa sessiya brauzer yopilganda ham saqlanadi |
-| F-1.5 | Email orqali ro'yxatdan o'tganlar uchun parolni tiklash (havola emailga yuboriladi, `/reset-password` sahifasida yangi parol) |
+| F-1.5 | Emaili bor foydalanuvchilar uchun parolni tiklash: `/reset-password` sahifasida email kiritiladi → emailga 6 xonali kod keladi → kod va yangi parol kiritiladi (havola emas, kod). Faqat telefon bilan ochilgan hisobda email yo'q — parolni super admin tiklaydi |
 | F-1.6 | Bloklangan foydalanuvchi tizimga kira olmaydi |
 | F-1.7 | Yangi foydalanuvchining roli doim `user` (rol ro'yxatdan o'tish ma'lumotidan olinmaydi) |
 | F-1.8 | Super admin `quvonchbek / admin123` SQL o'rnatish vaqtida avtomatik yaratiladi; qayta o'rnatishda o'chirilmaydi, paroli o'zgartirilmaydi |
@@ -155,11 +161,12 @@ sahifalarni tez ochadi. Foydalanuvchi progressi bitta `progress.state` (jsonb) m
 ### 3.8. Admin panel
 | № | Talab |
 |---|---|
-| F-8.1 | **Statistika:** foydalanuvchilar, shu hafta yangi, bugun faol, adminlar, bugungi AI so'rovlar, faol kalitlar, materiallar; kurs kontenti jadvali (tillar bo'yicha) |
-| F-8.0 | **Admin panel bosh ko'rinishi:** katta oynalar — **👥 Foydalanuvchilar** (jami, o'quvchilar, adminlar, bugun faol, shu hafta yangi), AI va API kalitlar, Materiallar; so'nggi ro'yxatdan o'tganlar; tezkor amallar. Oyna bosilganda tegishli bo'lim ochiladi |
-| F-8.1a | **«👥 Foydalanuvchilar» oynasi** chap menyuning «Boshqaruv» bo'limida ham alohida punkt sifatida turadi; bosilganda foydalanuvchilar ro'yxati ochiladi |
+| F-8.1 | **Statistika:** bugungi AI so'rovlar, faol kalitlar, materiallar, kurs kontenti jadvali (tillar bo'yicha); **faqat super adminga** qo'shimcha: foydalanuvchilar soni, shu hafta yangi, bugun faol, adminlar |
+| F-8.0 | **Admin panel bosh ko'rinishi:** katta oynalar. Super admin uchun: **👥 Foydalanuvchilar** (jami, o'quvchilar, adminlar, bugun faol, shu hafta yangi), AI va API kalitlar, Materiallar; so'nggi ro'yxatdan o'tganlar; tezkor amallar. Oddiy admin uchun: Materiallar, AI va API kalitlar, Email xizmati (foydalanuvchilar oynasi, so'nggi ro'yxatdan o'tganlar va «foydalanuvchi qo'shish» yo'q). Oyna bosilganda tegishli bo'lim ochiladi |
+| F-8.1a | **«👥 Foydalanuvchilar» oynasi** chap menyuning «Boshqaruv» bo'limida alohida punkt sifatida turadi — **faqat super adminga**. Oddiy admin uchun punkt ko'rinmaydi, `/admin?tab=users` havolasi esa «Umumiy» bo'limga qaytaradi |
+| F-8.1b | **✉️ Email xizmati:** provayder (Brevo/Resend), API kalit (maskalangan), yuboruvchi email va nom, **test xat yuborish** tugmasi; holat belgisi (sozlangan/sozlanmagan). Saqlash va test — faqat super admin |
 | F-8.2 | **Foydalanuvchilar ro'yxati:** kompyuterda jadval (foydalanuvchi, email/telefon, rol, ro'yxatdan o'tgan sana, oxirgi kirish, amallar), telefonda kartochkalar; qidiruv (ism, login, email, telefon); filtr (barchasi, o'quvchilar, adminlar, bloklanganlar); saralash (yangi, eski, ism, oxirgi kirish); «Yangilash»; qo'shish (login yoki email + ixtiyoriy telefon + parol + ism + rol); rol o'zgartirish (faqat super admin); parolni tiklash; bloklash/ochish; o'chirish; foydalanuvchi kartasi (kirish ma'lumotlari, XP, seriya, darslar, oxirgi mashqlar, bugungi AI) |
-| F-8.3 | Ruxsatlar: admin faqat o'quvchilarni boshqaradi; super admin — o'quvchi va adminlarni; super adminni o'chirish/bloklash mumkin emas; o'zini o'chirish mumkin emas |
+| F-8.3 | **Ruxsatlar: foydalanuvchilarni ko'rish va boshqarish faqat super adminda.** Oddiy admin ro'yxat, foydalanuvchi kartasi, email/telefon, progress va AI foydalanish hisobini ko'ra olmaydi, qo'sha/o'chira/bloklay olmaydi, parolni tiklay olmaydi, rol bera olmaydi. Bu ikki qatlamda majburlanadi: (1) `admin` funksiyasi 403 qaytaradi; (2) Postgres RLS (`0008_users_super_only.sql`) — `profiles`, `progress`, `ai_usage` jadvallarini o'qish faqat egasi va super adminga ochiq, shuning uchun to'g'ridan-to'g'ri API so'rovi ham ma'lumot bermaydi. Super adminni o'chirish/bloklash mumkin emas; o'zini o'chirish mumkin emas |
 | F-8.4 | **AI va API kalitlar:** provayder rejimi (avtomatik / aniq provayder / o'chiq), Gemini modeli, kunlik limit, ustoz uslubi; kalitlar ro'yxati (maskalangan, model, navbat, muvaffaqiyat/xato soni, oxirgi xato); qo'shish (provayder, nom, kalit, model, Base URL, navbat); **sinash** (javob vaqti va namuna); yoqish/o'chirish; tahrirlash; o'chirish |
 | F-8.5 | Kalitlar rotatsiyasi: biri xato bersa keyingisi ishlatiladi; yaroqsiz kalit (401/403) 3 marta ketma-ket xato bersa avtomatik o'chiriladi; limit (429) xatosida o'chirilmaydi |
 | F-8.6 | **Materiallar:** barcha bo'limlarga tezkor o'tish va sonlari |
@@ -193,13 +200,15 @@ sahifalarni tez ochadi. Foydalanuvchi progressi bitta `progress.state` (jsonb) m
 
 | Jadval | Asosiy ustunlar | Kirish (RLS) |
 |---|---|---|
-| `profiles` | id, username, display_name, role (user/admin/superadmin), email, phone, is_blocked, last_seen_at, created_at | o'zi va adminlar o'qiydi; o'zi faqat ismini o'zgartiradi |
-| `progress` | user_id, state (jsonb), updated_at | o'zi o'qiydi/yozadi; adminlar o'qiydi |
+| `profiles` | id, username, display_name, role (user/admin/superadmin), email, phone, is_blocked, last_seen_at, created_at | **o'zi va super admin** o'qiydi (oddiy admin — yo'q); o'zi faqat ismini o'zgartiradi |
+| `progress` | user_id, state (jsonb), updated_at | o'zi o'qiydi/yozadi; super admin o'qiydi |
 | `media_items` | id, kind, lang, title, description, storage_path, file_url, mime, size_bytes, content (jsonb), lesson_ref, position, is_published, uploaded_by, created_at | kirgan foydalanuvchilar nashr qilinganlarni o'qiydi; adminlar yozadi |
 | `settings` | key, value (ai_provider, ai_model_gemini, ai_daily_limit, ai_tutor_style) | kirganlar o'qiydi; super admin/Edge Function yozadi |
 | `api_keys` | id, provider, label, key_value, base_url, model, priority, is_active, failure_count, success_count, last_used_at, last_error | klientdan butunlay yopiq (faqat service-role) |
-| `ai_usage` | user_id, day, count | o'zi va adminlar o'qiydi; yozish faqat `bump_ai_usage()` orqali |
-| `login_attempts` | key (login/email/telefon), fails, window_start, locked_until | klientdan butunlay yopiq |
+| `ai_usage` | user_id, day, count | o'zi va super admin o'qiydi; yozish faqat `bump_ai_usage()` orqali |
+| `login_attempts` | key (login/email/telefon/IP…), fails, window_start, locked_until | klientdan butunlay yopiq (kirish va kod yuborish cheklovlari uchun ham ishlatiladi) |
+| `email_codes` | email, purpose (register/reset/change-email), code_hash, attempts, expires_at, created_at; kalit (email, purpose) | klientdan butunlay yopiq (RLS yoqilgan, siyosat yo'q) |
+| `secure_settings` | key, value (mail_provider, mail_api_key, mail_from, mail_from_name) | klientdan butunlay yopiq; faqat Edge Function (service-role) |
 
 `profiles.phone` — noyob (unique index). `phone_available(p_phone)` — ro'yxatdan o'tish formasi uchun ochiq funksiya.
 | `books`, `vocab_sets` | (1-versiyadan) | o'qish uchun saqlanadi; ma'lumotlari `media_items` ga ko'chirilgan |
@@ -220,11 +229,17 @@ Barcha so'rovlar: `POST /functions/v1/<nomi>`, sarlavha `Authorization: Bearer <
 | action | Kim | Tavsif |
 |---|---|---|
 | `login` | **ochiq (tokensiz)** | `identifier` (email/telefon/login), `password` → `{session}`; urinishlar cheklovi bilan |
-| `update-my-contact` | har qanday kirgan foydalanuvchi | `email?`, `phone?` — o'z kirish ma'lumotlarini qo'shish/almashtirish |
-| `list-users`, `user-detail`, `stats` | admin+ | ro'yxat (oxirgi kirish bilan), foydalanuvchi kartasi, statistika |
-| `create-user` | admin+ (admin rolini faqat super admin) | `identifier` (login/email/telefon), `phone?`, `password`, `displayName`, `role` |
-| `delete-user`, `reset-password`, `block-user` | admin+ (ruxsat matritsasi bo'yicha) | o'chirish, yangi parol, bloklash (`blocked`) |
+| `send-email-code` | **ochiq** | `email`, `purpose` (register / reset) → emailga 6 xonali kod; 60 s kutish, IP va email bo'yicha soatlik cheklov |
+| `register` | **ochiq** | `email?`, `phone?`, `password`, `displayName`, `code?` — email bo'lsa `code` majburiy, faqat telefon bo'lsa kodsiz; hisobni server yaratadi |
+| `reset-with-code` | **ochiq** | `email`, `code`, `password` — parolni kod bilan tiklash |
+| `update-my-contact` | har qanday kirgan foydalanuvchi | `email?` (+ `emailCode`, purpose `change-email`), `phone?` — o'z kirish ma'lumotlarini qo'shish/almashtirish |
+| `stats` | admin+ | statistika; foydalanuvchi sonlari (`users`, `byRole`, `newThisWeek`, `activeToday`) faqat super adminga, oddiy adminda `null` |
+| `list-users`, `user-detail` | **faqat super admin** | ro'yxat (oxirgi kirish bilan), foydalanuvchi kartasi |
+| `create-user` | **faqat super admin** | `identifier` (login/email/telefon), `phone?`, `password`, `displayName`, `role` (admin qo'shgan hisobga kod yuborilmaydi) |
+| `delete-user`, `reset-password`, `block-user` | **faqat super admin** | o'chirish, yangi parol, bloklash (`blocked`); super adminning o'ziga qo'llanmaydi |
 | `set-role` | super admin | `role`: user / admin |
+| `get-mail-settings` | admin+ | Email xizmati holati (kalit maskalangan) |
+| `save-mail-settings`, `test-mail` | super admin | `provider`, `apiKey`, `from`, `fromName`; test xat yuborish |
 | `get-ai-settings` | admin+ | AI holati |
 | `save-ai-settings` | super admin | `provider`, `geminiModel`, `dailyLimit`, `tutorStyle` |
 | `list-api-keys` | admin+ | maskalangan ro'yxat |
@@ -257,22 +272,24 @@ Barcha so'rovlar: `POST /functions/v1/<nomi>`, sarlavha `Authorization: Bearer <
 | `/media/:tur` | Materiallar (audio, video, image, text, dialog, vocab, news) |
 | `/ai` | AI ustoz |
 | `/profile` | Profil va sozlamalar |
-| `/admin` | Admin panel: Umumiy (oynalar) · `?tab=users` Foydalanuvchilar · `?tab=ai` AI va API kalitlar · `?tab=content` Materiallar · `?tab=stats` Statistika |
+| `/admin` | Admin panel: Umumiy (oynalar) · `?tab=users` Foydalanuvchilar (**faqat super admin**) · `?tab=ai` AI va API kalitlar · `?tab=mail` Email xizmati · `?tab=content` Materiallar · `?tab=stats` Statistika |
 
 Chap menyu bo'limlari: **Asosiy** (Bosh sahifa, Darslar, AI ustoz, Natijalar) · **Mashg'ulotlar** (Lug'at mashqi,
 Lug'at, Dialog mashqi, Grammatika, Fe'llar) · **Materiallar** (Yangiliklar, Musiqa, Video, Dialoglar, Lug'atlar,
-Matnlar, Rasmlar) · **Boshqaruv** (Admin panel, 👥 Foydalanuvchilar, AI va API kalitlar — faqat adminlarga). Yuqorida til tanlash (🇬🇧 🇷🇺 🇹🇷), pastda tungi rejim va profil.
+Matnlar, Rasmlar) · **Boshqaruv** (Admin panel, AI va API kalitlar — adminlarga; 👥 Foydalanuvchilar — faqat super adminga). Yuqorida til tanlash (🇬🇧 🇷🇺 🇹🇷), pastda tungi rejim va profil.
 
 ---
 
 ## 8. Joylashtirish
 
 Batafsil: `DEPLOY.md`. Qisqacha:
-1. Supabase: `supabase/setup_full.sql` → SQL Editor → Run; Auth'da «Confirm email» o'chiriladi;
-   `admin` va `ai` funksiyalari JWT tekshiruvisiz joylanadi.
+1. Supabase: `supabase/setup_full.sql` (0001…0008) → SQL Editor → Run; Auth'da «Confirm email» va
+   «Allow new users to sign up» o'chiriladi (hisoblar faqat `admin` funksiyasi orqali ochiladi, shunda email kodini
+   chetlab o'tib bo'lmaydi); `admin` va `ai` funksiyalari JWT tekshiruvisiz joylanadi.
 2. GitHub: kod yuklanadi.
 3. Netlify: repozitoriy ulanadi, `VITE_SUPABASE_URL` va `VITE_SUPABASE_ANON_KEY` kiritiladi.
-4. `quvonchbek / admin123` bilan kirib, parol almashtiriladi va AI kaliti qo'shiladi.
+4. `quvonchbek / admin123` bilan kirib, parol almashtiriladi, AI kaliti qo'shiladi va «✉️ Email xizmati»
+   (Brevo/Resend API kaliti + tasdiqlangan yuboruvchi email) sozlanib, test xat yuboriladi.
 
 ---
 
@@ -285,9 +302,14 @@ Batafsil: `DEPLOY.md`. Qisqacha:
 | T-1b | Band telefon raqami bilan ro'yxatdan o'tishga urinish | «Bu telefon raqami allaqachon ro'yxatdan o'tgan» |
 | T-1c | Rus tili 1-oy darsi → Dialog → «🎭 Rolli o'qish» → «Men — Сара» | Administrator gaplari ovoz chiqarib o'qiladi, o'quvchi gapida mikrofon tugmasi va baho chiqadi |
 | T-1d | Admin panel → «👥 Foydalanuvchilar» oynasini bosish (yoki chap menyudagi punkt) | Foydalanuvchilar ro'yxati (jadval) ochiladi; qidiruv, filtr va saralash ishlaydi |
-| T-2 | Email bilan ro'yxatdan o'tish va kirish; «Parolni unutdingizmi?» | Tiklash xati keladi, yangi parol bilan kirish mumkin |
+| T-2 | Email bilan ro'yxatdan o'tish: forma → emailga kod keladi → kod kiritiladi → hisob ochiladi; keyin «Parolni unutdingizmi?» | Kod 1 daqiqa ichida keladi; noto'g'ri kod rad etiladi; tiklash kodi bilan yangi parol qo'yib kirish mumkin |
+| T-2a | Faqat telefon bilan ro'yxatdan o'tish | Kod so'ralmaydi, hisob darhol ochiladi |
+| T-2b | Email kodini 5 marta noto'g'ri kiritish; kod eskirgach (10 daqiqa) kiritish; 60 soniyadan oldin qayta yuborish | Har holatda tushunarli xato; yangi kod so'rash kerak |
+| T-2c | Admin tizimda bo'lmagan (hech kim kirmagan) paytda email bilan ro'yxatdan o'tish | Kod baribir avtomatik keladi |
 | T-3 | `quvonchbek / admin123` bilan kirish | Admin panel ochiladi, roli «Super admin» |
-| T-4 | Super admin admin qo'shadi; admin o'quvchi qo'shadi; admin boshqa adminni o'chirishga urinadi | Birinchi ikkisi muvaffaqiyatli, uchinchisi «ruxsat yo'q» |
+| T-4 | Super admin admin qo'shadi va rol beradi | Muvaffaqiyatli; yangi admin materiallar yuklay oladi |
+| T-4a | Oddiy admin bilan kirish: chap menyu va admin panel | «👥 Foydalanuvchilar» punkti, oynasi, «so'nggi ro'yxatdan o'tganlar» va «foydalanuvchi qo'shish» **ko'rinmaydi**; statistikada foydalanuvchi sonlari yo'q; `/admin?tab=users` «Umumiy»ga qaytaradi |
+| T-4b | Oddiy admin `admin` funksiyasiga `list-users` / `create-user` / `delete-user` / `block-user` yuboradi; `profiles` jadvalini REST orqali o'qiydi | Funksiya 403 «faqat super admin uchun» qaytaradi; REST faqat o'z qatorini qaytaradi |
 | T-5 | O'quvchini bloklash | U kira olmaydi; blokdan chiqarilgach kiradi |
 | T-6 | Gemini kalitini qo'shish → «Sinash» | ✅ «Ishlayapti (… ms)»; AI ustoz holati «AI faol» |
 | T-7 | Kalitni noto'g'ri qiymat bilan qo'shish → sinash | ❌ aniq xato matni; kalit ishlatilmaydi |
@@ -304,8 +326,16 @@ Batafsil: `DEPLOY.md`. Qisqacha:
 
 ## 10. Cheklovlar va tavsiyalar
 
-- **SMS orqali tasdiqlash** joriy versiyada yo'q (telefon raqami parol bilan ishlaydi). Kerak bo'lsa, Supabase
-  Phone provider + SMS xizmati (Twilio, Eskiz.uz va h.k.) ulanib, OTP qo'shilishi mumkin.
+- **SMS orqali tasdiqlash** joriy versiyada yo'q: telefon bilan ro'yxatdan o'tishda kod so'ralmaydi (telefon raqami
+  parol bilan ishlaydi, raqam egaligi tekshirilmaydi). Kerak bo'lsa, SMS xizmati (Twilio, Eskiz.uz va h.k.) ulanib,
+  telefon uchun ham OTP qo'shilishi mumkin.
+- **Email kodlari** uchinchi tomon xizmati orqali yuboriladi (Brevo bepul rejasi — kuniga 300 ta xat). Supabase Edge
+  Functions SMTP portlarini bloklagani uchun faqat HTTP API (Brevo/Resend) ishlatiladi. Xizmat sozlanmasa, email bilan
+  ro'yxatdan o'tish va parolni tiklash ishlamaydi.
+- Telefon bilan ochilgan hisobda email yo'q, shuning uchun parolni «email kodi» bilan tiklab bo'lmaydi — super admin
+  Foydalanuvchilar bo'limidan parolni tiklaydi yoki foydalanuvchi profilida email qo'shib oladi.
+- Oddiy adminlar foydalanuvchilarni ko'rmaydi (o'quvchi shaxsiy ma'lumotlarini himoyalash uchun). Agar kelajakda
+  o'qituvchilarga o'z o'quvchilarining natijalarini ko'rsatish kerak bo'lsa, buning uchun alohida «guruh» tushunchasi qo'shiladi.
 - Bepul Supabase rejasi: 500 MB baza, 1 GB fayl saqlash, har bir fayl ≤ 50 MB. Ko'p video uchun pullik reja
   yoki tashqi video xosting (YouTube havolasi) tavsiya etiladi.
 - Matnni ovoz bilan o'qish sifati qurilmadagi ovozlarga bog'liq (Profil → Talaffuz ovozi).

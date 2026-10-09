@@ -20,7 +20,7 @@ Super admin (avtomatik yaratiladi): **login `quvonchbek` · parol `admin123`** �
 | Natijalar | Har bir mashq tarixi, xatolar ro'yxati (sizning javobingiz va to'g'ri javob), xatolar banki — xato qilingan so'zlar ustida qayta mashq |
 | Materiallar (chap menyu) | 🎵 Musiqa · 🎬 Video · 💬 Dialoglar · 📚 Lug'atlar · 📄 Matnlar · 🖼 Rasmlar · 📰 Yangiliklar — ketma-ketlikda ochiladi (pleylist, galereya, o'qish rejimi) |
 | AI ustoz | Istalgan sahifada ochiladigan chat (Ctrl/⌘+K), dars kontekstini biladi, ovoz bilan yozish, vazifa berish va javobni baholash (0–100) |
-| Admin panel | Bosh ko'rinish (katta oynalar); **👥 Foydalanuvchilar** oynasi — jadval/kartochka ko'rinishidagi ro'yxat, qidiruv, filtr, saralash, qo'shish (login/email + telefon), rol berish, parolni tiklash, bloklash, o'chirish, foydalanuvchi progressi; AI provayderlar va API kalitlar (sinash tugmasi bilan); materiallar; statistika |
+| Admin panel | Bosh ko'rinish (katta oynalar); **👥 Foydalanuvchilar** oynasi (**faqat super adminga ko'rinadi**) — jadval/kartochka ko'rinishidagi ro'yxat, qidiruv, filtr, saralash, qo'shish (login/email + telefon), rol berish, parolni tiklash, bloklash, o'chirish, foydalanuvchi progressi; **✉️ Email xizmati** (tasdiqlash kodlari uchun Brevo/Resend); AI provayderlar va API kalitlar (sinash tugmasi bilan); materiallar; statistika |
 | Qo'shimcha | Kunlik maqsad (XP), streak, haftalik faollik grafigi, tungi rejim, talaffuz ovozi sozlamalari |
 
 ## Tuzilma
@@ -35,7 +35,7 @@ til-sayohati/
 │       ├── context/         AuthContext (sessiya, progress), TutorContext (AI ustoz)
 │       └── lib/             api.js (Supabase), practice.js, lessonProgress.js, identity.js, translit.js …
 ├── supabase/
-│   ├── setup_full.sql       Yangi o'rnatish uchun yagona SQL fayl (0001…0006 birlashtirilgan)
+│   ├── setup_full.sql       Yangi o'rnatish uchun yagona SQL fayl (0001…0008 birlashtirilgan)
 │   ├── migrations/          Bosqichma-bosqich migratsiyalar
 │   └── functions/           Edge Functions: admin (boshqaruv), ai (AI ustoz)
 ├── data-src/                Manba ma'lumotlar (Word fayllardan) va i18n/ — rus/turk tarjimalari (so'zlar, iboralar, dialog va o'qish matnlari)
@@ -59,6 +59,8 @@ Kontentni qayta yig'ish: `node scripts/build-content.mjs`
 ## Xavfsizlik
 
 - Barcha jadvallarda Row Level Security; o'quvchi faqat o'z progressini ko'radi, materiallarni faqat adminlar yozadi.
+- Foydalanuvchilar ro'yxati va ularning ma'lumotlari faqat **super adminga** ochiq (oddiy admin server va baza darajasida ham ko'ra olmaydi).
+- Email bilan ro'yxatdan o'tishda 6 xonali kod serverda avtomatik yaratilib yuboriladi (admin ishtirokisiz); telefon bilan kodsiz.
 - Rol hech qachon ro'yxatdan o'tish ma'lumotidan olinmaydi (doim `user`); o'z rolini o'zgartirish trigger bilan bloklangan.
 - API kalitlar `api_keys` jadvalida — klientdan butunlay yopiq, faqat Edge Function (service-role) o'qiydi, panelda faqat maskalangan ko'rinadi.
 - AI uchun har bir o'quvchiga kunlik limit (admin panelda sozlanadi).

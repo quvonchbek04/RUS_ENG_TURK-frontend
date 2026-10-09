@@ -161,7 +161,9 @@ export default function Sidebar({ collapsed = false, onToggleCollapse, onNavigat
           <>
             <SectionLabel collapsed={collapsed}>Boshqaruv</SectionLabel>
             <NavRow icon="👑" label="Admin panel" to="/admin" active={is('/admin') && (!adminTab || adminTab === 'home')} collapsed={collapsed} />
-            <NavRow icon="👥" label="Foydalanuvchilar" to="/admin?tab=users" active={is('/admin') && adminTab === 'users'} collapsed={collapsed} />
+            {user.role === 'superadmin' && (
+              <NavRow icon="👥" label="Foydalanuvchilar" to="/admin?tab=users" active={is('/admin') && adminTab === 'users'} collapsed={collapsed} />
+            )}
             <NavRow icon="🔑" label="AI va API kalitlar" to="/admin?tab=ai" active={is('/admin') && adminTab === 'ai'} collapsed={collapsed} />
           </>
         )}

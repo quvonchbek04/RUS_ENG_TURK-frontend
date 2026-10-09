@@ -5,12 +5,14 @@
 // uchun klientdan emas, shu funksiya orqali (service-role kalit bilan) bajariladi.
 //
 // So'rov: POST { action, ...payload }   Header: Authorization: Bearer <sessiya tokeni>
-// Istisno: action "login" — tokensiz (email, telefon yoki login + parol bilan kirish).
+// Ochiq (tokensiz) amallar: "login" (email/telefon/login + parol), "send-email-code" (emailga 6 xonali kod),
+// "register" (email — kod bilan tasdiqlanadi, telefon — kodsiz), "reset-with-code" (parolni kod bilan tiklash).
 //
 // Eslatma: fayl ATAYLAB hech qanday nisbiy importga ega emas — Supabase
 // Dashboard'dagi muharrir orqali (CLI'siz) joylashtirilganda ham ishlaydi.
 
 import { createClient } from "npm:@supabase/supabase-js@2";
+import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -76,6 +78,279 @@ function resolveIdentifier(input: string) {
 function maskKey(v: string) {
   if (!v) return "";
   return v.length <= 12 ? "••••" + v.slice(-3) : `${v.slice(0, 6)}••••${v.slice(-4)}`;
+}
+
+// deno-lint-ignore no-explicit-any
+type Admin = SupabaseClient<any, any, any>;
+
+// ---------------------------------------------------------------------------
+// EMAIL TASDIQLASH KODLARI (6 xonali, 10 daqiqa, 5 urinish)
+// ---------------------------------------------------------------------------
+const CODE_TTL_MS = 10 * 60_000;
+const CODE_MAX_ATTEMPTS = 5;
+const CODE_COOLDOWN_MS = 60_000;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const CODE_PURPOSES = ["register", "reset", "change-email"];
+
+function normEmail(v: unknown): string {
+  return String(v || "").trim().toLowerCase();
+}
+
+function clientIp(req: Request): string {
+  return (req.headers.get("cf-connecting-ip") || req.headers.get("x-forwarded-for") || "unknown").split(",")[0].trim().slice(0, 64);
+}
+
+async function hmacHex(text: string): Promise<string> {
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(SERVICE_KEY), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function randomCode(): string {
+  const a = new Uint32Array(1);
+  crypto.getRandomValues(a);
+  return String(a[0] % 1_000_000).padStart(6, "0");
+}
+
+/** Oynada `max` martadan ko'p chaqirilsa false qaytaradi (kod yuborishdan suiste'mol qilishdan himoya). */
+async function allow(admin: Admin, key: string, max: number, windowMs: number): Promise<boolean> {
+  const { data: row } = await admin.from("login_attempts").select("*").eq("key", key).maybeSingle();
+  const now = Date.now();
+  const fresh = !row || now - new Date(row.window_start as string).getTime() > windowMs;
+  if (!fresh && ((row!.fails as number) || 0) >= max) return false;
+  await admin.from("login_attempts").upsert({
+    key,
+    fails: fresh ? 1 : ((row!.fails as number) || 0) + 1,
+    window_start: fresh ? new Date(now).toISOString() : row!.window_start,
+    locked_until: null,
+  });
+  return true;
+}
+
+type MailCfg = { provider: string; apiKey: string; from: string; fromName: string };
+
+async function getMailConfig(admin: Admin): Promise<MailCfg> {
+  const { data } = await admin.from("secure_settings").select("key, value").in("key", ["mail_provider", "mail_api_key", "mail_from", "mail_from_name"]);
+  const m: Record<string, string> = {};
+  (data || []).forEach((r: { key: string; value: string }) => (m[r.key] = r.value));
+  return {
+    provider: (m.mail_provider || "brevo").toLowerCase(),
+    apiKey: m.mail_api_key || "",
+    from: m.mail_from || "",
+    fromName: m.mail_from_name || "Til sayohati",
+  };
+}
+
+async function sendMail(cfg: MailCfg, to: string, subject: string, html: string, text: string): Promise<void> {
+  if (!cfg.apiKey || !cfg.from) throw new Error("Email xizmati sozlanmagan");
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 15000);
+  try {
+    const res =
+      cfg.provider === "resend"
+        ? await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${cfg.apiKey}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ from: `${cfg.fromName} <${cfg.from}>`, to: [to], subject, html, text }),
+            signal: ctrl.signal,
+          })
+        : await fetch("https://api.brevo.com/v3/smtp/email", {
+            method: "POST",
+            headers: { "api-key": cfg.apiKey, "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify({ sender: { name: cfg.fromName, email: cfg.from }, to: [{ email: to }], subject, htmlContent: html, textContent: text }),
+            signal: ctrl.signal,
+          });
+    if (!res.ok) {
+      const t = await res.text().catch(() => "");
+      throw new Error(`${cfg.provider} (${res.status}): ${t.slice(0, 300)}`);
+    }
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function codeMail(code: string, purpose: string) {
+  const what = purpose === "reset" ? "Parolni tiklash" : purpose === "change-email" ? "Emailni o'zgartirish" : "Ro'yxatdan o'tish";
+  const subject = `${code} — Til sayohati tasdiqlash kodi`;
+  const html =
+    `<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#16201c">` +
+    `<div style="font-size:20px;font-weight:700;color:#0f5f4d">🎫 Til sayohati</div>` +
+    `<p style="font-size:15px;margin:18px 0 12px">${what} uchun tasdiqlash kodi:</p>` +
+    `<div style="font-size:34px;font-weight:700;letter-spacing:8px;background:#e2f1eb;color:#0f5f4d;padding:16px 20px;border-radius:12px;text-align:center">${code}</div>` +
+    `<p style="font-size:13px;color:#5d6a64;line-height:1.5;margin-top:16px">Kod 10 daqiqa amal qiladi. Uni hech kimga bermang. ` +
+    `Agar bu so'rovni siz yubormagan bo'lsangiz, xatni e'tiborsiz qoldiring.</p></div>`;
+  const text = `Til sayohati — ${what}\n\nTasdiqlash kodi: ${code}\n\nKod 10 daqiqa amal qiladi. Uni hech kimga bermang.`;
+  return { subject, html, text };
+}
+
+/** Kodni tekshiradi; to'g'ri bo'lsa o'chiradi (bir martalik). Xato bo'lsa — matn qaytaradi. */
+async function verifyCode(admin: Admin, email: string, purpose: string, code: unknown): Promise<string | null> {
+  const c = String(code || "").replace(/\D/g, "");
+  if (c.length !== 6) return "6 xonali kodni kiriting";
+  const { data: row } = await admin.from("email_codes").select("*").eq("email", email).eq("purpose", purpose).maybeSingle();
+  if (!row) return "Kod topilmadi. Yangi kod so'rang.";
+  const drop = () => admin.from("email_codes").delete().eq("email", email).eq("purpose", purpose);
+  if (new Date(row.expires_at as string).getTime() < Date.now()) {
+    await drop();
+    return "Kod muddati tugagan. Yangi kod so'rang.";
+  }
+  if (((row.attempts as number) || 0) >= CODE_MAX_ATTEMPTS) {
+    await drop();
+    return "Juda ko'p noto'g'ri urinish. Yangi kod so'rang.";
+  }
+  if ((await hmacHex(`${email}|${purpose}|${c}`)) !== row.code_hash) {
+    const attempts = ((row.attempts as number) || 0) + 1;
+    await admin.from("email_codes").update({ attempts }).eq("email", email).eq("purpose", purpose);
+    const left = CODE_MAX_ATTEMPTS - attempts;
+    return left > 0 ? `Kod noto'g'ri (${left} ta urinish qoldi)` : "Juda ko'p noto'g'ri urinish. Yangi kod so'rang.";
+  }
+  await drop();
+  return null;
+}
+
+async function emailTaken(admin: Admin, email: string, exceptId?: string): Promise<boolean> {
+  let q = admin.from("profiles").select("id").ilike("email", email.replace(/[\\%_]/g, (ch) => "\\" + ch)).limit(1);
+  if (exceptId) q = q.neq("id", exceptId);
+  const { data } = await q;
+  return !!data?.length;
+}
+
+const PUBLIC_ACTIONS = new Set(["login", "send-email-code", "register", "reset-with-code"]);
+
+/** Tokensiz (yoki o'z tokeni bilan) ishlaydigan ochiq amallar: kirish, kod yuborish, ro'yxatdan o'tish, parolni tiklash. */
+async function handlePublic(action: string, body: Record<string, unknown>, req: Request): Promise<Response> {
+  if (action === "login") return await handleLogin(body);
+
+  const admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
+  const ip = clientIp(req);
+
+  // ---------- Emailga kod yuborish ----------
+  if (action === "send-email-code") {
+    const email = normEmail(body.email);
+    const purpose = String(body.purpose || "");
+    if (!CODE_PURPOSES.includes(purpose)) return json({ error: "Noto'g'ri so'rov" }, 400);
+    if (!EMAIL_RE.test(email) || email.endsWith("@" + SYNTH_DOMAIN)) return json({ error: "Email manzili noto'g'ri" }, 400);
+
+    let userId: string | undefined;
+    if (purpose === "change-email") {
+      const caller = createClient(SUPABASE_URL, ANON_KEY, { global: { headers: { Authorization: req.headers.get("Authorization") || "" } } });
+      const { data: { user } } = await caller.auth.getUser();
+      if (!user) return json({ error: "Kirish talab qilinadi" }, 401);
+      userId = user.id;
+    }
+
+    if (!(await allow(admin, `codeip:${ip}`, 15, 3_600_000))) return json({ error: "Juda ko'p so'rov. Bir ozdan keyin qayta urinib ko'ring." }, 429);
+    if (!(await allow(admin, `codeem:${email}`, 5, 3_600_000))) return json({ error: "Bu emailga juda ko'p kod yuborildi. 1 soatdan keyin qayta urinib ko'ring." }, 429);
+
+    if (purpose === "register" && (await emailTaken(admin, email))) {
+      return json({ error: "Bu email allaqachon ro'yxatdan o'tgan. Kirish sahifasidan foydalaning." }, 400);
+    }
+    if (purpose === "change-email" && (await emailTaken(admin, email, userId))) {
+      return json({ error: "Bu email boshqa hisobga biriktirilgan" }, 400);
+    }
+    if (purpose === "reset" && !(await emailTaken(admin, email))) {
+      // Email mavjudligini oshkor qilmaymiz — har doim "yuborildi" deymiz
+      return json({ ok: true, cooldown: CODE_COOLDOWN_MS / 1000 });
+    }
+
+    const { data: prev } = await admin.from("email_codes").select("created_at").eq("email", email).eq("purpose", purpose).maybeSingle();
+    if (prev && Date.now() - new Date(prev.created_at as string).getTime() < CODE_COOLDOWN_MS) {
+      return json({ error: "Kodni qayta yuborish uchun 1 daqiqa kuting" }, 429);
+    }
+
+    const cfg = await getMailConfig(admin);
+    if (!cfg.apiKey || !cfg.from) {
+      return json({ error: "Email xizmati hali sozlanmagan. Administratorga murojaat qiling yoki telefon raqami bilan ro'yxatdan o'ting." }, 503);
+    }
+
+    const code = randomCode();
+    await admin.from("email_codes").delete().lt("expires_at", new Date().toISOString());
+    await admin.from("email_codes").upsert({
+      email,
+      purpose,
+      code_hash: await hmacHex(`${email}|${purpose}|${code}`),
+      attempts: 0,
+      expires_at: new Date(Date.now() + CODE_TTL_MS).toISOString(),
+      created_at: new Date().toISOString(),
+    });
+    try {
+      const m = codeMail(code, purpose);
+      await sendMail(cfg, email, m.subject, m.html, m.text);
+    } catch (e) {
+      console.error("Email yuborilmadi:", (e as Error).message);
+      await admin.from("email_codes").delete().eq("email", email).eq("purpose", purpose);
+      return json({ error: "Xatni yuborib bo'lmadi. Email manzilini tekshiring yoki birozdan keyin qayta urinib ko'ring." }, 502);
+    }
+    return json({ ok: true, cooldown: CODE_COOLDOWN_MS / 1000 });
+  }
+
+  // ---------- Ro'yxatdan o'tish (email — kod bilan, telefon — kodsiz) ----------
+  if (action === "register") {
+    if (!(await allow(admin, `reg:${ip}`, 20, 3_600_000))) return json({ error: "Juda ko'p urinish. Bir ozdan keyin qayta urinib ko'ring." }, 429);
+    const email = normEmail(body.email);
+    const phoneRaw = String(body.phone || "").trim();
+    const hasPhone = phoneRaw.replace(/\D/g, "").length > 3;
+    const password = String(body.password || "");
+    if (password.length < 6) return json({ error: "Parol kamida 6 belgidan iborat bo'lishi kerak" }, 400);
+    if (!email && !hasPhone) return json({ error: "Email yoki telefon raqamidan kamida bittasini kiriting" }, 400);
+
+    let phone: string | null = null;
+    if (hasPhone) {
+      const d = normalizePhone(phoneRaw);
+      if (!d) return json({ error: "Telefon raqamini to'g'ri kiriting (masalan: +998 90 123 45 67)" }, 400);
+      phone = "+" + d;
+      const { data: taken } = await admin.from("profiles").select("id").eq("phone", phone).maybeSingle();
+      if (taken) return json({ error: "Bu telefon raqami allaqachon ro'yxatdan o'tgan. Kirish sahifasidan foydalaning." }, 400);
+    }
+
+    let authEmail: string;
+    let username: string;
+    if (email) {
+      if (!EMAIL_RE.test(email) || email.endsWith("@" + SYNTH_DOMAIN)) return json({ error: "Email manzili noto'g'ri" }, 400);
+      if (await emailTaken(admin, email)) return json({ error: "Bu email allaqachon ro'yxatdan o'tgan. Kirish sahifasidan foydalaning." }, 400);
+      const bad = await verifyCode(admin, email, "register", body.code);
+      if (bad) return json({ error: bad, codeError: true }, 400);
+      authEmail = email;
+      username = email.split("@")[0].replace(/[^a-zA-Z0-9_.-]/g, "").slice(0, 30) || "user";
+    } else {
+      const d = phone!.slice(1);
+      authEmail = `tel${d}@${SYNTH_DOMAIN}`;
+      username = d;
+    }
+    const displayName = String(body.displayName || "").trim().slice(0, 60) || username;
+
+    const { error } = await admin.auth.admin.createUser({
+      email: authEmail,
+      password,
+      email_confirm: true,
+      user_metadata: { username, display_name: displayName, phone: phone || undefined },
+    });
+    if (error) {
+      const msg = /already|registered|exists/i.test(error.message) ? "Bu email yoki telefon allaqachon ro'yxatdan o'tgan" : error.message;
+      return json({ error: msg }, 400);
+    }
+    return json({ ok: true, email: authEmail });
+  }
+
+  // ---------- Parolni kod bilan tiklash ----------
+  if (action === "reset-with-code") {
+    if (!(await allow(admin, `rst:${ip}`, 20, 3_600_000))) return json({ error: "Juda ko'p urinish. Bir ozdan keyin qayta urinib ko'ring." }, 429);
+    const email = normEmail(body.email);
+    const password = String(body.password || "");
+    if (!EMAIL_RE.test(email)) return json({ error: "Email manzili noto'g'ri" }, 400);
+    if (password.length < 6) return json({ error: "Parol kamida 6 belgidan iborat bo'lishi kerak" }, 400);
+    const bad = await verifyCode(admin, email, "reset", body.code);
+    if (bad) return json({ error: bad, codeError: true }, 400);
+    const { data: prof } = await admin.from("profiles").select("id").ilike("email", email.replace(/[\\%_]/g, (ch) => "\\" + ch)).limit(1);
+    const id = prof?.[0]?.id as string | undefined;
+    if (!id) return json({ error: "Hisob topilmadi" }, 404);
+    const { error } = await admin.auth.admin.updateUserById(id, { password });
+    if (error) return json({ error: error.message }, 400);
+    await admin.from("login_attempts").delete().eq("key", email);
+    return json({ ok: true });
+  }
+
+  return json({ error: "Noma'lum amal" }, 400);
 }
 
 const LOGIN_FAIL = "Login (email/telefon) yoki parol noto'g'ri";
@@ -152,9 +427,9 @@ Deno.serve(async (req) => {
   if (req.method !== "POST") return json({ error: "Faqat POST so'rovlar qabul qilinadi" }, 405);
 
   try {
-    // Ochiq amal (tokensiz): kirish
+    // Ochiq amallar (tokensiz): kirish, kod yuborish, ro'yxatdan o'tish, parolni tiklash
     const peek = await req.clone().json().catch(() => ({}));
-    if (peek?.action === "login") return await handleLogin(peek);
+    if (PUBLIC_ACTIONS.has(String(peek?.action))) return await handlePublic(String(peek.action), peek, req);
 
     const authHeader = req.headers.get("Authorization") || "";
     const callerClient = createClient(SUPABASE_URL, ANON_KEY, {
@@ -180,11 +455,13 @@ Deno.serve(async (req) => {
       return data as Profile | null;
     }
 
-    /** Chaqiruvchi shu foydalanuvchini boshqara oladimi (super admin hammani, admin faqat o'quvchilarni). */
+    // Foydalanuvchilar ro'yxati va ularni boshqarish — FAQAT super admin uchun.
+    // Oddiy admin (masalan o'qituvchi) materiallar va AI bilan ishlay oladi, lekin foydalanuvchilarni ko'rmaydi.
+    const superOnly = () => json({ error: "Foydalanuvchilar bo'limi faqat super admin uchun" }, 403);
+
+    /** Super admin o'zidan boshqa hammani boshqara oladi; super adminning o'zini — hech kim. */
     function canManage(target: Profile) {
-      if (target.role === "superadmin") return false;
-      if (target.role === "admin") return isSuper;
-      return isStaff;
+      return isSuper && target.role !== "superadmin";
     }
 
     // =====================================================================
@@ -207,6 +484,9 @@ Deno.serve(async (req) => {
             return json({ error: "Email manzili noto'g'ri" }, 400);
           }
           if (e !== authEmail) {
+            // Yangi emailni faqat emailga yuborilgan kod orqali tasdiqlagan foydalanuvchi o'rnata oladi
+            const bad = await verifyCode(admin, e, "change-email", body.emailCode);
+            if (bad) return json({ error: bad, codeError: true }, 400);
             const { error } = await admin.auth.admin.updateUserById(user.id, { email: e, email_confirm: true });
             if (error) {
               const msg = /already|registered|exists|unique/i.test(error.message) ? "Bu email boshqa hisobga biriktirilgan" : error.message;
@@ -248,7 +528,7 @@ Deno.serve(async (req) => {
     // FOYDALANUVCHILAR
     // =====================================================================
     if (action === "list-users") {
-      if (!isStaff) return forbid();
+      if (!isSuper) return superOnly();
       const { data: profiles, error } = await admin.from("profiles").select("*").order("created_at", { ascending: true });
       if (error) return json({ error: error.message }, 400);
       // Auth ma'lumotlari (oxirgi kirish vaqti) — bir necha sahifa bo'lishi mumkin
@@ -263,7 +543,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "user-detail") {
-      if (!isStaff) return forbid();
+      if (!isSuper) return superOnly();
       const target = await getTarget(String(body.id || ""));
       if (!target) return json({ error: "Foydalanuvchi topilmadi" }, 404);
       const { data: prog } = await admin
@@ -276,11 +556,10 @@ Deno.serve(async (req) => {
       return json({ user: publicUser(target), progress: prog?.state || {}, progressUpdatedAt: prog?.updated_at || null, aiUsedToday: usage?.count || 0 });
     }
 
-    // superadmin: 'user' yoki 'admin' yaratadi; admin: faqat 'user'
+    // Faqat super admin: 'user' yoki 'admin' yaratadi
     if (action === "create-user" || action === "create-admin") {
-      if (!isStaff) return forbid();
+      if (!isSuper) return superOnly();
       const role = action === "create-admin" || body.role === "admin" ? "admin" : "user";
-      if (role === "admin" && !isSuper) return json({ error: "Admin qo'shish faqat super admin uchun" }, 403);
       const ident = resolveIdentifier(String(body.identifier || body.username || ""));
       if (!ident) {
         return json({ error: "Login (kamida 3 belgi: harf, raqam, _ . -), email yoki telefon raqamini to'g'ri kiriting" }, 400);
@@ -319,7 +598,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "delete-user" || action === "delete-admin") {
-      if (!isStaff) return forbid();
+      if (!isSuper) return superOnly();
       const targetId = String(body.id || "");
       if (targetId === user.id) return json({ error: "O'zingizni o'chira olmaysiz" }, 400);
       const target = await getTarget(targetId);
@@ -344,7 +623,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "reset-password") {
-      if (!isStaff) return forbid();
+      if (!isSuper) return superOnly();
       const target = await getTarget(String(body.id || ""));
       if (!target) return json({ error: "Foydalanuvchi topilmadi" }, 404);
       if (target.id !== user.id && !canManage(target)) return forbid();
@@ -356,7 +635,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "block-user") {
-      if (!isStaff) return forbid();
+      if (!isSuper) return superOnly();
       const target = await getTarget(String(body.id || ""));
       if (!target) return json({ error: "Foydalanuvchi topilmadi" }, 404);
       if (target.id === user.id) return json({ error: "O'zingizni bloklay olmaysiz" }, 400);
@@ -391,7 +670,16 @@ Deno.serve(async (req) => {
       const mediaByKind: Record<string, number> = {};
       (media || []).forEach((m) => (mediaByKind[m.kind as string] = (mediaByKind[m.kind as string] || 0) + 1));
       const aiToday = (usage || []).reduce((s, u) => s + ((u.count as number) || 0), 0);
-      return json({ users: (roles || []).length, byRole, newThisWeek, activeToday, mediaByKind, aiToday, activeKeys: keyCount || 0 });
+      // Foydalanuvchilar soni va tarkibi — faqat super adminga; oddiy admin faqat kontent/AI statistikasini oladi
+      return json({
+        users: isSuper ? (roles || []).length : null,
+        byRole: isSuper ? byRole : null,
+        newThisWeek: isSuper ? newThisWeek : null,
+        activeToday: isSuper ? activeToday : null,
+        mediaByKind,
+        aiToday,
+        activeKeys: keyCount || 0,
+      });
     }
 
     // =====================================================================
@@ -451,6 +739,57 @@ Deno.serve(async (req) => {
         if (error) return json({ error: error.message }, 400);
       }
       return json(await aiSettingsSnapshot());
+    }
+
+    // =====================================================================
+    // EMAIL XIZMATI (kod yuborish uchun): Brevo yoki Resend
+    // =====================================================================
+    if (action === "get-mail-settings") {
+      if (!isStaff) return forbid();
+      const cfg = await getMailConfig(admin);
+      return json({
+        provider: cfg.provider,
+        from: cfg.from,
+        fromName: cfg.fromName,
+        hasKey: !!cfg.apiKey,
+        maskedKey: cfg.apiKey ? maskKey(cfg.apiKey) : "",
+        configured: !!(cfg.apiKey && cfg.from),
+      });
+    }
+
+    if (action === "save-mail-settings") {
+      if (!isSuper) return forbid();
+      const provider = String(body.provider || "brevo").toLowerCase();
+      if (!["brevo", "resend"].includes(provider)) return json({ error: "Noma'lum provayder" }, 400);
+      const from = normEmail(body.from);
+      if (from && !EMAIL_RE.test(from)) return json({ error: "Yuboruvchi email manzili noto'g'ri" }, 400);
+      const rows: { key: string; value: string }[] = [
+        { key: "mail_provider", value: provider },
+        { key: "mail_from", value: from },
+        { key: "mail_from_name", value: String(body.fromName || "Til sayohati").trim().slice(0, 60) || "Til sayohati" },
+      ];
+      const apiKey = String(body.apiKey || "").trim();
+      if (apiKey) rows.push({ key: "mail_api_key", value: apiKey });
+      const { error } = await admin.from("secure_settings").upsert(rows, { onConflict: "key" });
+      if (error) return json({ error: error.message }, 400);
+      const cfg = await getMailConfig(admin);
+      return json({ ok: true, configured: !!(cfg.apiKey && cfg.from), maskedKey: cfg.apiKey ? maskKey(cfg.apiKey) : "" });
+    }
+
+    if (action === "test-mail") {
+      if (!isSuper) return forbid();
+      const to = normEmail(body.to);
+      if (!EMAIL_RE.test(to)) return json({ error: "Email manzili noto'g'ri" }, 400);
+      const cfg = await getMailConfig(admin);
+      if (!cfg.apiKey || !cfg.from) return json({ error: "Avval API kalit va yuboruvchi emailni saqlang" }, 400);
+      const started = Date.now();
+      try {
+        const m = codeMail("123456", "register");
+        await sendMail(cfg, to, "Test: " + m.subject, m.html, m.text);
+        return json({ ok: true, latencyMs: Date.now() - started });
+      } catch (e) {
+        return json({ ok: false, error: String((e as Error).message || e) });
+      }
     }
 
     // =====================================================================

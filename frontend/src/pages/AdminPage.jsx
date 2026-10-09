@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { MEDIA_META, MEDIA_ORDER } from '../lib/media.js';
 import { formatPhone } from '../lib/identity.js';
 import UsersPanel, { ROLE_LABEL } from './admin/UsersPanel.jsx';
+import MailPanel from './admin/MailPanel.jsx';
 
 
 const PROVIDERS = {
@@ -32,6 +33,7 @@ const TABS = [
   ['home', '🏠 Umumiy'],
   ['users', '👥 Foydalanuvchilar'],
   ['ai', '🤖 AI va API kalitlar'],
+  ['mail', '✉️ Email xizmati'],
   ['content', '🗂️ Materiallar'],
   ['stats', '📊 Statistika'],
 ];
@@ -52,11 +54,16 @@ function StatsTab() {
       {error && <div className="alert alert-warn mb-4">Statistika olinmadi: {error}</div>}
       {stats && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-          <StatCard icon="👥" label="Foydalanuvchilar" value={stats.users} />
-          <StatCard icon="🆕" label="Shu hafta yangi" value={stats.newThisWeek} tone="gold" />
-          <StatCard icon="🟢" label="Bugun faol" value={stats.activeToday} tone="sky" />
+          {/* Foydalanuvchilar bo'yicha raqamlar — faqat super adminga keladi (oddiy adminda null) */}
+          {stats.users != null && (
+            <>
+              <StatCard icon="👥" label="Foydalanuvchilar" value={stats.users} />
+              <StatCard icon="🆕" label="Shu hafta yangi" value={stats.newThisWeek} tone="gold" />
+              <StatCard icon="🟢" label="Bugun faol" value={stats.activeToday} tone="sky" />
+              <StatCard icon="👑" label="Adminlar" value={(stats.byRole?.admin || 0) + (stats.byRole?.superadmin || 0)} tone="gold" />
+            </>
+          )}
           <StatCard icon="🤖" label="Bugungi AI so'rovlar" value={stats.aiToday} tone="brick" />
-          <StatCard icon="👑" label="Adminlar" value={(stats.byRole?.admin || 0) + (stats.byRole?.superadmin || 0)} tone="gold" />
           <StatCard icon="🔑" label="Faol API kalitlar" value={stats.activeKeys} />
           <StatCard icon="🗂️" label="Yuklangan materiallar" value={Object.values(stats.mediaByKind || {}).reduce((a, b) => a + b, 0)} tone="sky" />
           <StatCard icon="📰" label="Yangiliklar" value={stats.mediaByKind?.news || 0} tone="brick" />
@@ -441,14 +448,18 @@ function ContentTab() {
 // BOSH KO'RINISH — katta oynalar: bosilganda tegishli bo'lim ochiladi
 // =====================================================================
 function AdminHome({ me, open }) {
+  const isSuper = me.role === 'superadmin';
   const [stats, setStats] = useState(null);
   const [recent, setRecent] = useState(null);
   const [ai, setAi] = useState(null);
+  const [mail, setMail] = useState(null);
   useEffect(() => {
     api.adminStats().then(setStats).catch(() => {});
-    api.listAdminUsers().then((r) => setRecent(r.users || [])).catch(() => setRecent([]));
+    // Foydalanuvchilar ro'yxati — faqat super admin uchun
+    if (isSuper) api.listAdminUsers().then((r) => setRecent(r.users || [])).catch(() => setRecent([]));
     api.getAiSettings().then(setAi).catch(() => {});
-  }, []);
+    api.getMailSettings().then(setMail).catch(() => {});
+  }, [isSuper]);
 
   const users = recent || [];
   const learners = users.filter((u) => u.role === 'user').length;
@@ -458,30 +469,61 @@ function AdminHome({ me, open }) {
 
   return (
     <div className="space-y-6">
+      {mail && !mail.configured && (
+        <button type="button" onClick={() => open('mail')} className="alert alert-warn w-full text-left flex items-center gap-3 cursor-pointer">
+          <span className="text-2xl">✉️</span>
+          <span className="flex-1 text-sm">
+            <b>Email xizmati sozlanmagan</b> — email bilan ro'yxatdan o'tish va parolni tiklash ishlamaydi (telefon bilan ishlaydi). Sozlash uchun bosing →
+          </span>
+        </button>
+      )}
       <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        {/* Foydalanuvchilar oynasi — eng katta */}
-        <button
-          type="button"
-          onClick={() => open('users')}
-          className="hero-card p-5 text-left sm:col-span-2 cursor-pointer transition-transform hover:-translate-y-0.5"
-        >
-          <div className="flex items-start gap-4">
-            <span className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0" style={{ background: 'rgba(255,255,255,.16)' }}>
-              👥
-            </span>
-            <div className="flex-1 min-w-0">
-              <div className="text-xs font-bold uppercase tracking-[0.18em] opacity-80">Foydalanuvchilar</div>
-              <div className="font-display text-4xl font-semibold leading-tight">{recent ? users.length : '…'}</div>
-              <div className="text-sm opacity-90 mt-1">
-                {learners} o'quvchi · {staff} admin
-                {stats ? ` · bugun faol ${stats.activeToday} · shu hafta yangi ${stats.newThisWeek}` : ''}
+        {isSuper ? (
+          /* Foydalanuvchilar oynasi — eng katta (faqat super admin) */
+          <button
+            type="button"
+            onClick={() => open('users')}
+            className="hero-card p-5 text-left sm:col-span-2 cursor-pointer transition-transform hover:-translate-y-0.5"
+          >
+            <div className="flex items-start gap-4">
+              <span className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0" style={{ background: 'rgba(255,255,255,.16)' }}>
+                👥
+              </span>
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-bold uppercase tracking-[0.18em] opacity-80">Foydalanuvchilar</div>
+                <div className="font-display text-4xl font-semibold leading-tight">{recent ? users.length : '…'}</div>
+                <div className="text-sm opacity-90 mt-1">
+                  {learners} o'quvchi · {staff} admin
+                  {stats?.activeToday != null ? ` · bugun faol ${stats.activeToday} · shu hafta yangi ${stats.newThisWeek}` : ''}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="mt-4 inline-flex items-center gap-2 rounded-xl px-4 py-2 font-bold text-sm" style={{ background: '#fff', color: '#0c5444' }}>
-            Ro'yxatni ochish →
-          </div>
-        </button>
+            <div className="mt-4 inline-flex items-center gap-2 rounded-xl px-4 py-2 font-bold text-sm" style={{ background: '#fff', color: '#0c5444' }}>
+              Ro'yxatni ochish →
+            </div>
+          </button>
+        ) : (
+          /* Oddiy admin uchun asosiy oyna — materiallar */
+          <button
+            type="button"
+            onClick={() => open('content')}
+            className="hero-card p-5 text-left sm:col-span-2 cursor-pointer transition-transform hover:-translate-y-0.5"
+          >
+            <div className="flex items-start gap-4">
+              <span className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0" style={{ background: 'rgba(255,255,255,.16)' }}>
+                🗂️
+              </span>
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-bold uppercase tracking-[0.18em] opacity-80">Materiallar</div>
+                <div className="font-display text-4xl font-semibold leading-tight">{mediaTotal == null ? '…' : mediaTotal}</div>
+                <div className="text-sm opacity-90 mt-1">Musiqa, video, rasm, matn, dialog, lug'at va yangiliklar</div>
+              </div>
+            </div>
+            <div className="mt-4 inline-flex items-center gap-2 rounded-xl px-4 py-2 font-bold text-sm" style={{ background: '#fff', color: '#0c5444' }}>
+              Yuklash va boshqarish →
+            </div>
+          </button>
+        )}
 
         <button type="button" onClick={() => open('ai')} className="card card-hover p-5 text-left cursor-pointer">
           <div className="text-3xl mb-2">🤖</div>
@@ -494,17 +536,29 @@ function AdminHome({ me, open }) {
           {stats && <div className="text-xs faint mt-1">Bugun {stats.aiToday} ta so'rov</div>}
         </button>
 
-        <button type="button" onClick={() => open('content')} className="card card-hover p-5 text-left cursor-pointer">
-          <div className="text-3xl mb-2">🗂️</div>
-          <div className="font-bold" style={{ color: 'var(--ink)' }}>
-            Materiallar
-          </div>
-          <div className="text-sm muted">{mediaTotal == null ? '…' : `${mediaTotal} ta yuklangan`}</div>
-          <div className="text-xs faint mt-1">Musiqa, video, matn, dialog…</div>
-        </button>
+        {isSuper ? (
+          <button type="button" onClick={() => open('content')} className="card card-hover p-5 text-left cursor-pointer">
+            <div className="text-3xl mb-2">🗂️</div>
+            <div className="font-bold" style={{ color: 'var(--ink)' }}>
+              Materiallar
+            </div>
+            <div className="text-sm muted">{mediaTotal == null ? '…' : `${mediaTotal} ta yuklangan`}</div>
+            <div className="text-xs faint mt-1">Musiqa, video, matn, dialog…</div>
+          </button>
+        ) : (
+          <button type="button" onClick={() => open('mail')} className="card card-hover p-5 text-left cursor-pointer">
+            <div className="text-3xl mb-2">✉️</div>
+            <div className="font-bold" style={{ color: 'var(--ink)' }}>
+              Email xizmati
+            </div>
+            <div className="text-sm muted">{mail ? (mail.configured ? 'Sozlangan' : 'Sozlanmagan') : '…'}</div>
+            <div className="text-xs faint mt-1">Tasdiqlash kodlari</div>
+          </button>
+        )}
       </div>
 
-      <div className="grid lg:grid-cols-[1.4fr_1fr] gap-5">
+      <div className={isSuper ? 'grid lg:grid-cols-[1.4fr_1fr] gap-5' : 'grid gap-5 max-w-xl'}>
+        {isSuper && (
         <div className="card p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="h2">🆕 So'nggi ro'yxatdan o'tganlar</div>
@@ -531,12 +585,15 @@ function AdminHome({ me, open }) {
             ))}
           </div>
         </div>
+        )}
         <div className="card p-5">
           <div className="h2 mb-3">⚡ Tezkor amallar</div>
           <div className="grid gap-2">
-            <button type="button" className="btn btn-gold btn-block" onClick={() => open('users', { add: '1' })}>
-              + {me.role === 'superadmin' ? "Foydalanuvchi yoki admin qo'shish" : "Foydalanuvchi qo'shish"}
-            </button>
+            {isSuper && (
+              <button type="button" className="btn btn-gold btn-block" onClick={() => open('users', { add: '1' })}>
+                + Foydalanuvchi yoki admin qo'shish
+              </button>
+            )}
             <Link to="/media/news" className="btn btn-ghost btn-block">
               📰 Yangilik e'lon qilish
             </Link>
@@ -555,8 +612,12 @@ function AdminHome({ me, open }) {
 
 export default function AdminPage() {
   const { user } = useAuth();
+  const isSuper = user.role === 'superadmin';
   const [params, setParams] = useSearchParams();
-  const tab = params.get('tab') || 'home';
+  // "Foydalanuvchilar" bo'limi faqat super admin uchun; oddiy admin uni ko'rmaydi va havola orqali ham ocholmaydi
+  const tabs = TABS.filter(([k]) => k !== 'users' || isSuper);
+  const requested = params.get('tab') || 'home';
+  const tab = tabs.some(([k]) => k === requested) ? requested : 'home';
   const open = (k, extra = {}) => {
     setParams({ tab: k, ...extra });
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -567,16 +628,17 @@ export default function AdminPage() {
       <div className="page-wide">
         <PageHeader eyebrow="Boshqaruv" title="Admin panel" subtitle={`${ROLE_LABEL[user.role]} · ${user.displayName || user.username}`} />
         <div className="tabs mb-6">
-          {TABS.map(([k, l]) => (
+          {tabs.map(([k, l]) => (
             <button key={k} type="button" className={`chip ${tab === k ? 'chip-active' : ''}`} onClick={() => open(k)}>
               {l}
             </button>
           ))}
         </div>
         {tab === 'home' && <AdminHome me={user} open={open} />}
-        {tab === 'users' && <UsersPanel me={user} openForm={params.get('add') === '1'} />}
+        {tab === 'users' && isSuper && <UsersPanel me={user} openForm={params.get('add') === '1'} />}
         {tab === 'stats' && <StatsTab />}
         {tab === 'ai' && <AiTab me={user} />}
+        {tab === 'mail' && <MailPanel me={user} />}
         {tab === 'content' && <ContentTab />}
       </div>
     </Layout>

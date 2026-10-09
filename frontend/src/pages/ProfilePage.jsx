@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout.jsx';
 import { LANG_OPTIONS, PageHeader, StatCard, formatDate } from '../components/ui.jsx';
 import { api } from '../lib/api.js';
+import CodeField, { useCooldown } from '../components/CodeField.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTheme } from '../lib/hooks.js';
 import { getRemember, setRemember } from '../lib/supabase.js';
@@ -18,15 +19,52 @@ function ContactCard({ user, setUser }) {
   const [phone, setPhone] = useState(user.phone ? formatPhone(user.phone) : '+998 ');
   const [busy, setBusy] = useState('');
   const [msg, setMsg] = useState(null);
+  const [codeStep, setCodeStep] = useState(false);
+  const [code, setCode] = useState('');
+  const [cooldown, setCooldown] = useCooldown(0);
+  const cleanEmail = email.trim().toLowerCase();
 
-  async function save(field) {
-    setBusy(field);
+  // Yangi email — avval emailga 6 xonali kod yuboriladi, kod kiritilgach saqlanadi
+  async function sendEmailCode() {
+    setBusy('email');
     setMsg(null);
     try {
-      const res = await api.updateContact(field === 'email' ? { email } : { phone });
+      const res = await api.sendEmailCode(cleanEmail, 'change-email');
+      setCooldown(res?.cooldown || 60);
+      setCode('');
+      setCodeStep(true);
+    } catch (err) {
+      setMsg({ ok: false, text: err.message });
+    } finally {
+      setBusy('');
+    }
+  }
+
+  async function confirmEmail(e) {
+    e.preventDefault();
+    setBusy('email-confirm');
+    setMsg(null);
+    try {
+      const res = await api.updateContact({ email: cleanEmail, emailCode: code });
       setUser(res.user);
-      if (field === 'phone') setPhone(res.user.phone ? formatPhone(res.user.phone) : '+998 ');
-      setMsg({ ok: true, text: field === 'email' ? '✅ Email saqlandi — endi u bilan ham kira olasiz.' : '✅ Telefon saqlandi — endi u bilan ham kira olasiz.' });
+      setCodeStep(false);
+      setCode('');
+      setMsg({ ok: true, text: '✅ Email tasdiqlandi va saqlandi — endi u bilan ham kira olasiz.' });
+    } catch (err) {
+      setMsg({ ok: false, text: err.message });
+    } finally {
+      setBusy('');
+    }
+  }
+
+  async function savePhone() {
+    setBusy('phone');
+    setMsg(null);
+    try {
+      const res = await api.updateContact({ phone });
+      setUser(res.user);
+      setPhone(res.user.phone ? formatPhone(res.user.phone) : '+998 ');
+      setMsg({ ok: true, text: '✅ Telefon saqlandi — endi u bilan ham kira olasiz.' });
     } catch (err) {
       setMsg({ ok: false, text: err.message });
     } finally {
@@ -38,20 +76,46 @@ function ContactCard({ user, setUser }) {
     <div className="card p-5">
       <div className="h2 mb-1">🔑 Kirish ma'lumotlari</div>
       <p className="text-sm muted mb-4">Email ham, telefon ham kiritilgan bo'lsa — qaysi biri qulay bo'lsa, shu bilan kirasiz.</p>
-      <label className="field">
-        <span className="label">📧 Email {user.email && <span className="badge badge-pine ml-1">ulangan</span>}</span>
+      <div className="field">
+        <label className="label" htmlFor="profile-email">
+          📧 Email {user.email && <span className="badge badge-pine ml-1">tasdiqlangan</span>}
+        </label>
         <div className="flex gap-2">
-          <input type="email" className="input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ism@gmail.com" autoComplete="email" />
-          <button type="button" className="btn btn-soft shrink-0" disabled={busy === 'email' || !email.trim() || email.trim().toLowerCase() === (user.email || '')} onClick={() => save('email')}>
-            {busy === 'email' ? <span className="spinner" /> : 'Saqlash'}
+          <input
+            id="profile-email"
+            type="email"
+            className="input"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setCodeStep(false);
+            }}
+            placeholder="ism@gmail.com"
+            autoComplete="email"
+          />
+          <button
+            type="button"
+            className="btn btn-soft shrink-0"
+            disabled={busy === 'email' || !cleanEmail || cleanEmail === (user.email || '')}
+            onClick={sendEmailCode}
+          >
+            {busy === 'email' ? <span className="spinner" /> : 'Kod yuborish'}
           </button>
         </div>
-      </label>
+        {codeStep && (
+          <form onSubmit={confirmEmail} className="mt-3 card-soft p-3.5">
+            <CodeField value={code} onChange={setCode} email={cleanEmail} cooldown={cooldown} onResend={sendEmailCode} resending={busy === 'email'} />
+            <button type="submit" className="btn btn-primary mt-3" disabled={busy === 'email-confirm' || code.length !== 6}>
+              {busy === 'email-confirm' ? <span className="spinner" /> : '✓ Tasdiqlash va saqlash'}
+            </button>
+          </form>
+        )}
+      </div>
       <label className="field">
         <span className="label">📱 Telefon {user.phone && <span className="badge badge-pine ml-1">ulangan</span>}</span>
         <div className="flex gap-2">
           <input type="tel" inputMode="tel" className="input" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+998 90 123 45 67" autoComplete="tel" />
-          <button type="button" className="btn btn-soft shrink-0" disabled={busy === 'phone'} onClick={() => save('phone')}>
+          <button type="button" className="btn btn-soft shrink-0" disabled={busy === 'phone'} onClick={savePhone}>
             {busy === 'phone' ? <span className="spinner" /> : 'Saqlash'}
           </button>
         </div>
