@@ -1,7 +1,8 @@
 import { speakSimple } from '../lib/tts.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { t } from '../i18n/index.js';
 
-export default function SpeakButton({ text, lang, size = 'sm', className = '', title = 'Talaffuzni eshitish' }) {
+export default function SpeakButton({ text, lang, size = 'sm', className = '', title = t('Talaffuzni eshitish') }) {
   const { progress } = useAuth();
   const settings = progress.voiceSettings?.[lang] || {};
 

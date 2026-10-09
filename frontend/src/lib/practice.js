@@ -1,12 +1,27 @@
+import { t } from '../i18n/index.js';
+
 // Lug'at mashqi mexanizmi: savollar tuzish va javobni tekshirish.
 // Element (item) shakli: { w: so'z, t: o'qilishi, m: ma'nosi (o'zbekcha), s?: misol gap, st?: gap tarjimasi }
 
+// Rejim nomlari va izohlari — getter: har o'qilganda joriy interfeys tilida qaytadi.
+function mode(icon, labelKey, hintKey) {
+  return {
+    icon,
+    get label() {
+      return t(labelKey);
+    },
+    get hint() {
+      return t(hintKey);
+    },
+  };
+}
+
 export const MODES = {
-  choice: { label: "So'z → ma'no", icon: '🔤', hint: "So'zni ko'rib, to'g'ri tarjimani tanlang" },
-  reverse: { label: "Ma'no → so'z", icon: '🔁', hint: "O'zbekcha ma'noga mos so'zni tanlang" },
-  write: { label: 'Yozish', icon: '⌨️', hint: "Ma'noga qarab so'zni o'zingiz yozing" },
-  listen: { label: 'Tinglash', icon: '🎧', hint: "So'zni eshitib, ma'nosini tanlang" },
-  mixed: { label: 'Aralash', icon: '🎲', hint: 'Hamma turdagi savollar aralash' },
+  choice: mode('🔤', "So'z → ma'no", "So'zni ko'rib, to'g'ri tarjimani tanlang"),
+  reverse: mode('🔁', "Ma'no → so'z", "O'zbekcha ma'noga mos so'zni tanlang"),
+  write: mode('⌨️', 'Yozish', "Ma'noga qarab so'zni o'zingiz yozing"),
+  listen: mode('🎧', 'Tinglash', "So'zni eshitib, ma'nosini tanlang"),
+  mixed: mode('🎲', 'Aralash', 'Hamma turdagi savollar aralash'),
 };
 
 export function shuffle(arr) {
@@ -75,13 +90,13 @@ function pickDistractors(item, pool, field, n = 3) {
 }
 
 /** Savollar ro'yxatini tuzadi. pool — chalg'ituvchi variantlar olinadigan kengroq ro'yxat. */
-export function buildQuestions(items, { mode = 'choice', count = 20, pool = null, keepOrder = false } = {}) {
+export function buildQuestions(items, { mode: qMode = 'choice', count = 20, pool = null, keepOrder = false } = {}) {
   const source = dedupeItems(items);
   const distractorPool = dedupeItems(pool && pool.length >= 4 ? pool : source);
   const chosen = (keepOrder ? source : shuffle(source)).slice(0, count > 0 ? count : source.length);
   return chosen.map((item, idx) => {
-    let qm = mode;
-    if (mode === 'mixed') {
+    let qm = qMode;
+    if (qMode === 'mixed') {
       const opts = ['choice', 'choice', 'reverse', 'listen'];
       if (String(item.w).length <= 24) opts.push('write', 'write');
       qm = opts[Math.floor(Math.random() * opts.length)];
@@ -117,8 +132,8 @@ export function expectedAnswer(q) {
 }
 
 /** Lug'at qatorlarini (har xil manbadan) yagona element shakliga keltiradi. */
-export function fromVocabRow([w, t, m]) {
-  return { w, t: t && t !== w ? t : '', m };
+export function fromVocabRow([w, tr, m]) {
+  return { w, t: tr && tr !== w ? tr : '', m };
 }
 export function fromWordRow([w, m, s, st]) {
   return { w, t: '', m, s, st };

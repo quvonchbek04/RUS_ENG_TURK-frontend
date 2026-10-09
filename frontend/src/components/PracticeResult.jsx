@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import SpeakButton from './SpeakButton.jsx';
 import { readingHint } from '../lib/translit.js';
 import { MODES } from '../lib/practice.js';
+import { t } from '../i18n/index.js';
 import { formatDateTime } from './ui.jsx';
 
 function pct(r) {
@@ -10,10 +11,10 @@ function pct(r) {
 }
 
 function fmtDuration(sec) {
-  if (!sec) return '0 s';
+  if (!sec) return t('{s} s', { s: 0 });
   const m = Math.floor(sec / 60);
   const s = sec % 60;
-  return m ? `${m} daq ${s} s` : `${s} s`;
+  return m ? t('{m} daq {s} s', { m, s }) : t('{s} s', { s });
 }
 
 function ScoreRing({ value }) {
@@ -50,14 +51,18 @@ function WordRow({ it, lang, kind }) {
           <span className="font-display font-semibold text-[17px]" style={{ color: 'var(--ink)' }}>
             {it.w}
           </span>
-          {hint && hint !== it.w && <span className="font-mono text-xs" style={{ color: 'var(--gold)' }}>{hint}</span>}
+          {hint && hint !== it.w && (
+            <span className="font-mono text-xs" style={{ color: 'var(--gold)' }}>
+              {hint}
+            </span>
+          )}
         </div>
         <div className="text-sm mt-0.5" style={{ color: 'var(--pine)' }}>
           ✓ {it.m}
         </div>
         {kind === 'mistake' && (
           <div className="text-sm mt-0.5" style={{ color: 'var(--brick)' }}>
-            ✗ Sizning javobingiz: {it.g ? <b>{it.g}</b> : <i>javob berilmadi</i>}
+            ✗ {t('Sizning javobingiz:')} {it.g ? <b>{it.g}</b> : <i>{t('javob berilmadi')}</i>}
             {it.qm && <span className="faint text-xs"> · {MODES[it.qm]?.label}</span>}
           </div>
         )}
@@ -86,14 +91,14 @@ export default function PracticeResult({ record, onRetryMistakes, onRestart, ext
 
   const message =
     record.answered === 0
-      ? "Hech bir savolga javob berilmadi."
+      ? t('Hech bir savolga javob berilmadi.')
       : value >= 90
-        ? "A'lo! Juda yaxshi natija 🏆"
+        ? t("A'lo! Juda yaxshi natija 🏆")
         : value >= 70
-          ? 'Yaxshi natija! Xatolarni takrorlab oling 👍'
+          ? t('Yaxshi natija! Xatolarni takrorlab oling 👍')
           : value >= 50
-            ? "Yomon emas — xatolar ustida ishlash tavsiya etiladi 💪"
-            : "Bu so'zlarni yana bir bor takrorlash kerak 📚";
+            ? t('Yomon emas — xatolar ustida ishlash tavsiya etiladi 💪')
+            : t("Bu so'zlarni yana bir bor takrorlash kerak 📚");
 
   return (
     <div className="anim-rise">
@@ -101,15 +106,16 @@ export default function PracticeResult({ record, onRetryMistakes, onRestart, ext
         <div className="flex flex-wrap items-center gap-5">
           <ScoreRing value={value} />
           <div className="flex-1 min-w-[200px]">
-            <div className="eyebrow mb-1">Natija{record.early ? ' · muddatidan oldin to\'xtatildi' : ''}</div>
-            <div className="h1 !text-2xl sm:!text-3xl">
-              {record.correct} / {record.total} to'g'ri
+            <div className="eyebrow mb-1">
+              {t('Natija')}
+              {record.early ? ` · ${t("muddatidan oldin to'xtatildi")}` : ''}
             </div>
+            <div className="h1 !text-2xl sm:!text-3xl">{t("{a} / {b} to'g'ri", { a: record.correct, b: record.total })}</div>
             <p className="muted mt-1 text-sm">{message}</p>
             <div className="flex flex-wrap gap-2 mt-3">
-              <span className="badge badge-pine">✓ {record.correct} to'g'ri</span>
-              <span className="badge badge-brick">✗ {mistakes.length} xato</span>
-              {skipped.length > 0 && <span className="badge">⏭ {skipped.length} javobsiz</span>}
+              <span className="badge badge-pine">{t("✓ {n} to'g'ri", { n: record.correct })}</span>
+              <span className="badge badge-brick">{t('✗ {n} xato', { n: mistakes.length })}</span>
+              {skipped.length > 0 && <span className="badge">{t('⏭ {n} javobsiz', { n: skipped.length })}</span>}
               <span className="badge badge-sky">⏱ {fmtDuration(record.durationSec)}</span>
               {record.at && <span className="badge">{formatDateTime(record.at)}</span>}
             </div>
@@ -118,18 +124,18 @@ export default function PracticeResult({ record, onRetryMistakes, onRestart, ext
         <div className="flex flex-wrap gap-2 mt-5">
           {onRetryMistakes && retryList.length > 0 && (
             <button type="button" className="btn btn-gold" onClick={() => onRetryMistakes(retryList)}>
-              🔁 Xatolar ustida ishlash ({retryList.length})
+              {t('🔁 Xatolar ustida ishlash ({n})', { n: retryList.length })}
             </button>
           )}
           {onRestart && (
             <button type="button" className="btn btn-primary" onClick={onRestart}>
-              ↺ Yangi mashq
+              {t('↺ Yangi mashq')}
             </button>
           )}
           {extraActions}
           {showHistoryLink && (
             <Link to="/results" className="btn btn-ghost">
-              📊 Barcha natijalar
+              {t('📊 Barcha natijalar')}
             </Link>
           )}
         </div>
@@ -137,15 +143,15 @@ export default function PracticeResult({ record, onRetryMistakes, onRestart, ext
 
       <div className="tabs mb-3">
         <button type="button" className={`chip ${tab === 'mistakes' ? 'chip-active' : ''}`} onClick={() => setTab('mistakes')}>
-          ❌ Xatolar · {mistakes.length}
+          {t('❌ Xatolar · {n}', { n: mistakes.length })}
         </button>
         {skipped.length > 0 && (
           <button type="button" className={`chip ${tab === 'skipped' ? 'chip-active' : ''}`} onClick={() => setTab('skipped')}>
-            ⏭ Javobsiz · {skipped.length}
+            {t('⏭ Javobsiz · {n}', { n: skipped.length })}
           </button>
         )}
         <button type="button" className={`chip ${tab === 'ok' ? 'chip-active' : ''}`} onClick={() => setTab('ok')}>
-          ✅ To'g'rilar · {okList.length}
+          {t("✅ To'g'rilar · {n}", { n: okList.length })}
         </button>
       </div>
 
@@ -154,7 +160,7 @@ export default function PracticeResult({ record, onRetryMistakes, onRestart, ext
           (mistakes.length ? (
             mistakes.map((it, i) => <WordRow key={i} it={it} lang={record.lang} kind="mistake" />)
           ) : (
-            <div className="card-soft p-6 text-center muted">Xato yo'q — barakalla! 🎉</div>
+            <div className="card-soft p-6 text-center muted">{t("Xato yo'q — barakalla! 🎉")}</div>
           ))}
         {tab === 'skipped' && skipped.map((it, i) => <WordRow key={i} it={it} lang={record.lang} kind="skipped" />)}
         {tab === 'ok' &&
@@ -170,7 +176,7 @@ export default function PracticeResult({ record, onRetryMistakes, onRestart, ext
               ))}
             </div>
           ) : (
-            <div className="card-soft p-6 text-center muted">To'g'ri javoblar yo'q.</div>
+            <div className="card-soft p-6 text-center muted">{t("To'g'ri javoblar yo'q.")}</div>
           ))}
       </div>
     </div>

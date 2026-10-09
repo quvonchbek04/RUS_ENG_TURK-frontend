@@ -6,6 +6,7 @@ import { DialogView } from './LessonExtras.jsx';
 import { AiText } from './ui.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { readingHint } from '../lib/translit.js';
+import { t } from '../i18n/index.js';
 
 /** Bitta materialni turiga qarab ko'rsatadi (modal ichida yoki sahifada). */
 export default function MediaViewer({ item, onEnded, autoPlay = false }) {
@@ -45,7 +46,7 @@ export default function MediaViewer({ item, onEnded, autoPlay = false }) {
             onRateChange={(rate) => setVoice({ rate })}
             onVoiceChange={(voiceURI) => setVoice({ voiceURI })}
           />
-          <AiTaskWidget type="text" content={text.slice(0, 6000)} lang={lang} title="Matn bo'yicha AI vazifa" />
+          <AiTaskWidget type="text" content={text.slice(0, 6000)} lang={lang} title={t("Matn bo'yicha AI vazifa")} />
         </>
       )}
 
@@ -54,9 +55,9 @@ export default function MediaViewer({ item, onEnded, autoPlay = false }) {
           <DialogView lines={item.content?.lines || []} lang={lang} audioUrl={item.fileUrl} />
           <AiTaskWidget
             type="dialog"
-            content={(item.content?.lines || []).map(([s, l, t]) => `${s}: ${l}${t ? ` (${t})` : ''}`).join('\n')}
+            content={(item.content?.lines || []).map(([speaker, line, tr]) => `${speaker}: ${line}${tr ? ` (${tr})` : ''}`).join('\n')}
             lang={lang}
-            title="Dialog bo'yicha AI vazifa"
+            title={t("Dialog bo'yicha AI vazifa")}
           />
         </>
       )}
@@ -65,20 +66,24 @@ export default function MediaViewer({ item, onEnded, autoPlay = false }) {
         <>
           <div className="flex flex-wrap gap-2 mb-3">
             <Link to={`/lang/${lang}/practice-full?source=uploaded&set=${item.id}`} className="btn btn-primary btn-sm">
-              🔀 Shu lug'at bilan mashq qilish
+              {t("🔀 Shu lug'at bilan mashq qilish")}
             </Link>
-            <span className="badge">{(item.content?.words || []).length} ta so'z</span>
+            <span className="badge">{t("{n} ta so'z", { n: (item.content?.words || []).length })}</span>
           </div>
           <div className="grid sm:grid-cols-2 gap-2">
-            {(item.content?.words || []).map(([w, t, m], i) => {
-              const hint = readingHint(w, lang) || (t !== w ? t : '');
+            {(item.content?.words || []).map(([w, tr, m], i) => {
+              const hint = readingHint(w, lang) || (tr !== w ? tr : '');
               return (
                 <div key={i} className="card-soft p-3 flex items-center gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold" style={{ color: 'var(--ink)' }}>
                       {w}
                     </div>
-                    {hint && <div className="font-mono text-xs" style={{ color: 'var(--gold)' }}>{hint}</div>}
+                    {hint && (
+                      <div className="font-mono text-xs" style={{ color: 'var(--gold)' }}>
+                        {hint}
+                      </div>
+                    )}
                     <div className="text-sm muted">{m}</div>
                   </div>
                   <SpeakButton text={w} lang={lang} />

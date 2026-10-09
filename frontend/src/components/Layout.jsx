@@ -5,31 +5,33 @@ import AiTutorPanel from './AiTutorPanel.jsx';
 import { useCurrentLang } from '../lib/hooks.js';
 import { useTutor } from '../context/TutorContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import { t } from '../i18n/index.js';
+import { LanguageSwitcher } from '../i18n/react.jsx';
 
 function BottomNav({ onMenu }) {
   const { pathname } = useLocation();
   const lang = useCurrentLang();
   const { setOpen } = useTutor();
   const items = [
-    { to: '/', icon: '🏠', label: 'Asosiy', active: pathname === '/' },
-    { to: `/lang/${lang}`, icon: '🧭', label: 'Darslar', active: pathname === `/lang/${lang}` || pathname.includes('/month/') },
-    { to: `/lang/${lang}/practice-full`, icon: '🔀', label: 'Mashq', active: pathname.includes('/practice') || pathname === '/results' },
+    { to: '/', icon: '🏠', label: t('Asosiy'), active: pathname === '/' },
+    { to: `/lang/${lang}`, icon: '🧭', label: t('Darslar'), active: pathname === `/lang/${lang}` || pathname.includes('/month/') },
+    { to: `/lang/${lang}/practice-full`, icon: '🔀', label: t('Mashq'), active: pathname.includes('/practice') || pathname === '/results' },
   ];
   return (
-    <nav className="bottom-nav lg:hidden" aria-label="Asosiy menyu">
+    <nav className="bottom-nav lg:hidden" aria-label={t('Asosiy menyu')}>
       {items.map((it) => (
-        <Link key={it.label} to={it.to} className={it.active ? 'active' : ''}>
+        <Link key={it.to} to={it.to} className={it.active ? 'active' : ''}>
           <span className="nav-ico">{it.icon}</span>
           {it.label}
         </Link>
       ))}
       <button type="button" onClick={() => setOpen(true)} className={pathname === '/ai' ? 'active' : ''}>
         <span className="nav-ico">🤖</span>
-        AI ustoz
+        {t('AI ustoz')}
       </button>
       <button type="button" onClick={onMenu}>
         <span className="nav-ico">☰</span>
-        Menyu
+        {t('Menyu')}
       </button>
     </nav>
   );
@@ -108,7 +110,7 @@ export default function Layout({ children, wide = false }) {
             minHeight: 56,
           }}
         >
-          <button type="button" onClick={() => setMobileOpen(true)} className="btn btn-ghost btn-icon" aria-label="Menyuni ochish">
+          <button type="button" onClick={() => setMobileOpen(true)} className="btn btn-ghost btn-icon" aria-label={t('Menyuni ochish')}>
             ☰
           </button>
           <Link to="/" className="flex items-center gap-2 min-w-0">
@@ -117,8 +119,9 @@ export default function Layout({ children, wide = false }) {
               Til sayohati
             </span>
           </Link>
+          <LanguageSwitcher variant="cycle" className="ml-auto !w-9 !h-9 !min-h-9" />
           {user && (
-            <Link to="/profile" className="ml-auto w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: 'var(--grad-brand)', color: '#fff' }}>
+            <Link to="/profile" className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: 'var(--grad-brand)', color: '#fff' }}>
               {(user.displayName || user.username || '?').slice(0, 1).toUpperCase()}
             </Link>
           )}
@@ -128,8 +131,8 @@ export default function Layout({ children, wide = false }) {
 
         <footer className="hidden lg:block border-t py-5" style={{ borderColor: 'var(--line)' }}>
           <div className="page-wide !py-0 text-xs faint flex flex-wrap gap-x-4 gap-y-1">
-            <span>© Til sayohati — ingliz, rus va turk tillari o'zbek tilida</span>
-            <span>Ctrl/⌘ + K — AI ustoz</span>
+            <span>{t("© Til sayohati — ingliz, rus va turk tillari o'zbek tilida")}</span>
+            <span>{t('Ctrl/⌘ + K — AI ustoz')}</span>
           </div>
         </footer>
       </div>
@@ -140,9 +143,9 @@ export default function Layout({ children, wide = false }) {
           type="button"
           onClick={() => setOpen(true)}
           className="hidden lg:flex fixed right-6 bottom-6 z-30 btn btn-brand btn-lg !rounded-full shadow-lg"
-          title="AI ustozdan so'rash"
+          title={t("AI ustozdan so'rash")}
         >
-          🤖 AI ustoz
+          {t('🤖 AI ustoz')}
         </button>
       )}
 

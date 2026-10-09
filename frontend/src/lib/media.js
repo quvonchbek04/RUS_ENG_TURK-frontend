@@ -1,5 +1,7 @@
+import { t } from '../i18n/index.js';
+
 // Yuklanadigan material turlari: chap menyu, yuklash formasi va ko'rish sahifasi uchun umumiy sozlamalar.
-export const MEDIA_META = {
+const RAW_MEDIA_META = {
   audio: {
     icon: '🎵',
     label: 'Musiqa va audio',
@@ -61,4 +63,32 @@ export const MEDIA_META = {
   },
 };
 
+/** Matnli maydonlar getter bo'lib qoladi — har o'qilganda joriy interfeys tilida qaytadi. */
+function localized(obj, fields) {
+  const out = { ...obj };
+  for (const f of fields) {
+    if (obj[f] === undefined) continue;
+    const raw = obj[f];
+    Object.defineProperty(out, f, { get: () => t(raw), enumerable: true });
+  }
+  return out;
+}
+
+export const MEDIA_META = Object.fromEntries(
+  Object.entries(RAW_MEDIA_META).map(([kind, meta]) => [kind, localized(meta, ['label', 'short', 'hint', 'textLabel'])])
+);
+
 export const MEDIA_ORDER = ['news', 'audio', 'video', 'dialog', 'vocab', 'text', 'image'];
+
+/** Foydalanuvchi shu turdagi materialni yuklay, tahrirlay va o'chira oladimi?
+ *  Super admin — hamma turni; admin — faqat super admin ruxsat bergan turlarni; o'quvchi — hech narsani.
+ *  (Haqiqiy cheklov bazada ham majburlanadi — bu faqat tugmalarni ko'rsatish/yashirish uchun.) */
+export function canUploadKind(user, kind) {
+  if (!user) return false;
+  if (user.role === 'superadmin') return true;
+  return user.role === 'admin' && Array.isArray(user.uploadKinds) && user.uploadKinds.includes(kind);
+}
+
+export function uploadableKinds(user) {
+  return MEDIA_ORDER.filter((k) => canUploadKind(user, k));
+}

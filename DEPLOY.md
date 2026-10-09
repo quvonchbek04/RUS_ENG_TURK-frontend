@@ -12,10 +12,11 @@ Taxminiy vaqt: 20–30 daqiqa. Kerak bo'ladi: GitHub, Netlify va Supabase hisobl
    Bu bitta faylda hammasi bor: jadvallar, xavfsizlik (RLS) qoidalari, fayl saqlash joyi (`media` bucket),
    AI sozlamalari va **super admin** (login `quvonchbek`, parol `admin123`).
    > Avvalgi versiya o'rnatilgan bo'lsa — faqat `supabase/migrations/0004_seed_superadmin.sql`,
-   > `0005_v2_platform.sql`, `0006_email_phone_login.sql`, `0007_email_codes.sql` va
-   > `0008_users_super_only.sql` ni ketma-ket ishga tushirish kifoya (eski ma'lumotlar saqlanadi,
-   > kutubxona va lug'at to'plamlari yangi "Materiallar" bo'limiga avtomatik ko'chiriladi).
-   > Shundan keyin `admin` funksiyasini yangi kod bilan qayta joylang (1.5-band).
+   > `0005_v2_platform.sql`, `0006_email_phone_login.sql`, `0007_email_codes.sql`,
+   > `0008_users_super_only.sql`, `0009_admin_permissions.sql` va `0010_signup_methods_telegram.sql` ni
+   > ketma-ket ishga tushirish kifoya (eski ma'lumotlar saqlanadi, kutubxona va lug'at to'plamlari yangi
+   > "Materiallar" bo'limiga avtomatik ko'chiriladi; mavjud adminlarga hamma bo'limga yuklash ruxsati beriladi).
+   > Shundan keyin **`admin` va `ai` funksiyalarini yangi kod bilan qayta joylang** (1.5-band).
 3. **Authentication → Sign In / Providers:**
    - **Email provider** — yoqilgan bo'lsin; **Confirm email** — **O'CHIRING** (tasdiqlash kodini Supabase emas,
      ilovaning o'zi yuboradi; telefon bilan ro'yxatdan o'tish ichki email orqali ishlaydi, unga xat borib bo'lmaydi).
@@ -77,14 +78,41 @@ git push -u origin main
      Senders bo'limida o'z emailingizni qo'shib, tasdiqlang → SMTP & API → API Keys'dan kalit oling;
    - kalitni va yuboruvchi emailni panelga kiriting → **Saqlash** → **Test xat yuborish**: xat kelsa, tayyor.
    - Sozlanmaguncha email bilan ro'yxatdan o'tish ishlamaydi, telefon bilan esa ishlayveradi.
-5. **Admin panel → 👥 Foydalanuvchilar** (chap menyuda ham bor) — ro'yxat, qidiruv, rol berish, bloklash,
+   - Email kodini yoqish/o'chirish va boshqa usullar — keyingi band (🛡️ Ro'yxatdan o'tish).
+5. **Admin panel → 🛡️ Ro'yxatdan o'tish** (faqat super admin) — **foydalanuvchilar qaysi usullar bilan o'zlari
+   ro'yxatdan o'tishi mumkinligini** siz belgilaysiz (yoqish/o'chirish tugmalari):
+   - 👤 **Oddiy: ism + login + parol** — email ham, telefon ham kerak emas, tasdiqlash yo'q (parolni faqat admin tiklaydi);
+   - 📧 **Email bilan** — *tasdiqlash kodi bilan* (tavsiya; Email xizmati kerak) yoki *kodsiz* (email shunchaki saqlanadi,
+     Email xizmati kerak emas — Brevo tayyor bo'lmaguncha vaqtincha qulay, lekin birovning emailini yozish mumkin);
+   - 📱 **Telefon bilan** — *kodsiz* yoki **Telegram bot orqali tasdiqlash** (pastdagi qadamlarga qarang).
+   Kamida bitta usul yoqilgan bo'lishi shart. Forma faqat yoqilgan usullarni ko'rsatadi; server ham yopiq usulni qabul qilmaydi.
+   Siz o'zingiz qo'shgan hisoblarga (Foydalanuvchilar bo'limi) bu qoidalar ta'sir qilmaydi.
+   **Telegram botni ulash (bir marta):**
+   1. Telegram'da **@BotFather** → `/newbot` → nom va username (oxiri `bot` bilan, masalan `til_sayohati_bot`) bering;
+   2. BotFather bergan **tokenni** (`123456789:AAH…`) nusxalab, shu bo'limdagi "Telegram bot" maydoniga joylang → **Ulash**.
+      Webhook avtomatik o'rnatiladi (qo'shimcha sozlash kerak emas; `admin` funksiyasi joylangan va JWT tekshiruvi o'chiq bo'lishi shart);
+   3. **Tekshirish** tugmasi bot va webhook ishlayotganini ko'rsatadi; keyin "Telefon raqami bilan" blokida
+      **"Telegram bot orqali tasdiqlash"** ni tanlang.
+   Qanday ishlaydi: foydalanuvchi raqamini kiritadi → "Telegramni ochish" → botda *Start* → *Raqamni ulashish* (bot
+   ulashilgan raqam o'sha foydalanuvchiniki va kiritilgan raqamga teng ekanini tekshiradi) → bot 6 xonali kod yuboradi →
+   foydalanuvchi kodni saytga kiritadi. Bepul. Foydalanuvchida Telegram bo'lishi kerak. Profilda raqamni almashtirish ham shu orqali tasdiqlanadi.
+6. **Admin panel → 👥 Foydalanuvchilar** (chap menyuda ham bor) — ro'yxat, qidiruv, rol berish, bloklash,
    parolni tiklash, o'chirish; "+ Foydalanuvchi / admin" orqali yangi o'quvchi yoki admin qo'shing
    (login yoki email + ixtiyoriy telefon + parol; admin qo'shgan foydalanuvchilarga kod yuborilmaydi).
    > 🔒 **Bu bo'lim faqat super adminga ko'rinadi.** Oddiy admin foydalanuvchilar ro'yxatini, ularning
    > email/telefonini va progressini ko'rmaydi, qo'sha/o'chira/bloklay olmaydi (server ham, ma'lumotlar bazasi
    > ham ruxsat bermaydi). Oddiy admin faqat materiallar yuklaydi va AI/email holatini ko'radi.
    > Yangi admin tayinlash — Foydalanuvchilar bo'limida rolni "Admin" qilish (faqat super admin).
-6. **Chap menyu → Materiallar** — musiqa, video, rasm, matn, dialog, lug'at va yangiliklarni yuklang.
+7. **Admin panel → 🔐 Ruxsatlar** (chap menyuda ham bor, faqat super adminga) — har bir admin uchun qaysi bo'limlarda
+   (Yangiliklar, Musiqa, Video, Dialoglar, Lug'atlar, Matnlar, Rasmlar) material **yuklash, tahrirlash, o'chirish va
+   tartiblash** mumkinligini belgilaysiz: bo'limni bosib ruxsat berasiz/olib tashlaysiz, "Hammasi" / "Hech biri" tugmalari bor.
+   Yangi admin boshida hamma bo'limga ruxsat oladi — keyin cheklaysiz. Ruxsat berilmagan bo'limni admin faqat ko'ra oladi
+   (o'quvchi kabi). Cheklov server va baza darajasida ham majburlanadi.
+8. **Chap menyu → Materiallar** — musiqa, video, rasm, matn, dialog, lug'at va yangiliklarni yuklang
+   (admin — faqat o'ziga ruxsat berilgan bo'limlarga).
+9. **Sayt tili:** foydalanuvchi o'zbek, rus, ingliz yoki turk tilini tanlashi mumkin — kirish sahifasi yuqorisida, chap menyu
+   pastida va Profil → Sozlamalarda. Menyular, tugmalar, xabarlar va AI ustoz javoblari tanlangan tilda chiqadi; dars
+   materiallaridagi tushuntirishlar (grammatika matnlari, o'zbekcha tarjimalar) o'zbek tilida qoladi.
 
 ## 5. (Ixtiyoriy) Funksiyalarni avtomatik joylash
 
@@ -110,6 +138,11 @@ node scripts/build-content.mjs
 | Kod kelmayapti | Spam papkasini tekshiring; Email xizmati bo'limida "Test xat" yuboring — xato matni sababini ko'rsatadi (odatda yuboruvchi email tasdiqlanmagan yoki API kalit noto'g'ri) |
 | "Bu emailga juda ko'p kod yuborildi" | Bir emailga soatiga 5 tadan ko'p kod yuborilmaydi — 1 soat kuting |
 | "Ro'yxatdan o'tish vaqtincha o'chirilgan" yoki ro'yxatdan o'tib bo'lmayapti | `admin` funksiyasi yangi versiyada joylanmagan yoki `0007_email_codes.sql` ishga tushirilmagan |
+| Telegram'dan kod kelmayapti | Admin panel → 🛡️ Ro'yxatdan o'tish → **Tekshirish**: webhook ulangan bo'lishi kerak (aks holda tokenni qayta kiritib **Ulash** bosing). Foydalanuvchi botda avval *Start*, keyin *Raqamni ulashish* tugmasini bosgan bo'lishi va ulashilgan raqam saytdagi raqamga teng bo'lishi shart |
+| "Telegram orqali tasdiqlash yoqilmagan" | Super admin Telegram tasdiqlashni yoqmagan yoki bot ulanmagan |
+| Ro'yxatdan o'tish sahifasida usullar yo'q / "ro'yxatdan o'tish yopiq" | Hech bir usul yoqilmagan: Admin panel → 🛡️ Ro'yxatdan o'tish |
+| Ro'yxatdan o'tish sozlamalari saqlanmayapti / Telegram ishlamayapti | `0010_signup_methods_telegram.sql` ishga tushirilmagan yoki `admin` funksiyasi yangilanmagan |
+| Admin yuklayotganda "ruxsatingiz yo'q" xabarini ko'ryapti | Super admin unga shu bo'limga ruxsat bermagan: Admin panel → 🔐 Ruxsatlar. Ruxsat berilgach admin sahifani yangilasin. `0009_admin_permissions.sql` ishga tushirilmagan bo'lsa, yuklash hamma uchun ishlamay qolishi mumkin |
 | Admin "Foydalanuvchilar bo'limi faqat super admin uchun" xabarini ko'ryapti | Bu to'g'ri ishlashi: foydalanuvchilar faqat super adminga ko'rinadi (`0008_users_super_only.sql`) |
 | Telefon bilan kirib bo'lmayapti (email bilan esa kiradi) | `admin` funksiyasi joylanmagan yoki `0006_email_phone_login.sql` ishga tushirilmagan |
 | "Juda ko'p noto'g'ri urinish" | 15 daqiqada 10 marta noto'g'ri parol — 15 daqiqa kuting yoki admin parolni tiklasin |

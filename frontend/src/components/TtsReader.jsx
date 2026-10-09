@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { buildWordTimings, getVoicesFor, isSpeechSupported, langToBCP47 } from '../lib/tts.js';
+import { t } from '../i18n/index.js';
 
 function escapeHtml(str) {
   return (str || '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
@@ -50,12 +51,12 @@ export default function TtsReader({ text, lang, rate, voiceURI, onRateChange, on
     const elapsed = elapsedBeforePauseRef.current + (Date.now() - playStartTsRef.current);
     let current = null;
     spansRef.current.forEach((span, i) => {
-      const t = timingsRef.current[i];
-      if (!t) return;
-      if (elapsed >= t.end) {
+      const tm = timingsRef.current[i];
+      if (!tm) return;
+      if (elapsed >= tm.end) {
         span.classList.add('read');
         span.classList.remove('current');
-      } else if (elapsed >= t.start) {
+      } else if (elapsed >= tm.start) {
         span.classList.add('current');
         span.classList.remove('read');
         current = span;
@@ -82,7 +83,7 @@ export default function TtsReader({ text, lang, rate, voiceURI, onRateChange, on
 
   function start(resume) {
     if (!isSpeechSupported()) {
-      alert("Kechirasiz, bu brauzer ovozli o'qishni qo'llab-quvvatlamaydi.");
+      alert(t("Kechirasiz, bu brauzer ovozli o'qishni qo'llab-quvvatlamaydi."));
       return;
     }
     window.speechSynthesis.cancel();
@@ -166,16 +167,16 @@ export default function TtsReader({ text, lang, rate, voiceURI, onRateChange, on
     <div>
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <button type="button" onClick={togglePlay} className="btn btn-primary">
-          {isPlaying ? '⏸ Pauza' : finished ? "↺ Qayta o'qish" : "▶ Ovoz bilan o'qish"}
+          {isPlaying ? t('⏸ Pauza') : finished ? t("↺ Qayta o'qish") : t("▶ Ovoz bilan o'qish")}
         </button>
         {(isPlaying || elapsedBeforePauseRef.current > 0) && (
           <button type="button" onClick={stop} className="btn btn-ghost">
-            ⏹ To'xtatish
+            {t("⏹ To'xtatish")}
           </button>
         )}
 
         <label className="flex items-center gap-2 text-xs font-semibold muted">
-          Tezlik
+          {t('Tezlik')}
           <input
             type="range"
             min="0.5"
@@ -195,7 +196,7 @@ export default function TtsReader({ text, lang, rate, voiceURI, onRateChange, on
             onChange={(e) => onVoiceChange(e.target.value || null)}
             className="select !w-auto !py-2 text-xs"
           >
-            <option value="">Standart ovoz</option>
+            <option value="">{t('Standart ovoz')}</option>
             {voices.map((v) => (
               <option key={v.voiceURI} value={v.voiceURI}>
                 {v.name}

@@ -3,13 +3,14 @@ import { api } from '../lib/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTutor } from '../context/TutorContext.jsx';
 import { withActivity } from '../lib/lessonProgress.js';
+import { t } from '../i18n/index.js';
 import { AiText } from './ui.jsx';
 
 const KINDS = [
   { key: 'auto', label: '🎲 Avtomatik' },
   { key: 'translate', label: '🔁 Tarjima' },
   { key: 'compose', label: '✍️ Gap tuzish' },
-  { key: 'fill', label: '🧩 Bo\'sh joy' },
+  { key: 'fill', label: "🧩 Bo'sh joy" },
   { key: 'question', label: '❓ Savol-javob' },
   { key: 'grammar', label: '📐 Grammatika' },
 ];
@@ -55,7 +56,7 @@ export default function AiTaskWidget({ type = 'text', content, lang, title = 'AI
       setTask(res);
       setAsked((a) => [...a, res.question].slice(-6));
     } catch (e) {
-      setError(e.message || 'Vazifa olishda xatolik yuz berdi');
+      setError(e.message || t('Vazifa olishda xatolik yuz berdi'));
     } finally {
       setLoading(false);
     }
@@ -71,7 +72,7 @@ export default function AiTaskWidget({ type = 'text', content, lang, title = 'AI
       setScore((s) => ({ done: s.done + 1, ok: s.ok + (res.correct ? 1 : 0) }));
       recordStat(Boolean(res.correct));
     } catch (e) {
-      setError(e.message || 'Javobni tekshirishda xatolik yuz berdi');
+      setError(e.message || t('Javobni tekshirishda xatolik yuz berdi'));
     } finally {
       setChecking(false);
     }
@@ -83,12 +84,12 @@ export default function AiTaskWidget({ type = 'text', content, lang, title = 'AI
         <span className="text-2xl">🤖</span>
         <div className="flex-1 min-w-[180px]">
           <div className="font-bold text-sm" style={{ color: 'var(--ink)' }}>
-            {title}
+            {t(title)}
           </div>
-          <div className="text-xs muted">AI shu material asosida shaxsiy vazifa beradi va javobingizni tekshiradi</div>
+          <div className="text-xs muted">{t('AI shu material asosida shaxsiy vazifa beradi va javobingizni tekshiradi')}</div>
         </div>
         <button type="button" onClick={requestTask} className="btn btn-primary btn-sm">
-          Vazifa olish
+          {t('Vazifa olish')}
         </button>
       </div>
     );
@@ -97,28 +98,28 @@ export default function AiTaskWidget({ type = 'text', content, lang, title = 'AI
   return (
     <div className="mt-5 card p-4 sm:p-5" style={{ borderColor: 'color-mix(in srgb, var(--sky) 35%, var(--line))' }}>
       <div className="flex flex-wrap items-center gap-2 mb-3">
-        <span className="badge badge-sky">🤖 {title}</span>
+        <span className="badge badge-sky">🤖 {t(title)}</span>
         {score.done > 0 && (
           <span className="badge badge-pine">
             ✓ {score.ok}/{score.done}
           </span>
         )}
         <button type="button" className="ml-auto text-xs muted underline" onClick={() => setOpen(false)}>
-          yig'ish
+          {t("yig'ish")}
         </button>
       </div>
 
       <div className="tabs mb-3">
         {KINDS.map((k) => (
           <button key={k.key} type="button" className={`chip !py-1.5 !text-xs ${kind === k.key ? 'chip-active' : ''}`} onClick={() => setKind(k.key)}>
-            {k.label}
+            {t(k.label)}
           </button>
         ))}
       </div>
 
       {loading && (
         <div className="flex items-center gap-2 text-sm muted py-4">
-          <span className="spinner" /> Vazifa tayyorlanmoqda…
+          <span className="spinner" /> {t('Vazifa tayyorlanmoqda…')}
         </div>
       )}
 
@@ -130,16 +131,16 @@ export default function AiTaskWidget({ type = 'text', content, lang, title = 'AI
           <div className="flex flex-wrap gap-3 mb-3 text-xs">
             {task.hint && (
               <button type="button" className="font-bold" style={{ color: 'var(--gold)' }} onClick={() => setShowHint((v) => !v)}>
-                💡 {showHint ? 'Maslahatni yashirish' : 'Maslahat'}
+                💡 {showHint ? t('Maslahatni yashirish') : t('Maslahat')}
               </button>
             )}
             {task.sample && (
               <button type="button" className="font-bold" style={{ color: 'var(--pine)' }} onClick={() => setShowSample((v) => !v)}>
-                👁 {showSample ? 'Namunani yashirish' : "Namunaviy javob"}
+                👁 {showSample ? t('Namunani yashirish') : t('Namunaviy javob')}
               </button>
             )}
-            <button type="button" className="font-bold" style={{ color: 'var(--sky)' }} onClick={() => ask(`Bu vazifani tushunmadim, yordam ber: ${task.question}`)}>
-              💬 Ustozdan so'rash
+            <button type="button" className="font-bold" style={{ color: 'var(--sky)' }} onClick={() => ask(t('Bu vazifani tushunmadim, yordam ber: {task}', { task: task.question }))}>
+              {t("💬 Ustozdan so'rash")}
             </button>
           </div>
           {showHint && task.hint && <div className="alert alert-warn mb-3 text-sm">{task.hint}</div>}
@@ -147,19 +148,13 @@ export default function AiTaskWidget({ type = 'text', content, lang, title = 'AI
 
           {!feedback && (
             <>
-              <textarea
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                placeholder="Javobingizni shu yerga yozing…"
-                rows={3}
-                className="textarea mb-2"
-              />
+              <textarea value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder={t('Javobingizni shu yerga yozing…')} rows={3} className="textarea mb-2" />
               <div className="flex flex-wrap gap-2">
                 <button type="button" onClick={submitAnswer} disabled={checking || !answer.trim()} className="btn btn-primary">
-                  {checking ? <><span className="spinner" /> Tekshirilmoqda…</> : 'Tekshirish'}
+                  {checking ? <><span className="spinner" /> {t('Tekshirilmoqda…')}</> : t('Tekshirish')}
                 </button>
                 <button type="button" onClick={requestTask} className="btn btn-ghost">
-                  🔁 Boshqa vazifa
+                  {t('🔁 Boshqa vazifa')}
                 </button>
               </div>
             </>
@@ -175,7 +170,7 @@ export default function AiTaskWidget({ type = 'text', content, lang, title = 'AI
                 <div className="flex-1 min-w-0">
                   {typeof feedback.score === 'number' && (
                     <div className="font-bold mb-1" style={{ color: feedback.correct ? 'var(--pine)' : 'var(--brick)' }}>
-                      Baho: {feedback.score}/100
+                      {t('Baho: {n}/100', { n: feedback.score })}
                     </div>
                   )}
                   <AiText text={feedback.feedback} />
@@ -184,15 +179,15 @@ export default function AiTaskWidget({ type = 'text', content, lang, title = 'AI
               {feedback.corrected && (
                 <div className="rounded-xl p-3.5 text-sm mb-2" style={{ background: 'var(--panel-2)', color: 'var(--ink)' }}>
                   <div className="text-[11px] font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--pine)' }}>
-                    To'g'ri variant
+                    {t("To'g'ri variant")}
                   </div>
                   {feedback.corrected}
                 </div>
               )}
               {feedback.tips?.length > 0 && (
                 <ul className="text-sm muted list-disc pl-5 mb-2">
-                  {feedback.tips.map((t, i) => (
-                    <li key={i}>{t}</li>
+                  {feedback.tips.map((tip, i) => (
+                    <li key={i}>{tip}</li>
                   ))}
                 </ul>
               )}
@@ -206,11 +201,11 @@ export default function AiTaskWidget({ type = 'text', content, lang, title = 'AI
                     }}
                     className="btn btn-gold"
                   >
-                    ✏️ Qayta urinish
+                    {t('✏️ Qayta urinish')}
                   </button>
                 )}
                 <button type="button" onClick={requestTask} className={`btn ${feedback.correct ? 'btn-primary' : 'btn-ghost'}`}>
-                  🔁 Yangi vazifa
+                  {t('🔁 Yangi vazifa')}
                 </button>
               </div>
             </div>
@@ -221,7 +216,7 @@ export default function AiTaskWidget({ type = 'text', content, lang, title = 'AI
       {error && <div className="alert alert-error mt-3 text-sm">{error}</div>}
       {!loading && !task && !error && (
         <button type="button" onClick={requestTask} className="btn btn-primary">
-          Vazifa olish
+          {t('Vazifa olish')}
         </button>
       )}
     </div>

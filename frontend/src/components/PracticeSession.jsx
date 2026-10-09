@@ -5,6 +5,7 @@ import { buildQuestions, checkAnswer, expectedAnswer, MODES } from '../lib/pract
 import { readingHint } from '../lib/translit.js';
 import { speakSimple } from '../lib/tts.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { t } from '../i18n/index.js';
 
 const cut = (s, n = 140) => (s ? String(s).slice(0, n) : undefined);
 
@@ -106,8 +107,8 @@ export default function PracticeSession({ items, pool, lang, mode = 'choice', co
   // Tinglash savolida so'zni avtomatik o'qib beradi
   useEffect(() => {
     if (q?.mode === 'listen' && !current) {
-      const t = setTimeout(() => speakSimple(q.item.w, lang, { rate: voice.rate ?? 0.85, voiceURI: voice.voiceURI }), 250);
-      return () => clearTimeout(t);
+      const timer = setTimeout(() => speakSimple(q.item.w, lang, { rate: voice.rate ?? 0.85, voiceURI: voice.voiceURI }), 250);
+      return () => clearTimeout(timer);
     }
     if (q?.mode === 'write' && !current) setTimeout(() => inputRef.current?.focus(), 50);
     return undefined;
@@ -138,11 +139,11 @@ export default function PracticeSession({ items, pool, lang, mode = 'choice', co
     return (
       <div className="card p-8 text-center">
         <div className="text-4xl mb-2">🫙</div>
-        <div className="h2 mb-1">So'z topilmadi</div>
-        <p className="muted text-sm">Tanlangan manbada mashq uchun so'zlar yo'q.</p>
+        <div className="h2 mb-1">{t("So'z topilmadi")}</div>
+        <p className="muted text-sm">{t("Tanlangan manbada mashq uchun so'zlar yo'q.")}</p>
         {onExit && (
           <button type="button" className="btn btn-primary mt-4" onClick={onExit}>
-            Orqaga
+            {t('Orqaga')}
           </button>
         )}
       </div>
@@ -150,7 +151,7 @@ export default function PracticeSession({ items, pool, lang, mode = 'choice', co
   }
 
   const hint = readingHint(q.item.w, lang) || q.item.t;
-  const promptWord = q.mode === 'choice' || ((q.mode === 'listen') && current);
+  const promptWord = q.mode === 'choice' || (q.mode === 'listen' && current);
   const expected = expectedAnswer(q);
 
   return (
@@ -159,7 +160,7 @@ export default function PracticeSession({ items, pool, lang, mode = 'choice', co
       <div className="flex items-center gap-3 mb-3">
         <div className="min-w-0 flex-1">
           <div className="text-xs font-bold uppercase tracking-wider muted truncate">
-            {MODES[q.mode]?.icon} {title}
+            {MODES[q.mode]?.icon} {t(title)}
           </div>
           <div className="font-display text-lg font-semibold" style={{ color: 'var(--ink)' }}>
             {idx + 1} / {questions.length}
@@ -167,8 +168,8 @@ export default function PracticeSession({ items, pool, lang, mode = 'choice', co
         </div>
         <span className="badge badge-pine">✓ {correctCount}</span>
         <span className="badge badge-brick">✗ {wrongCount}</span>
-        <button type="button" onClick={() => finish(true)} className="btn btn-danger btn-sm" title="Mashqni shu yerda tugatib, natijani ko'rish">
-          ⏹ To'xtatish
+        <button type="button" onClick={() => finish(true)} className="btn btn-danger btn-sm" title={t("Mashqni shu yerda tugatib, natijani ko'rish")}>
+          {t("⏹ To'xtatish")}
         </button>
       </div>
       <ProgressBar value={((idx + (current ? 1 : 0)) / questions.length) * 100} className="mb-6" />
@@ -196,7 +197,7 @@ export default function PracticeSession({ items, pool, lang, mode = 'choice', co
             type="button"
             onClick={() => speakSimple(q.item.w, lang, { rate: voice.rate ?? 0.85, voiceURI: voice.voiceURI })}
             className="w-24 h-24 rounded-full mx-auto flex items-center justify-center text-4xl btn-brand"
-            title="Yana eshitish"
+            title={t('Yana eshitish')}
           >
             🔊
           </button>
@@ -209,7 +210,7 @@ export default function PracticeSession({ items, pool, lang, mode = 'choice', co
             </div>
             {q.mode === 'write' && !current && (
               <div className="text-xs muted mt-2">
-                Birinchi harf: <b className="font-mono">{String(q.item.w).trim()[0]}</b> · {String(q.item.w).trim().length} ta belgi
+                {t('Birinchi harf:')} <b className="font-mono">{String(q.item.w).trim()[0]}</b> · {t('{n} ta belgi', { n: String(q.item.w).trim().length })}
               </div>
             )}
           </>
@@ -262,7 +263,7 @@ export default function PracticeSession({ items, pool, lang, mode = 'choice', co
             value={typed}
             onChange={(e) => setTyped(e.target.value)}
             disabled={!!current}
-            placeholder="So'zni yozing…"
+            placeholder={t("So'zni yozing…")}
             autoComplete="off"
             autoCapitalize="off"
             spellCheck={false}
@@ -272,7 +273,7 @@ export default function PracticeSession({ items, pool, lang, mode = 'choice', co
           />
           {!current && (
             <button type="submit" className="btn btn-primary" disabled={!typed.trim()}>
-              Tekshirish
+              {t('Tekshirish')}
             </button>
           )}
         </form>
@@ -280,19 +281,16 @@ export default function PracticeSession({ items, pool, lang, mode = 'choice', co
 
       {/* Javobdan keyingi izoh */}
       {current && (
-        <div
-          className="mt-4 rounded-2xl p-4 anim-rise"
-          style={{ background: current.ok ? 'var(--success-bg)' : 'var(--error-bg)' }}
-        >
+        <div className="mt-4 rounded-2xl p-4 anim-rise" style={{ background: current.ok ? 'var(--success-bg)' : 'var(--error-bg)' }}>
           <div className="flex items-start gap-3">
             <span className="text-2xl">{current.ok ? '✅' : current.skipped ? '⏭️' : '❌'}</span>
             <div className="flex-1 min-w-0">
               <div className="font-bold" style={{ color: current.ok ? 'var(--pine)' : 'var(--brick)' }}>
-                {current.ok ? (current.typo ? "To'g'ri (kichik imlo xatosi bor)" : "To'g'ri!") : current.skipped ? "O'tkazib yuborildi" : "Noto'g'ri"}
+                {current.ok ? (current.typo ? t("To'g'ri (kichik imlo xatosi bor)") : t("To'g'ri!")) : current.skipped ? t("O'tkazib yuborildi") : t("Noto'g'ri")}
               </div>
               {(!current.ok || current.typo || q.mode === 'listen') && (
                 <div className="text-sm mt-0.5" style={{ color: 'var(--ink)' }}>
-                  To'g'ri javob: <b>{expected}</b>
+                  {t("To'g'ri javob:")} <b>{expected}</b>
                   {q.mode !== 'choice' && q.mode !== 'listen' && <> — {q.item.m}</>}
                   {q.mode === 'listen' && <> ({q.item.w})</>}
                 </div>
@@ -311,11 +309,11 @@ export default function PracticeSession({ items, pool, lang, mode = 'choice', co
       <div className="mt-5 flex flex-wrap items-center gap-2">
         {current ? (
           <button type="button" onClick={goNext} className="btn btn-primary btn-lg flex-1">
-            {idx + 1 >= questions.length ? "Natijani ko'rish" : 'Keyingisi →'}
+            {idx + 1 >= questions.length ? t("Natijani ko'rish") : t('Keyingisi →')}
           </button>
         ) : (
           <button type="button" onClick={skip} className="btn btn-ghost">
-            ⏭ O'tkazib yuborish
+            {t("⏭ O'tkazib yuborish")}
           </button>
         )}
         <label className="flex items-center gap-2 text-xs muted ml-auto cursor-pointer select-none">
@@ -332,10 +330,10 @@ export default function PracticeSession({ items, pool, lang, mode = 'choice', co
             }}
             style={{ accentColor: 'var(--pine)' }}
           />
-          To'g'ri bo'lsa avtomatik keyingisi
+          {t("To'g'ri bo'lsa avtomatik keyingisi")}
         </label>
       </div>
-      <p className="hidden lg:block text-[11px] faint mt-3">Klaviatura: 1–4 — variant tanlash, Enter — keyingisi.</p>
+      <p className="hidden lg:block text-[11px] faint mt-3">{t('Klaviatura: 1–4 — variant tanlash, Enter — keyingisi.')}</p>
     </div>
   );
 }

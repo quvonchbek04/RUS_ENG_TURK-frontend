@@ -1,0 +1,32 @@
+// Umumiy matnlar, material turlari, o'rganiladigan tillar.  Qator: [uz, ru, en, tr]
+export default [
+  ['Sayt tili', 'Язык сайта', 'Site language', 'Site dili'],
+  ['Yuklanmoqda…', 'Загрузка…', 'Loading…', 'Yükleniyor…'],
+  ['Yopish', 'Закрыть', 'Close', 'Kapat'],
+  ['Barchasi', 'Все', 'All', 'Hepsi'],
+  ['Ingliz tili', 'Английский язык', 'English', 'İngilizce'],
+  ['Rus tili', 'Русский язык', 'Russian', 'Rusça'],
+  ['Turk tili', 'Турецкий язык', 'Turkish', 'Türkçe'],
+
+  // material turlari (media.js)
+  ['Musiqa va audio', 'Музыка и аудио', 'Music & audio', 'Müzik ve ses'],
+  ['Musiqa', 'Музыка', 'Music', 'Müzik'],
+  ["MP3, M4A, OGG, WAV · bir nechta faylni birdan tanlash mumkin · har biri ≤ 50 MB", 'MP3, M4A, OGG, WAV · можно выбрать сразу несколько файлов · каждый ≤ 50 МБ', 'MP3, M4A, OGG, WAV · you can pick several files at once · each ≤ 50 MB', 'MP3, M4A, OGG, WAV · birden fazla dosya seçilebilir · her biri ≤ 50 MB'],
+  ["Qo'shiq matni / transkript (ixtiyoriy)", 'Текст песни / транскрипция (необязательно)', 'Song lyrics / transcript (optional)', 'Şarkı sözleri / transkript (isteğe bağlı)'],
+  ['Videolar', 'Видео', 'Videos', 'Videolar'],
+  ['Video', 'Видео', 'Video', 'Video'],
+  ['MP4, WEBM · har biri ≤ 50 MB', 'MP4, WEBM · каждый ≤ 50 МБ', 'MP4, WEBM · each ≤ 50 MB', 'MP4, WEBM · her biri ≤ 50 MB'],
+  ["Izoh / subtitr matni (ixtiyoriy)", 'Описание / субтитры (необязательно)', 'Description / subtitles (optional)', 'Açıklama / altyazı metni (isteğe bağlı)'],
+  ['Rasmlar', 'Изображения', 'Images', 'Resimler'],
+  ['JPG, PNG, WEBP, GIF · bir nechta rasmni birdan yuklash mumkin', 'JPG, PNG, WEBP, GIF · можно загрузить сразу несколько изображений', 'JPG, PNG, WEBP, GIF · you can upload several images at once', 'JPG, PNG, WEBP, GIF · birden fazla resim yüklenebilir'],
+  ["Rasm tagidagi izoh (ixtiyoriy)", 'Подпись под изображением (необязательно)', 'Caption under the image (optional)', 'Resmin altındaki açıklama (isteğe bağlı)'],
+  ['Dialoglar', 'Диалоги', 'Dialogues', 'Diyaloglar'],
+  ["Har qatorda: «A: Hello! | Salom!» · ixtiyoriy audio fayl ham biriktirish mumkin", 'В каждой строке: «A: Hello! | Привет!» · можно прикрепить аудиофайл', 'One line each: “A: Hello! | Hi!” · you can also attach an audio file', 'Her satırda: «A: Hello! | Merhaba!» · isteğe bağlı ses dosyası eklenebilir'],
+  ["Lug'atlar", 'Словари', 'Vocabularies', 'Sözlükler'],
+  ["Har qatorda: «so'z — tarjima» yoki «so'z ; talaffuz ; tarjima» · lug'at mashqiga avtomatik qo'shiladi", 'В каждой строке: «слово — перевод» или «слово ; произношение ; перевод» · автоматически добавляется в словарные упражнения', 'One per line: “word — translation” or “word ; pronunciation ; translation” · added to vocabulary practice automatically', 'Her satırda: «kelime — çeviri» veya «kelime ; okunuş ; çeviri» · kelime alıştırmasına otomatik eklenir'],
+  ['Matnlar', 'Тексты', 'Texts', 'Metinler'],
+  ["PDF, DOCX yoki TXT — matn ajratib olinadi va ovoz bilan o'qish mumkin bo'ladi", 'PDF, DOCX или TXT — текст извлекается и его можно прослушать', 'PDF, DOCX or TXT — the text is extracted and can be read aloud', 'PDF, DOCX veya TXT — metin ayıklanır ve sesli okunabilir'],
+  ['Yangiliklar', 'Новости', 'News', 'Haberler'],
+  ["E'lon matni · ixtiyoriy rasm", 'Текст объявления · изображение по желанию', 'Announcement text · optional image', 'Duyuru metni · isteğe bağlı resim'],
+  ['Yangilik matni', 'Текст новости', 'News text', 'Haber metni'],
+];

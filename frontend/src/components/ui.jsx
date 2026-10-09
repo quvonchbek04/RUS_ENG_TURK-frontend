@@ -1,14 +1,16 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getLocale, t } from '../i18n/index.js';
 
+// O'rganiladigan tillar. `label` — getter: har safar joriy interfeys tilida qaytadi.
 export const LANG_OPTIONS = [
-  { key: 'en', flag: '🇬🇧', label: 'Ingliz tili', short: 'EN' },
-  { key: 'ru', flag: '🇷🇺', label: 'Rus tili', short: 'RU' },
-  { key: 'tr', flag: '🇹🇷', label: 'Turk tili', short: 'TR' },
+  { key: 'en', flag: '🇬🇧', short: 'EN', get label() { return t('Ingliz tili'); } },
+  { key: 'ru', flag: '🇷🇺', short: 'RU', get label() { return t('Rus tili'); } },
+  { key: 'tr', flag: '🇹🇷', short: 'TR', get label() { return t('Turk tili'); } },
 ];
 export const LANG_BY_KEY = Object.fromEntries(LANG_OPTIONS.map((l) => [l.key, l]));
 
-export function PageLoading({ label = 'Yuklanmoqda…' }) {
+export function PageLoading({ label = t('Yuklanmoqda…') }) {
   return (
     <div className="page-narrow">
       <div className="skeleton h-6 w-40 mb-4" />
@@ -87,7 +89,7 @@ export function Modal({ open, onClose, title, children, wide = false, footer }) 
       >
         <div className="flex items-center gap-3 px-5 py-4 border-b" style={{ borderColor: 'var(--line)' }}>
           <div className="h2 flex-1 min-w-0 truncate">{title}</div>
-          <button type="button" onClick={onClose} className="btn btn-ghost btn-icon" aria-label="Yopish">
+          <button type="button" onClick={onClose} className="btn btn-ghost btn-icon" aria-label={t('Yopish')}>
             ✕
           </button>
         </div>
@@ -120,7 +122,7 @@ export function StatCard({ icon, label, value, tone = 'pine' }) {
 }
 
 export function LangChips({ value, onChange, withAll = false }) {
-  const items = withAll ? [{ key: 'all', flag: '🌐', label: 'Barchasi' }, ...LANG_OPTIONS] : LANG_OPTIONS;
+  const items = withAll ? [{ key: 'all', flag: '🌐', label: t('Barchasi') }, ...LANG_OPTIONS] : LANG_OPTIONS;
   return (
     <div className="tabs">
       {items.map((l) => (
@@ -187,7 +189,7 @@ export function formatBytes(n) {
 export function formatDate(d) {
   if (!d) return '';
   try {
-    return new Date(d).toLocaleDateString('uz-UZ', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return new Date(d).toLocaleDateString(getLocale(), { day: '2-digit', month: '2-digit', year: 'numeric' });
   } catch {
     return String(d).slice(0, 10);
   }
@@ -197,7 +199,8 @@ export function formatDateTime(d) {
   if (!d) return '';
   try {
     const x = new Date(d);
-    return `${x.toLocaleDateString('uz-UZ', { day: '2-digit', month: '2-digit' })} ${x.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })}`;
+    const loc = getLocale();
+    return `${x.toLocaleDateString(loc, { day: '2-digit', month: '2-digit' })} ${x.toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' })}`;
   } catch {
     return String(d);
   }

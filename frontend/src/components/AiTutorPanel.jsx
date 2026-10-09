@@ -5,15 +5,17 @@ import { useTutor } from '../context/TutorContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { readingHint } from '../lib/translit.js';
 import { langToBCP47 } from '../lib/tts.js';
+import { t } from '../i18n/index.js';
 import { AiText, LANG_OPTIONS } from './ui.jsx';
 
+// Tezkor so'rovlar AI ga yuboriladi — shuning uchun sayt tilidagi matn ishlatiladi (t() har chiqarishda).
 const QUICK = [
-  { icon: '💡', text: 'Shu mavzuni sodda qilib tushuntirib ber', needsContext: true },
-  { icon: '🧪', text: "Menga shu mavzu bo'yicha 5 ta test savoli ber", needsContext: true },
-  { icon: '✍️', text: 'Gapimni tekshir: ' },
-  { icon: '🔎', text: "Bu so'z nimani anglatadi: " },
-  { icon: '🗣️', text: "Keling, oddiy suhbat mashqi qilamiz — sen savol ber, men javob beraman" },
-  { icon: '📝', text: 'Menga bugun uchun 10 ta foydali so\'z va misol gaplar ber' },
+  { icon: '💡', key: 'Shu mavzuni sodda qilib tushuntirib ber', needsContext: true },
+  { icon: '🧪', key: "Menga shu mavzu bo'yicha 5 ta test savoli ber", needsContext: true },
+  { icon: '✍️', key: 'Gapimni tekshir: ' },
+  { icon: '🔎', key: "Bu so'z nimani anglatadi: " },
+  { icon: '🗣️', key: 'Keling, oddiy suhbat mashqi qilamiz — sen savol ber, men javob beraman' },
+  { icon: '📝', key: "Menga bugun uchun 10 ta foydali so'z va misol gaplar ber" },
 ];
 
 const storageKey = (lang) => `til_tutor_${lang}`;
@@ -26,6 +28,8 @@ function loadHistory(lang) {
   }
 }
 
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 /** AI kalit bo'lmaganda: xabardagi so'zlarni kurs lug'atidan qidiradi. */
 async function localLookup(lang, message) {
   const data = await api.content(lang);
@@ -34,19 +38,23 @@ async function localLookup(lang, message) {
   (data.wordbank || []).forEach((c) => c.rows.forEach((r) => rows.push([r[0], r[1], r[2], r[3]])));
   (data.phrasebank || []).forEach((c) => c.rows.forEach((r) => rows.push([r[0], r[1], r[2], r[3]])));
   (data.dictExtra || []).forEach((c) => c.words.forEach((w) => rows.push([w[0], w[2]])));
+  // Tezkor tugma matnlarini (hozirgi va o'zbekcha) xabar boshidan olib tashlaymiz
+  const prefixes = [...QUICK.map((q) => t(q.key)), ...QUICK.map((q) => q.key), "bu so'z nimani anglatadi", 'gapimni tekshir', 'tarjima']
+    .map((p) => p.replace(/[:\s]+$/, ''))
+    .filter(Boolean);
   const terms = String(message)
-    .replace(/^(bu so'z nimani anglatadi|gapimni tekshir|tarjima)[:\s]*/i, '')
+    .replace(new RegExp(`^(${prefixes.map(escapeRe).join('|')})[:\\s]*`, 'i'), '')
     .toLowerCase()
     .split(/[\s,.;!?:"'«»()]+/)
-    .filter((t) => t.length >= 2)
+    .filter((term) => term.length >= 2)
     .slice(0, 6);
   const found = [];
   const seen = new Set();
-  for (const t of terms) {
+  for (const term of terms) {
     for (const r of rows) {
       const w = String(r[0]).toLowerCase();
       const m = String(r[1]).toLowerCase();
-      if (w === t || m === t || m.split(/[,/;]\s*/).includes(t)) {
+      if (w === term || m === term || m.split(/[,/;]\s*/).includes(term)) {
         const key = w + '|' + m;
         if (seen.has(key)) continue;
         seen.add(key);
@@ -59,7 +67,7 @@ async function localLookup(lang, message) {
   return found
     .map((r) => {
       const hint = readingHint(r[0], lang);
-      return `- **${r[0]}**${hint ? ` (${hint})` : ''} — ${r[1]}${r[2] ? `\n  Misol: ${r[2]}${r[3] ? ` (${r[3]})` : ''}` : ''}`;
+      return `- **${r[0]}**${hint ? ` (${hint})` : ''} — ${r[1]}${r[2] ? `\n  ${t('Misol:')} ${r[2]}${r[3] ? ` (${r[3]})` : ''}` : ''}`;
     })
     .join('\n');
 }
@@ -131,7 +139,7 @@ export default function AiTutorPanel({ compact = false, onClose }) {
       let reply = res.reply;
       if (res.mock) {
         const local = await localLookup(lang, text).catch(() => null);
-        reply = local ? `**Lug'atdan topilganlar:**\n\n${local}\n\n${res.reply}` : res.reply;
+        reply = local ? `**${t("Lug'atdan topilganlar:")}**\n\n${local}\n\n${res.reply}` : res.reply;
       }
       setMessages((m) => [...m, { role: 'assistant', content: reply || '…', mock: !!res.mock }]);
       updateProgress((prev) => {
@@ -171,9 +179,11 @@ export default function AiTutorPanel({ compact = false, onClose }) {
 
   const statusBadge =
     status?.provider === 'mock' ? (
-      <span className="badge badge-gold" title="Administrator API kalit qo'shganda to'liq AI rejimi yoqiladi">Oddiy rejim</span>
+      <span className="badge badge-gold" title={t("Administrator API kalit qo'shganda to'liq AI rejimi yoqiladi")}>
+        {t('Oddiy rejim')}
+      </span>
     ) : status?.provider && status.provider !== 'unknown' ? (
-      <span className="badge badge-pine">AI faol</span>
+      <span className="badge badge-pine">{t('AI faol')}</span>
     ) : null;
 
   return (
@@ -184,18 +194,14 @@ export default function AiTutorPanel({ compact = false, onClose }) {
         </span>
         <div className="min-w-0 flex-1">
           <div className="font-bold leading-tight" style={{ color: 'var(--ink)' }}>
-            AI ustoz
+            {t('AI ustoz')}
           </div>
           <div className="flex items-center gap-1.5 mt-0.5">
             {statusBadge}
-            {status?.dailyLimit > 0 && (
-              <span className="text-[11px] faint">
-                bugun {status.usedToday || 0}/{status.dailyLimit}
-              </span>
-            )}
+            {status?.dailyLimit > 0 && <span className="text-[11px] faint">{t('bugun {a}/{b}', { a: status.usedToday || 0, b: status.dailyLimit })}</span>}
           </div>
         </div>
-        <select value={lang} onChange={(e) => setLang(e.target.value)} className="select !w-auto !py-1.5 !px-2 text-sm" aria-label="Til">
+        <select value={lang} onChange={(e) => setLang(e.target.value)} className="select !w-auto !py-1.5 !px-2 text-sm" aria-label={t('Til')}>
           {LANG_OPTIONS.map((l) => (
             <option key={l.key} value={l.key}>
               {l.flag} {l.short}
@@ -203,12 +209,12 @@ export default function AiTutorPanel({ compact = false, onClose }) {
           ))}
         </select>
         {messages.length > 0 && (
-          <button type="button" className="btn btn-ghost btn-icon" title="Suhbatni tozalash" onClick={() => setMessages([])}>
+          <button type="button" className="btn btn-ghost btn-icon" title={t('Suhbatni tozalash')} onClick={() => setMessages([])}>
             🧹
           </button>
         )}
         {onClose && (
-          <button type="button" className="btn btn-ghost btn-icon" onClick={onClose} aria-label="Yopish">
+          <button type="button" className="btn btn-ghost btn-icon" onClick={onClose} aria-label={t('Yopish')}>
             ✕
           </button>
         )}
@@ -218,7 +224,7 @@ export default function AiTutorPanel({ compact = false, onClose }) {
         <label className="flex items-center gap-2 px-4 py-2 text-xs border-b cursor-pointer" style={{ borderColor: 'var(--line)', background: 'var(--panel-2)' }}>
           <input type="checkbox" checked={useContext} onChange={(e) => setUseContext(e.target.checked)} style={{ accentColor: 'var(--pine)' }} />
           <span className="truncate muted">
-            📘 Hozirgi mavzu: <b style={{ color: 'var(--ink)' }}>{context.title}</b>
+            {t('📘 Hozirgi mavzu:')} <b style={{ color: 'var(--ink)' }}>{context.title}</b>
           </span>
         </label>
       )}
@@ -228,11 +234,9 @@ export default function AiTutorPanel({ compact = false, onClose }) {
           <div className="text-center py-6">
             <div className="text-4xl mb-2">👋</div>
             <div className="font-bold" style={{ color: 'var(--ink)' }}>
-              Salom! Men sizning shaxsiy til ustozingizman.
+              {t('Salom! Men sizning shaxsiy til ustozingizman.')}
             </div>
-            <p className="text-sm muted mt-1 max-w-sm mx-auto">
-              Grammatikani tushuntiraman, gaplaringizni tekshiraman, savollar beraman va suhbat mashqi qilamiz. O'zbek tilida yozavering.
-            </p>
+            <p className="text-sm muted mt-1 max-w-sm mx-auto">{t("Grammatikani tushuntiraman, gaplaringizni tekshiraman, savollar beraman va suhbat mashqi qilamiz. O'zbek tilida yozavering.")}</p>
           </div>
         )}
         {messages.map((m, i) => (
@@ -257,7 +261,7 @@ export default function AiTutorPanel({ compact = false, onClose }) {
         {busy && (
           <div className="flex justify-start">
             <div className="rounded-2xl px-4 py-3 text-sm muted flex items-center gap-2" style={{ background: 'var(--panel-2)', border: '1px solid var(--line)' }}>
-              <span className="spinner" /> Ustoz yozmoqda…
+              <span className="spinner" /> {t('Ustoz yozmoqda…')}
             </div>
           </div>
         )}
@@ -266,8 +270,8 @@ export default function AiTutorPanel({ compact = false, onClose }) {
       <div className="border-t px-3 pt-2.5" style={{ borderColor: 'var(--line)', paddingBottom: 'calc(10px + env(safe-area-inset-bottom))' }}>
         <div className="tabs mb-2">
           {quick.map((q) => (
-            <button key={q.text} type="button" className="chip !py-1.5 !text-xs" onClick={() => send(q.text)} disabled={busy}>
-              {q.icon} {q.text.replace(/[:]\s*$/, '')}
+            <button key={q.key} type="button" className="chip !py-1.5 !text-xs" onClick={() => send(t(q.key))} disabled={busy}>
+              {q.icon} {t(q.key).replace(/[:]\s*$/, '')}
             </button>
           ))}
         </div>
@@ -283,7 +287,7 @@ export default function AiTutorPanel({ compact = false, onClose }) {
               }
             }}
             rows={1}
-            placeholder="Savolingizni yozing…"
+            placeholder={t('Savolingizni yozing…')}
             className="textarea !min-h-[46px] max-h-32 !py-2.5"
           />
           {SpeechRec && (
@@ -291,12 +295,12 @@ export default function AiTutorPanel({ compact = false, onClose }) {
               type="button"
               onClick={toggleMic}
               className={`btn btn-icon !w-[46px] !h-[46px] ${listening ? 'btn-danger' : 'btn-ghost'}`}
-              title={`Ovoz bilan yozish (${LANG_OPTIONS.find((l) => l.key === lang)?.label})`}
+              title={t('Ovoz bilan yozish ({name})', { name: LANG_OPTIONS.find((l) => l.key === lang)?.label })}
             >
               {listening ? '⏺' : '🎙️'}
             </button>
           )}
-          <button type="button" onClick={() => send()} disabled={busy || !input.trim()} className="btn btn-primary btn-icon !w-[46px] !h-[46px]" aria-label="Yuborish">
+          <button type="button" onClick={() => send()} disabled={busy || !input.trim()} className="btn btn-primary btn-icon !w-[46px] !h-[46px]" aria-label={t('Yuborish')}>
             ➤
           </button>
         </div>

@@ -5,6 +5,7 @@ import { getSpeechRecognition, langToBCP47, speakSequence, speakWithEnd } from '
 import { normalizeAnswer, shuffle } from '../lib/practice.js';
 import { withActivity } from '../lib/lessonProgress.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { t } from '../i18n/index.js';
 
 function SectionTitle({ icon, children, hint }) {
   return (
@@ -23,8 +24,8 @@ export function GrammarMore({ items }) {
   if (!items?.length) return null;
   return (
     <div>
-      <SectionTitle icon="📘" hint="Kengaytma">
-        Qo'shimcha grammatika
+      <SectionTitle icon="📘" hint={t('Kengaytma')}>
+        {t("Qo'shimcha grammatika")}
       </SectionTitle>
       <div className="space-y-3">
         {items.map((g, i) => (
@@ -55,18 +56,18 @@ export function GrammarMore({ items }) {
 /** Aytilgan gap bilan asl gapning so'zma-so'z mosligi (0–100). */
 function speechScore(target, said, lang) {
   const tok = (s) => normalizeAnswer(s, lang).split(' ').filter(Boolean);
-  const t = tok(target);
+  const want = tok(target);
   const pool = tok(said);
-  if (!t.length) return 0;
+  if (!want.length) return 0;
   let hit = 0;
-  for (const w of t) {
+  for (const w of want) {
     const i = pool.indexOf(w);
     if (i >= 0) {
       hit += 1;
       pool.splice(i, 1);
     }
   }
-  return Math.round((hit / t.length) * 100);
+  return Math.round((hit / want.length) * 100);
 }
 
 /** 🎭 Rolli o'qish: o'quvchi bitta rolni o'ynaydi — ilova qolgan gaplarni o'qiydi,
@@ -85,10 +86,13 @@ function RolePlay({ lines, lang, showTr, onExit }) {
   const SpeechRec = getSpeechRecognition();
   const finished = step >= lines.length;
 
-  useEffect(() => () => {
-    stopRef.current?.();
-    recRef.current?.abort?.();
-  }, []);
+  useEffect(
+    () => () => {
+      stopRef.current?.();
+      recRef.current?.abort?.();
+    },
+    []
+  );
 
   // Suhbatdoshning gapi — avtomatik o'qiladi va keyingisiga o'tiladi
   useEffect(() => {
@@ -117,10 +121,13 @@ function RolePlay({ lines, lang, showTr, onExit }) {
     rec.maxAlternatives = 3;
     rec.onresult = (e) => {
       const alts = Array.from(e.results?.[0] || []).map((a) => a.transcript);
-      const best = alts.reduce((acc, a) => {
-        const sc = speechScore(lines[step][1], a, lang);
-        return sc > acc.sc ? { sc, a } : acc;
-      }, { sc: -1, a: alts[0] || '' });
+      const best = alts.reduce(
+        (acc, a) => {
+          const sc = speechScore(lines[step][1], a, lang);
+          return sc > acc.sc ? { sc, a } : acc;
+        },
+        { sc: -1, a: alts[0] || '' }
+      );
       setHeard((h) => ({ ...h, [step]: best.a }));
       setScores((s) => ({ ...s, [step]: Math.max(0, best.sc) }));
     };
@@ -143,19 +150,21 @@ function RolePlay({ lines, lang, showTr, onExit }) {
     return (
       <div className="card-soft p-4">
         <div className="font-bold mb-1" style={{ color: 'var(--ink)' }}>
-          🎭 Rolli o'qish
+          {t("🎭 Rolli o'qish")}
         </div>
         <p className="text-sm muted mb-3">
-          Rolni tanlang. Ilova suhbatdoshning gaplarini o'qiydi, siz o'z gaplaringizni {SpeechRec ? 'mikrofonga ayting — talaffuzingiz baholanadi' : "ovoz chiqarib o'qing"}.
+          {SpeechRec
+            ? t("Rolni tanlang. Ilova suhbatdoshning gaplarini o'qiydi, siz o'z gaplaringizni mikrofonga ayting — talaffuzingiz baholanadi.")
+            : t("Rolni tanlang. Ilova suhbatdoshning gaplarini o'qiydi, siz o'z gaplaringizni ovoz chiqarib o'qing.")}
         </p>
         <div className="flex flex-wrap gap-2">
           {speakers.map((s) => (
             <button key={s} type="button" className="btn btn-primary btn-sm" onClick={() => restart(s)}>
-              Men — {s}
+              {t('Men — {name}', { name: s })}
             </button>
           ))}
           <button type="button" className="btn btn-ghost btn-sm" onClick={onExit}>
-            Bekor qilish
+            {t('Bekor qilish')}
           </button>
         </div>
       </div>
@@ -168,13 +177,20 @@ function RolePlay({ lines, lang, showTr, onExit }) {
   return (
     <div>
       <div className="flex flex-wrap items-center gap-2 mb-3">
-        <span className="badge badge-gold">🎭 Sizning rolingiz: {role}</span>
-        {avg != null && <span className={`badge ${avg >= 70 ? 'badge-pine' : 'badge-brick'}`}>O'rtacha: {avg}%</span>}
+        <span className="badge badge-gold">{t('🎭 Sizning rolingiz: {name}', { name: role })}</span>
+        {avg != null && <span className={`badge ${avg >= 70 ? 'badge-pine' : 'badge-brick'}`}>{t("O'rtacha: {n}%", { n: avg })}</span>}
         <button type="button" className="btn btn-ghost btn-sm ml-auto" onClick={() => restart(role)}>
-          ↺ Boshidan
+          {t('↺ Boshidan')}
         </button>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => { stopRef.current?.(); onExit(); }}>
-          ✕ Chiqish
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={() => {
+            stopRef.current?.();
+            onExit();
+          }}
+        >
+          {t('✕ Chiqish')}
         </button>
       </div>
       <div className="space-y-2.5">
@@ -203,7 +219,7 @@ function RolePlay({ lines, lang, showTr, onExit }) {
                 {showTr && tr && <div className="text-xs mt-1 opacity-80">{tr}</div>}
                 {mine && heard[i] !== undefined && (
                   <div className="text-xs mt-1.5 pt-1.5 border-t" style={{ borderColor: 'rgba(255,255,255,.25)' }}>
-                    🎙 «{heard[i] || '…'}» — <b>{sc}%</b> {sc >= 85 ? "a'lo!" : sc >= 60 ? 'yaxshi' : 'yana urinib ko\'ring'}
+                    🎙 «{heard[i] || '…'}» — <b>{sc}%</b> {sc >= 85 ? t("a'lo!") : sc >= 60 ? t('yaxshi') : t("yana urinib ko'ring")}
                   </div>
                 )}
               </div>
@@ -216,27 +232,28 @@ function RolePlay({ lines, lang, showTr, onExit }) {
         <div className="flex flex-wrap gap-2 mt-4">
           {SpeechRec && (
             <button type="button" className={`btn ${listening ? 'btn-danger' : 'btn-brand'}`} onClick={listen} disabled={listening}>
-              {listening ? <><span className="spinner" /> Tinglayapman…</> : scores[step] !== undefined ? '🎙 Qayta aytish' : '🎙 Gapingizni ayting'}
+              {listening ? <><span className="spinner" /> {t('Tinglayapman…')}</> : scores[step] !== undefined ? t('🎙 Qayta aytish') : t('🎙 Gapingizni ayting')}
             </button>
           )}
           <button type="button" className="btn btn-ghost" onClick={() => speakWithEnd(lines[step][1], lang, { rate: voice.rate ?? 0.9, voiceURI: voice.voiceURI })}>
-            🔊 Namuna
+            {t('🔊 Namuna')}
           </button>
           <button type="button" className="btn btn-primary" onClick={() => setStep((s) => s + 1)} disabled={listening}>
-            {SpeechRec && scores[step] === undefined ? "O'tkazib yuborish →" : 'Keyingisi →'}
+            {SpeechRec && scores[step] === undefined ? t("O'tkazib yuborish →") : t('Keyingisi →')}
           </button>
         </div>
       )}
       {!finished && step >= 0 && lines[step][0] !== role && (
         <div className="text-sm muted mt-4 flex items-center gap-2">
-          <span className="spinner" /> {lines[step][0]} gapirmoqda…
+          <span className="spinner" /> {t('{name} gapirmoqda…', { name: lines[step][0] })}
         </div>
       )}
       {finished && (
         <div className="alert alert-success mt-4">
-          🎉 Dialog tugadi!{avg != null ? ` O'rtacha talaffuz: ${avg}%.` : ''}{' '}
+          {t('🎉 Dialog tugadi!')}
+          {avg != null ? ` ${t("O'rtacha talaffuz: {n}%.", { n: avg })}` : ''}{' '}
           <button type="button" className="underline font-bold" onClick={() => restart(speakers.find((s) => s !== role) || role)}>
-            Boshqa rolda o'qish
+            {t("Boshqa rolda o'qish")}
           </button>
         </div>
       )}
@@ -268,7 +285,7 @@ export function DialogView({ title, lines, lang, hint, audioUrl, defaultShowTr =
         )}
         <label className="flex items-center gap-2 text-xs muted cursor-pointer select-none mb-3">
           <input type="checkbox" checked={showTr} onChange={(e) => setShowTr(e.target.checked)} style={{ accentColor: 'var(--pine)' }} />
-          Tarjimani ko'rsatish
+          {t("Tarjimani ko'rsatish")}
         </label>
         <RolePlay lines={lines} lang={lang} showTr={showTr} onExit={() => setRolePlay(false)} />
       </div>
@@ -297,7 +314,7 @@ export function DialogView({ title, lines, lang, hint, audioUrl, defaultShowTr =
       )}
       <div className="flex flex-wrap items-center gap-2 mb-3">
         <button type="button" onClick={playAll} className={`btn btn-sm ${playing >= 0 ? 'btn-danger' : 'btn-soft'}`}>
-          {playing >= 0 ? '⏹ To\'xtatish' : '▶ Butun dialogni tinglash'}
+          {playing >= 0 ? t("⏹ To'xtatish") : t('▶ Butun dialogni tinglash')}
         </button>
         {speakers.length >= 2 && (
           <button
@@ -309,12 +326,12 @@ export function DialogView({ title, lines, lang, hint, audioUrl, defaultShowTr =
               setRolePlay(true);
             }}
           >
-            🎭 Rolli o'qish
+            {t("🎭 Rolli o'qish")}
           </button>
         )}
         <label className="flex items-center gap-2 text-xs muted cursor-pointer select-none ml-auto">
           <input type="checkbox" checked={showTr} onChange={(e) => setShowTr(e.target.checked)} style={{ accentColor: 'var(--pine)' }} />
-          Tarjimani ko'rsatish
+          {t("Tarjimani ko'rsatish")}
         </label>
       </div>
       {audioUrl && <audio controls preload="none" src={audioUrl} className="w-full mb-3" />}
@@ -337,9 +354,7 @@ export function DialogView({ title, lines, lang, hint, audioUrl, defaultShowTr =
                 }}
               >
                 <div className="text-[15px]">{line}</div>
-                {lang === 'ru' && readingHint(line, lang) && showTr && (
-                  <div className="text-[11px] mt-0.5 opacity-70 font-mono">{readingHint(line, lang)}</div>
-                )}
+                {lang === 'ru' && readingHint(line, lang) && showTr && <div className="text-[11px] mt-0.5 opacity-70 font-mono">{readingHint(line, lang)}</div>}
                 {showTr && tr && <div className="text-xs mt-1 opacity-80">{tr}</div>}
               </div>
               <SpeakButton text={line} lang={lang} />
@@ -354,7 +369,7 @@ export function DialogView({ title, lines, lang, hint, audioUrl, defaultShowTr =
 /** Ikkinchi dialog (ingliz tili darslarida) */
 export function DialogExtra({ dialog, lang }) {
   if (!dialog?.lines?.length) return null;
-  return <DialogView title={dialog.title} lines={dialog.lines} lang={lang} hint="2-dialog" />;
+  return <DialogView title={dialog.title} lines={dialog.lines} lang={lang} hint={t('2-dialog')} />;
 }
 
 /** O'qish matni + savollar */
@@ -364,7 +379,7 @@ export function ReadingBlock({ reading, lang }) {
   if (!reading) return null;
   return (
     <div>
-      <SectionTitle icon="📖" hint="O'qish">
+      <SectionTitle icon="📖" hint={t("O'qish")}>
         {reading.title}
       </SectionTitle>
       <div className="card p-4">
@@ -375,7 +390,7 @@ export function ReadingBlock({ reading, lang }) {
           <SpeakButton text={reading.text} lang={lang} />
         </div>
         <button type="button" onClick={() => setShowTr((v) => !v)} className="mt-3 text-xs font-bold" style={{ color: 'var(--gold)' }}>
-          {showTr ? '▾ Tarjimani yashirish' : "▸ Tarjimani ko'rsatish"}
+          {showTr ? t('▾ Tarjimani yashirish') : t("▸ Tarjimani ko'rsatish")}
         </button>
         {showTr && (
           <p className="mt-2 text-sm leading-relaxed rounded-lg p-3" style={{ background: 'var(--panel-2)', color: 'var(--ink-soft)' }}>
@@ -385,7 +400,7 @@ export function ReadingBlock({ reading, lang }) {
       </div>
       {reading.questions?.length > 0 && (
         <div className="mt-3 space-y-2">
-          <div className="text-[11px] font-bold uppercase tracking-wider muted">Tushunish savollari</div>
+          <div className="text-[11px] font-bold uppercase tracking-wider muted">{t('Tushunish savollari')}</div>
           {reading.questions.map(([q, a], i) => (
             <div key={i} className="card-soft p-3">
               <div className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>
@@ -397,7 +412,7 @@ export function ReadingBlock({ reading, lang }) {
                 </div>
               ) : (
                 <button type="button" className="text-xs font-bold mt-1.5" style={{ color: 'var(--pine)' }} onClick={() => setOpen((o) => ({ ...o, [i]: true }))}>
-                  Javobni ko'rish
+                  {t("Javobni ko'rish")}
                 </button>
               )}
             </div>
@@ -427,26 +442,48 @@ export function WordsExplorer({ words = [], phrases = [], lang, wordCats = [], p
 
   return (
     <div>
-      <SectionTitle icon="🗂️" hint="Word fayldan">
-        Gaplar bilan so'zlar va iboralar
+      <SectionTitle icon="🗂️" hint={t('Word fayldan')}>
+        {t("Gaplar bilan so'zlar va iboralar")}
       </SectionTitle>
       <div className="flex flex-wrap items-center gap-2 mb-3">
         {words.length > 0 && (
-          <button type="button" className={`chip ${tab === 'words' ? 'chip-active' : ''}`} onClick={() => { setTab('words'); setLimit(20); }}>
-            So'zlar · {words.length}
+          <button
+            type="button"
+            className={`chip ${tab === 'words' ? 'chip-active' : ''}`}
+            onClick={() => {
+              setTab('words');
+              setLimit(20);
+            }}
+          >
+            {t("So'zlar · {n}", { n: words.length })}
           </button>
         )}
         {phrases.length > 0 && (
-          <button type="button" className={`chip ${tab === 'phrases' ? 'chip-active' : ''}`} onClick={() => { setTab('phrases'); setLimit(20); }}>
-            Iboralar · {phrases.length}
+          <button
+            type="button"
+            className={`chip ${tab === 'phrases' ? 'chip-active' : ''}`}
+            onClick={() => {
+              setTab('phrases');
+              setLimit(20);
+            }}
+          >
+            {t('Iboralar · {n}', { n: phrases.length })}
           </button>
         )}
         <label className="ml-auto flex items-center gap-2 text-xs muted cursor-pointer select-none">
           <input type="checkbox" checked={hide} onChange={(e) => setHide(e.target.checked)} style={{ accentColor: 'var(--pine)' }} />
-          Tarjimani yashirish
+          {t('Tarjimani yashirish')}
         </label>
       </div>
-      <input value={q} onChange={(e) => { setQ(e.target.value); setLimit(20); }} placeholder="🔍 Qidirish…" className="input mb-3" />
+      <input
+        value={q}
+        onChange={(e) => {
+          setQ(e.target.value);
+          setLimit(20);
+        }}
+        placeholder={t('🔍 Qidirish…')}
+        className="input mb-3"
+      />
       <div className="space-y-2">
         {filtered.slice(0, limit).map(([w, tr, sent, sentTr, cat], i) => {
           const hint = readingHint(w, lang);
@@ -473,29 +510,25 @@ export function WordsExplorer({ words = [], phrases = [], lang, wordCats = [], p
                     </div>
                   )}
                   {sentTr && (
-                    <div
-                      className="text-xs mt-0.5 muted cursor-pointer"
-                      style={{ filter: hide ? 'blur(5px)' : 'none' }}
-                      onClick={(e) => (e.currentTarget.style.filter = 'none')}
-                    >
+                    <div className="text-xs mt-0.5 muted cursor-pointer" style={{ filter: hide ? 'blur(5px)' : 'none' }} onClick={(e) => (e.currentTarget.style.filter = 'none')}>
                       {sentTr}
                     </div>
                   )}
-                  {cats[cat] && <div className="text-[10.5px] faint mt-1">{cats[cat]}</div>}
+                  {cats[cat] && <div className="text-[10.5px] faint mt-1">{t(cats[cat])}</div>}
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <SpeakButton text={w} lang={lang} title="So'zni eshitish" />
-                  {sent && <SpeakButton text={sent} lang={lang} title="Gapni eshitish" />}
+                  <SpeakButton text={w} lang={lang} title={t("So'zni eshitish")} />
+                  {sent && <SpeakButton text={sent} lang={lang} title={t('Gapni eshitish')} />}
                 </div>
               </div>
             </div>
           );
         })}
-        {filtered.length === 0 && <div className="text-sm text-center py-6 muted">Hech narsa topilmadi.</div>}
+        {filtered.length === 0 && <div className="text-sm text-center py-6 muted">{t('Hech narsa topilmadi.')}</div>}
       </div>
       {filtered.length > limit && (
         <button type="button" onClick={() => setLimit((l) => l + 30)} className="btn btn-ghost btn-block mt-3">
-          Yana ko'rsatish ({filtered.length - limit} ta qoldi)
+          {t("Yana ko'rsatish ({n} ta qoldi)", { n: filtered.length - limit })}
         </button>
       )}
     </div>
@@ -523,7 +556,7 @@ export function Flashcards({ items, lang }) {
         <span className="muted">
           {pos + 1} / {order.length}
         </span>
-        <span className="badge badge-pine">Bilaman: {knownCount}</span>
+        <span className="badge badge-pine">{t('Bilaman: {n}', { n: knownCount })}</span>
         <button
           type="button"
           className="btn btn-ghost btn-sm ml-auto"
@@ -533,7 +566,7 @@ export function Flashcards({ items, lang }) {
             setFlipped(false);
           }}
         >
-          🔀 Aralashtirish
+          {t('🔀 Aralashtirish')}
         </button>
       </div>
       <div
@@ -555,11 +588,15 @@ export function Flashcards({ items, lang }) {
             <div className="font-display text-3xl font-semibold break-words" style={{ color: 'var(--ink)' }}>
               {it.w}
             </div>
-            {hint && hint !== it.w && <div className="font-mono text-sm mt-1" style={{ color: 'var(--gold)' }}>{hint}</div>}
+            {hint && hint !== it.w && (
+              <div className="font-mono text-sm mt-1" style={{ color: 'var(--gold)' }}>
+                {hint}
+              </div>
+            )}
             <div className="mt-4" onClick={(e) => e.stopPropagation()}>
               <SpeakButton text={it.w} lang={lang} size="lg" />
             </div>
-            <div className="text-xs faint mt-4">Ma'nosini ko'rish uchun bosing</div>
+            <div className="text-xs faint mt-4">{t("Ma'nosini ko'rish uchun bosing")}</div>
           </div>
           <div className="flip-face flip-back">
             <div className="font-display text-2xl font-semibold" style={{ color: 'var(--pine)' }}>
@@ -586,7 +623,7 @@ export function Flashcards({ items, lang }) {
             go(1);
           }}
         >
-          ✗ <span className="hidden sm:inline">Bilmayman</span>
+          ✗ <span className="hidden sm:inline">{t('Bilmayman')}</span>
         </button>
         <button
           type="button"
@@ -596,7 +633,7 @@ export function Flashcards({ items, lang }) {
             go(1);
           }}
         >
-          ✓ <span className="hidden sm:inline">Bilaman</span>
+          ✓ <span className="hidden sm:inline">{t('Bilaman')}</span>
         </button>
         <button type="button" className="btn btn-ghost" onClick={() => go(1)}>
           →

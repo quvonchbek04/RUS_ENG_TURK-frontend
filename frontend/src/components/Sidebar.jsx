@@ -5,6 +5,8 @@ import { api } from '../lib/api.js';
 import { useCurrentLang, useTheme } from '../lib/hooks.js';
 import { MEDIA_META, MEDIA_ORDER } from '../lib/media.js';
 import { isAdminRole, getStreak } from '../lib/lessonProgress.js';
+import { t } from '../i18n/index.js';
+import { LanguageSwitcher } from '../i18n/react.jsx';
 import { LANG_OPTIONS } from './ui.jsx';
 
 function NavRow({ icon, label, to, active, collapsed, onClick, count, accent }) {
@@ -72,6 +74,7 @@ export default function Sidebar({ collapsed = false, onToggleCollapse, onNavigat
 
   if (!user) return null;
   const isStaff = isAdminRole(user.role);
+  const isSuper = user.role === 'superadmin';
   const streak = getStreak(progress);
   const langInfo = meta?.LANGS?.[lang];
   const is = (p) => pathname === p;
@@ -95,18 +98,18 @@ export default function Sidebar({ collapsed = false, onToggleCollapse, onNavigat
           )}
         </Link>
         {!mobile && !collapsed && (
-          <button type="button" onClick={onToggleCollapse} className="ml-auto btn btn-ghost btn-icon !w-8 !h-8 !min-h-8 text-xs" title="Panelni yig'ish">
+          <button type="button" onClick={onToggleCollapse} className="ml-auto btn btn-ghost btn-icon !w-8 !h-8 !min-h-8 text-xs" title={t("Panelni yig'ish")}>
             «
           </button>
         )}
       </div>
       {!mobile && collapsed && (
-        <button type="button" onClick={onToggleCollapse} className="mx-auto mb-1 btn btn-ghost btn-icon !w-8 !h-8 !min-h-8 text-xs" title="Panelni kengaytirish">
+        <button type="button" onClick={onToggleCollapse} className="mx-auto mb-1 btn btn-ghost btn-icon !w-8 !h-8 !min-h-8 text-xs" title={t('Panelni kengaytirish')}>
           »
         </button>
       )}
 
-      {/* Til tanlash */}
+      {/* O'rganiladigan til tanlash */}
       <div className={collapsed ? 'flex flex-col items-center gap-1.5 px-2 pb-2' : 'grid grid-cols-3 gap-1.5 px-3 pb-2'}>
         {LANG_OPTIONS.map((l) => {
           const active = lang === l.key;
@@ -130,20 +133,26 @@ export default function Sidebar({ collapsed = false, onToggleCollapse, onNavigat
       </div>
 
       <nav className="flex-1 overflow-y-auto no-scrollbar px-2 pb-4">
-        <SectionLabel collapsed={collapsed}>Asosiy</SectionLabel>
-        <NavRow icon="🏠" label="Bosh sahifa" to="/" active={is('/')} collapsed={collapsed} />
-        <NavRow icon="🧭" label={langInfo ? `Darslar · ${langInfo.label}` : 'Darslar'} to={`/lang/${lang}`} active={is(`/lang/${lang}`) || pathname.includes('/month/')} collapsed={collapsed} />
-        <NavRow icon="🤖" label="AI ustoz" to="/ai" active={is('/ai')} collapsed={collapsed} />
-        <NavRow icon="📊" label="Natijalar" to="/results" active={is('/results')} collapsed={collapsed} />
+        <SectionLabel collapsed={collapsed}>{t('Asosiy')}</SectionLabel>
+        <NavRow icon="🏠" label={t('Bosh sahifa')} to="/" active={is('/')} collapsed={collapsed} />
+        <NavRow
+          icon="🧭"
+          label={langInfo ? t('Darslar · {name}', { name: t(langInfo.label) }) : t('Darslar')}
+          to={`/lang/${lang}`}
+          active={is(`/lang/${lang}`) || pathname.includes('/month/')}
+          collapsed={collapsed}
+        />
+        <NavRow icon="🤖" label={t('AI ustoz')} to="/ai" active={is('/ai')} collapsed={collapsed} />
+        <NavRow icon="📊" label={t('Natijalar')} to="/results" active={is('/results')} collapsed={collapsed} />
 
-        <SectionLabel collapsed={collapsed}>Mashg'ulotlar</SectionLabel>
-        <NavRow icon="🔀" label="Lug'at mashqi" to={`/lang/${lang}/practice-full`} active={is(`/lang/${lang}/practice-full`)} collapsed={collapsed} />
-        <NavRow icon="📖" label="Lug'at" to={`/lang/${lang}/dictionary`} active={is(`/lang/${lang}/dictionary`)} collapsed={collapsed} />
-        <NavRow icon="🎧" label="Dialog mashqi" to={`/lang/${lang}/dialogs`} active={is(`/lang/${lang}/dialogs`)} collapsed={collapsed} />
-        <NavRow icon="📐" label="Grammatika" to={`/lang/${lang}/grammar`} active={is(`/lang/${lang}/grammar`)} collapsed={collapsed} />
-        <NavRow icon="🔤" label="Fe'llar jadvali" to={`/lang/${lang}/verbs`} active={is(`/lang/${lang}/verbs`)} collapsed={collapsed} />
+        <SectionLabel collapsed={collapsed}>{t("Mashg'ulotlar")}</SectionLabel>
+        <NavRow icon="🔀" label={t("Lug'at mashqi")} to={`/lang/${lang}/practice-full`} active={is(`/lang/${lang}/practice-full`)} collapsed={collapsed} />
+        <NavRow icon="📖" label={t("Lug'at")} to={`/lang/${lang}/dictionary`} active={is(`/lang/${lang}/dictionary`)} collapsed={collapsed} />
+        <NavRow icon="🎧" label={t('Dialog mashqi')} to={`/lang/${lang}/dialogs`} active={is(`/lang/${lang}/dialogs`)} collapsed={collapsed} />
+        <NavRow icon="📐" label={t('Grammatika')} to={`/lang/${lang}/grammar`} active={is(`/lang/${lang}/grammar`)} collapsed={collapsed} />
+        <NavRow icon="🔤" label={t("Fe'llar jadvali")} to={`/lang/${lang}/verbs`} active={is(`/lang/${lang}/verbs`)} collapsed={collapsed} />
 
-        <SectionLabel collapsed={collapsed}>Materiallar</SectionLabel>
+        <SectionLabel collapsed={collapsed}>{t('Materiallar')}</SectionLabel>
         {MEDIA_ORDER.map((k) => (
           <NavRow
             key={k}
@@ -159,21 +168,26 @@ export default function Sidebar({ collapsed = false, onToggleCollapse, onNavigat
 
         {isStaff && (
           <>
-            <SectionLabel collapsed={collapsed}>Boshqaruv</SectionLabel>
-            <NavRow icon="👑" label="Admin panel" to="/admin" active={is('/admin') && (!adminTab || adminTab === 'home')} collapsed={collapsed} />
-            {user.role === 'superadmin' && (
-              <NavRow icon="👥" label="Foydalanuvchilar" to="/admin?tab=users" active={is('/admin') && adminTab === 'users'} collapsed={collapsed} />
+            <SectionLabel collapsed={collapsed}>{t('Boshqaruv')}</SectionLabel>
+            <NavRow icon="👑" label={t('Admin panel')} to="/admin" active={is('/admin') && (!adminTab || adminTab === 'home')} collapsed={collapsed} />
+            {isSuper && (
+              <>
+                <NavRow icon="👥" label={t('Foydalanuvchilar')} to="/admin?tab=users" active={is('/admin') && adminTab === 'users'} collapsed={collapsed} />
+                <NavRow icon="🔐" label={t('Adminlar ruxsatlari')} to="/admin?tab=perms" active={is('/admin') && adminTab === 'perms'} collapsed={collapsed} />
+                <NavRow icon="🛡️" label={t("Ro'yxatdan o'tish")} to="/admin?tab=signup" active={is('/admin') && adminTab === 'signup'} collapsed={collapsed} />
+              </>
             )}
-            <NavRow icon="🔑" label="AI va API kalitlar" to="/admin?tab=ai" active={is('/admin') && adminTab === 'ai'} collapsed={collapsed} />
+            <NavRow icon="🔑" label={t('AI va API kalitlar')} to="/admin?tab=ai" active={is('/admin') && adminTab === 'ai'} collapsed={collapsed} />
           </>
         )}
       </nav>
 
       {/* Pastki qism */}
       <div className="border-t p-2 space-y-1" style={{ borderColor: 'var(--line)', paddingBottom: mobile ? 'calc(8px + env(safe-area-inset-bottom))' : undefined }}>
-        <NavRow icon={theme === 'dark' ? '☀️' : '🌙'} label={theme === 'dark' ? 'Kunduzgi rejim' : 'Tungi rejim'} onClick={toggleTheme} collapsed={collapsed} />
+        {collapsed ? <LanguageSwitcher variant="cycle" className="mx-auto" /> : <LanguageSwitcher className="px-1 pb-1" />}
+        <NavRow icon={theme === 'dark' ? '☀️' : '🌙'} label={theme === 'dark' ? t('Kunduzgi rejim') : t('Tungi rejim')} onClick={toggleTheme} collapsed={collapsed} />
         {collapsed ? (
-          <NavRow icon="👤" label="Profil" to="/profile" active={is('/profile')} collapsed />
+          <NavRow icon="👤" label={t('Profil')} to="/profile" active={is('/profile')} collapsed />
         ) : (
           <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl" style={{ background: is('/profile') ? 'var(--pine-soft)' : 'transparent' }}>
             <Link to="/profile" className="flex items-center gap-2.5 min-w-0 flex-1">
@@ -188,7 +202,7 @@ export default function Sidebar({ collapsed = false, onToggleCollapse, onNavigat
                   {user.displayName || user.username}
                 </span>
                 <span className="block text-[11px] faint truncate">
-                  {streak > 0 ? `🔥 ${streak} kun ketma-ket` : user.role === 'superadmin' ? 'Super admin' : user.role === 'admin' ? 'Admin' : "O'quvchi"}
+                  {streak > 0 ? t('🔥 {n} kun ketma-ket', { n: streak }) : isSuper ? t('Super admin') : user.role === 'admin' ? t('Admin') : t("O'quvchi")}
                 </span>
               </span>
             </Link>
@@ -199,8 +213,8 @@ export default function Sidebar({ collapsed = false, onToggleCollapse, onNavigat
                 navigate('/login');
               }}
               className="btn btn-ghost btn-icon !w-9 !h-9 !min-h-9 shrink-0"
-              title="Chiqish"
-              aria-label="Chiqish"
+              title={t('Chiqish')}
+              aria-label={t('Chiqish')}
               style={{ color: 'var(--brick)' }}
             >
               ⎋

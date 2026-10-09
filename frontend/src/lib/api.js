@@ -1,5 +1,9 @@
 import { supabase, setRemember } from './supabase.js';
 import { SYNTH_DOMAIN, isSyntheticEmail, isValidEmail, normalizePhone, resolveIdentifier, formatPhone } from './identity.js';
+import { getLang, t } from '../i18n/index.js';
+
+/** Xato obyekti: xabar joriy interfeys tiliga o'giriladi (o'zbekcha kalit yoki serverdan kelgan o'zbekcha matn). */
+const E = (message) => new Error(t(message));
 
 // ============================================================================
 // Ilovaning barcha ma'lumot almashinuvi shu yerda: Supabase (Auth, Postgres,
@@ -16,12 +20,15 @@ const MAX_UPLOAD_BYTES = 50 * 1024 * 1024;
 function throwIfError(error) {
   if (!error) return;
   if (/failed to fetch|networkerror|load failed/i.test(error.message || '')) {
-    throw new Error("Server bilan aloqa yo'q. Internet ulanishini tekshirib, qayta urinib ko'ring.");
+    throw E("Server bilan aloqa yo'q. Internet ulanishini tekshirib, qayta urinib ko'ring.");
+  }
+  if (/row-level security|violates row-level/i.test(error.message || '')) {
+    throw E("Bu amal uchun ruxsatingiz yo'q. Kerak bo'lsa, super admin bilan bog'laning.");
   }
   if (/relation .* does not exist|could not find the table/i.test(error.message || '')) {
-    throw new Error("Bazada kerakli jadval topilmadi — supabase/migrations dagi SQL fayllarni ishga tushiring.");
+    throw E("Bazada kerakli jadval topilmadi — supabase/migrations dagi SQL fayllarni ishga tushiring.");
   }
-  throw new Error(error.message || "Supabase so'rovida xatolik yuz berdi");
+  throw E(error.message || "Supabase so'rovida xatolik yuz berdi");
 }
 
 export function publicProfile(p) {
@@ -34,6 +41,7 @@ export function publicProfile(p) {
     email: p.email,
     phone: p.phone,
     isBlocked: p.is_blocked,
+    uploadKinds: p.upload_kinds || [],
     lastSeenAt: p.last_seen_at,
     createdAt: p.created_at,
   };
@@ -78,17 +86,17 @@ async function callFunction(name, body) {
       }
     }
     if (!serverMessage && /Failed to send|fetch/i.test(error.message || '')) {
-      serverMessage = `"${name}" Edge Function'ga ulanib bo'lmadi. Funksiya Supabase'ga joylanganini tekshiring.`;
+      serverMessage = t('"{name}" Edge Function\'ga ulanib bo\'lmadi. Funksiya Supabase\'ga joylanganini tekshiring.', { name });
     }
-    throw new Error(serverMessage || error.message || "Server bilan bog'lanishda xato yuz berdi");
+    throw E(serverMessage || error.message || "Server bilan bog'lanishda xato yuz berdi");
   }
-  if (data && data.error) throw new Error(data.error);
+  if (data && data.error) throw E(data.error);
   return data;
 }
 
 async function currentUser() {
   const { data: { session } } = await supabase.auth.getSession();
-  if (!session?.user) throw new Error('Kirish talab qilinadi');
+  if (!session?.user) throw E('Kirish talab qilinadi');
   return session.user;
 }
 
@@ -121,7 +129,7 @@ let uploadedCache = {}; // lang -> { at, data }
 async function fetchJson(url) {
   // Netlify statik fayllarni ETag bilan beradi — brauzer yangilanganini tekshirib, o'zgarmagan bo'lsa keshdan oladi
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`Kurs kontenti yuklanmadi (${url})`);
+  if (!res.ok) throw E(`Kurs kontenti yuklanmadi (${url})`);
   return res.json();
 }
 
@@ -204,32 +212,69 @@ export const api = {
   /** Email va/yoki telefon bilan ro'yxatdan o'tish (kamida bittasi kerak).
    *  Email kiritilsa — emailga yuborilgan 6 xonali kod (`code`) majburiy; faqat telefon bilan o'tilsa kod so'ralmaydi.
    *  Ikkalasi kiritilsa — keyin istalgani bilan kirish mumkin. */
-  register: async ({ email, phone, password, displayName, code }) => {
-    if (String(password || '').length < 6) throw new Error("Parol kamida 6 belgidan iborat bo'lishi kerak");
+  register: async ({ email, phone, username, password, displayName, code, tgToken, tgCode }) => {
+    if (String(password || '').length < 6) throw E("Parol kamida 6 belgidan iborat bo'lishi kerak");
     const e = String(email || '').trim().toLowerCase();
     const phoneRaw = String(phone || '').trim();
+    const login = String(username || '').trim();
     const hasPhone = phoneRaw.replace(/\D/g, '').length > 3; // "+998 " yolg'iz qolsa — bo'sh hisoblanadi
-    if (!e && !hasPhone) throw new Error('Email yoki telefon raqamidan kamida bittasini kiriting');
+    // Oddiy usul: faqat login (ism) + parol — email ham, telefon ham kiritilmaydi
+    if (!e && !hasPhone && !login) throw E('Email yoki telefon raqamidan kamida bittasini kiriting');
 
-    if (hasPhone && !normalizePhone(phoneRaw)) throw new Error("Telefon raqamini to'g'ri kiriting (masalan: +998 90 123 45 67)");
-    if (e && !isValidEmail(e)) throw new Error("Email manzilini to'g'ri kiriting (masalan: ism@gmail.com)");
-    if (e && isSyntheticEmail(e)) throw new Error("Bu email manzilidan foydalanib bo'lmaydi");
+    if (hasPhone && !normalizePhone(phoneRaw)) throw E("Telefon raqamini to'g'ri kiriting (masalan: +998 90 123 45 67)");
+    if (e && !isValidEmail(e)) throw E("Email manzilini to'g'ri kiriting (masalan: ism@gmail.com)");
+    if (e && isSyntheticEmail(e)) throw E("Bu email manzilidan foydalanib bo'lmaydi");
+    if (!e && !hasPhone && !/^[a-zA-Z0-9_.-]{3,40}$/.test(login)) {
+      throw E("Login 3–40 belgidan iborat bo'lsin: lotin harflari, raqamlar, _ . - belgilari");
+    }
 
-    // Hisob server tomonda yaratiladi: email bo'lsa — kod tekshiriladi, faqat telefon bo'lsa — kodsiz
-    const res = await callFunction('admin', { action: 'register', email: e, phone: hasPhone ? phoneRaw : '', password, displayName, code });
+    // Hisob server tomonda yaratiladi: usullarni (login / email / telefon) va tasdiqlash kodlarini super admin belgilaydi
+    const res = await callFunction('admin', {
+      action: 'register',
+      email: e,
+      phone: hasPhone ? phoneRaw : '',
+      username: !e && !hasPhone ? login : '',
+      password,
+      displayName,
+      code,
+      tgToken,
+      tgCode,
+    });
     setRemember(true);
     const { data, error } = await supabase.auth.signInWithPassword({ email: res.email, password });
-    if (error) throw new Error(authErrorMessage(error, "Hisob yaratildi, lekin kirishda xatolik. Kirish sahifasidan kiring."));
+    if (error) throw E(authErrorMessage(error, "Hisob yaratildi, lekin kirishda xatolik. Kirish sahifasidan kiring."));
     const profile = await fetchProfile(data.user.id);
     return { user: publicProfile(profile) };
   },
+
+  /** Ro'yxatdan o'tish rejimi: { emailCode: email kodi talab qilinadimi, mailReady: email xizmati sozlanganmi }.
+   *  Server javob bermasa — xavfsizroq standart (kod talab qilinadi). */
+  signupConfig: async () => {
+    const fallback = { methods: { login: true, email: true, phone: true }, emailCode: true, phoneTelegram: false, tgBot: '', mailReady: true };
+    try {
+      const res = await callFunction('admin', { action: 'signup-config' });
+      return {
+        methods: { login: res?.methods?.login !== false, email: res?.methods?.email !== false, phone: res?.methods?.phone !== false },
+        emailCode: res?.emailCode !== false,
+        phoneTelegram: !!res?.phoneTelegram,
+        tgBot: res?.tgBot || '',
+        mailReady: !!res?.mailReady,
+      };
+    } catch {
+      return fallback;
+    }
+  },
+
+  /** Telegram orqali telefon tasdiqlashni boshlaydi: bot havolasi va so'rov tokenini qaytaradi.
+   *  purpose: 'register' | 'phone-change' (profilda raqamni almashtirish — kirgan foydalanuvchi). */
+  tgStart: ({ phone, purpose = 'register' }) => callFunction('admin', { action: 'tg-start', phone, purpose }),
 
   /** Emailga 6 xonali tasdiqlash kodini yuboradi. purpose: 'register' | 'reset' | 'change-email' */
   sendEmailCode: (email, purpose) => callFunction('admin', { action: 'send-email-code', email: String(email || '').trim().toLowerCase(), purpose }),
 
   login: async ({ identifier, password, remember = true }) => {
     const ident = resolveIdentifier(identifier);
-    if (!ident) throw new Error("Email, telefon raqami yoki loginni to'g'ri kiriting");
+    if (!ident) throw E("Email, telefon raqami yoki loginni to'g'ri kiriting");
     setRemember(remember);
     let { data, error } = await supabase.auth.signInWithPassword({ email: ident.email, password });
     const invalid = error && /invalid login|invalid credentials/i.test(error.message || '');
@@ -252,19 +297,19 @@ export const api = {
             /* e'tiborsiz */
           }
         }
-        throw new Error(msg || "Login (email/telefon) yoki parol noto'g'ri");
+        throw E(msg || "Login (email/telefon) yoki parol noto'g'ri");
       }
     }
     if (error) {
       if (/invalid login|invalid credentials/i.test(error.message || '')) {
-        throw new Error("Login (email/telefon) yoki parol noto'g'ri");
+        throw E("Login (email/telefon) yoki parol noto'g'ri");
       }
-      throw new Error(authErrorMessage(error, "Kirishda xatolik yuz berdi"));
+      throw E(authErrorMessage(error, "Kirishda xatolik yuz berdi"));
     }
     const profile = await fetchProfile(data.user.id);
     if (profile?.is_blocked) {
       await supabase.auth.signOut();
-      throw new Error("Hisobingiz bloklangan. Administrator bilan bog'laning.");
+      throw E("Hisobingiz bloklangan. Administrator bilan bog'laning.");
     }
     return { user: publicProfile(profile) };
   },
@@ -288,36 +333,40 @@ export const api = {
   requestPasswordReset: async (email) => {
     const e = String(email || '').trim().toLowerCase();
     if (!isValidEmail(e) || isSyntheticEmail(e)) {
-      throw new Error("Parolni tiklash faqat email bilan ro'yxatdan o'tganlar uchun. Telefon orqali o'tgan bo'lsangiz, administratorga murojaat qiling.");
+      throw E("Parolni tiklash faqat email bilan ro'yxatdan o'tganlar uchun. Telefon orqali o'tgan bo'lsangiz, administratorga murojaat qiling.");
     }
     return callFunction('admin', { action: 'send-email-code', email: e, purpose: 'reset' });
   },
 
   resetPasswordWithCode: async ({ email, code, password }) => {
-    if (String(password || '').length < 6) throw new Error("Parol kamida 6 belgidan iborat bo'lishi kerak");
+    if (String(password || '').length < 6) throw E("Parol kamida 6 belgidan iborat bo'lishi kerak");
     return callFunction('admin', { action: 'reset-with-code', email: String(email || '').trim().toLowerCase(), code, password });
   },
 
   updatePassword: async (password) => {
-    if (String(password || '').length < 6) throw new Error("Parol kamida 6 belgidan iborat bo'lishi kerak");
+    if (String(password || '').length < 6) throw E("Parol kamida 6 belgidan iborat bo'lishi kerak");
     const { error } = await supabase.auth.updateUser({ password });
-    if (error) throw new Error(authErrorMessage(error));
+    if (error) throw E(authErrorMessage(error));
     return { ok: true };
   },
 
   /** O'z email/telefonini qo'shish yoki almashtirish (server tomonda tekshiriladi). */
-  updateContact: async ({ email, phone, emailCode }) => {
+  updateContact: async ({ email, phone, emailCode, tgToken, tgCode }) => {
     const payload = { action: 'update-my-contact' };
     if (email !== undefined) payload.email = email;
     if (email !== undefined && emailCode) payload.emailCode = emailCode;
     if (phone !== undefined) payload.phone = phone;
+    if (phone !== undefined && tgToken) {
+      payload.tgToken = tgToken;
+      payload.tgCode = tgCode;
+    }
     return callFunction('admin', payload);
   },
 
   updateProfile: async ({ displayName }) => {
     const user = await currentUser();
     const name = String(displayName || '').trim().slice(0, 60);
-    if (!name) throw new Error("Ism bo'sh bo'lmasligi kerak");
+    if (!name) throw E("Ism bo'sh bo'lmasligi kerak");
     const { data, error } = await supabase.from('profiles').update({ display_name: name }).eq('id', user.id).select('*').single();
     throwIfError(error);
     return { user: publicProfile(data) };
@@ -332,7 +381,7 @@ export const api = {
   meta: () => loadMeta(),
 
   content: async (lang) => {
-    if (!LANG_KEYS.includes(lang)) throw new Error('Til topilmadi');
+    if (!LANG_KEYS.includes(lang)) throw E('Til topilmadi');
     const [meta, file, uploaded] = await Promise.all([loadMeta(), loadLangFile(lang), loadUploaded(lang)]);
     const uploadedCategories = uploaded.vocab.map((v) => ({
       cat: `📤 ${v.title}`,
@@ -409,9 +458,9 @@ export const api = {
   },
 
   createMedia: async ({ kind, lang = 'all', title, description, lessonRef, content = {}, file, isPublished = true }) => {
-    if (!MEDIA_KINDS.includes(kind)) throw new Error("Noma'lum material turi");
+    if (!MEDIA_KINDS.includes(kind)) throw E("Noma'lum material turi");
     const cleanTitle = String(title || '').trim().slice(0, 300);
-    if (!cleanTitle) throw new Error('Sarlavha kerak');
+    if (!cleanTitle) throw E('Sarlavha kerak');
     const user = await currentUser();
     const { data: prof } = await supabase.from('profiles').select('username').eq('id', user.id).single();
 
@@ -420,7 +469,7 @@ export const api = {
     let mime = null;
     let size = null;
     if (file) {
-      if (file.size > MAX_UPLOAD_BYTES) throw new Error(`"${file.name}" juda katta (maksimal 50 MB)`);
+      if (file.size > MAX_UPLOAD_BYTES) throw E(`"${file.name}" juda katta (maksimal 50 MB)`);
       const ext = (file.name.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 8) || 'bin';
       const id = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
       storagePath = `${kind}/${new Date().toISOString().slice(0, 7)}/${id}.${ext}`;
@@ -428,10 +477,12 @@ export const api = {
         .from('media')
         .upload(storagePath, file, { contentType: file.type || undefined, cacheControl: '31536000', upsert: false });
       if (upErr) {
-        throw new Error(
-          /bucket/i.test(upErr.message)
-            ? "Storage'da \"media\" bucket topilmadi — 0005_v2_platform.sql migratsiyasini ishga tushiring."
-            : `Fayl yuklanmadi: ${upErr.message}`
+        throw E(
+          /row-level security|violates row-level|not authorized|unauthorized/i.test(upErr.message)
+            ? "Bu turdagi materialni yuklashga ruxsatingiz yo'q. Super admin bilan bog'laning."
+            : /bucket/i.test(upErr.message)
+              ? "Storage'da \"media\" bucket topilmadi — 0005_v2_platform.sql migratsiyasini ishga tushiring."
+              : `Fayl yuklanmadi: ${upErr.message}`
         );
       }
       fileUrl = supabase.storage.from('media').getPublicUrl(storagePath).data.publicUrl;
@@ -525,6 +576,8 @@ export const api = {
   createUser: (payload) => callFunction('admin', { action: 'create-user', ...payload }),
   deleteUser: (id) => callFunction('admin', { action: 'delete-user', id }),
   setRole: (id, role) => callFunction('admin', { action: 'set-role', id, role }),
+  /** Adminning yuklash ruxsatlari: uploadKinds — ruxsat berilgan material turlari (faqat super admin). */
+  setPermissions: (id, uploadKinds) => callFunction('admin', { action: 'set-permissions', id, uploadKinds }),
   resetUserPassword: (id, password) => callFunction('admin', { action: 'reset-password', id, password }),
   blockUser: (id, blocked) => callFunction('admin', { action: 'block-user', id, blocked }),
 
@@ -568,13 +621,21 @@ export const api = {
 
   // ---------------- AI ----------------
   aiStatus: () => callFunction('ai', { action: 'status' }),
-  aiTask: (payload) => callFunction('ai', { action: 'task', ...payload }),
-  aiCheck: (payload) => callFunction('ai', { action: 'check', ...payload }),
-  aiChat: (payload) => callFunction('ai', { action: 'chat', ...payload }),
-  aiExplain: (payload) => callFunction('ai', { action: 'explain', ...payload }),
+  // `ui` — sayt tili: AI ustoz tushuntirishlarni shu tilda yozadi
+  aiTask: (payload) => callFunction('ai', { action: 'task', ui: getLang(), ...payload }),
+  aiCheck: (payload) => callFunction('ai', { action: 'check', ui: getLang(), ...payload }),
+  aiChat: (payload) => callFunction('ai', { action: 'chat', ui: getLang(), ...payload }),
+  aiExplain: (payload) => callFunction('ai', { action: 'explain', ui: getLang(), ...payload }),
   aiTestKey: (id) => callFunction('ai', { action: 'test-key', id }),
   getMailSettings: () => callFunction('admin', { action: 'get-mail-settings' }),
   saveMailSettings: (payload) => callFunction('admin', { action: 'save-mail-settings', ...payload }),
+  /** Ro'yxatdan o'tish usullari va Telegram sozlamalari (faqat super admin). */
+  getSignupSettings: () => callFunction('admin', { action: 'get-signup-settings' }),
+  /** patch: { login?, email?, phone?, emailCode?, phoneTelegram? } — faqat berilgan maydonlar o'zgaradi. */
+  saveSignupSettings: (patch) => callFunction('admin', { action: 'save-signup-settings', ...patch }),
+  /** Telegram botni ulash (token bo'sh bo'lsa — uzish). */
+  tgSaveBot: (token) => callFunction('admin', { action: 'tg-save-bot', token }),
+  tgCheck: () => callFunction('admin', { action: 'tg-check' }),
   testMail: (to) => callFunction('admin', { action: 'test-mail', to }),
   getAiSettings: () => callFunction('admin', { action: 'get-ai-settings' }),
   saveAiSettings: (payload) => callFunction('admin', { action: 'save-ai-settings', ...payload }),

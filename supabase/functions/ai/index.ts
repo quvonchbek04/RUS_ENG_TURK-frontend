@@ -288,7 +288,10 @@ function extractJson(raw: string): Record<string, unknown> | null {
 // ---------------------------------------------------------------------------
 // PROMPTLAR
 // ---------------------------------------------------------------------------
-function tutorSystem(lang: string, cfg: AiConfig, extra = ""): string {
+// Sayt (interfeys) tili — AI ustoz tushuntirishlarni shu tilda yozadi (standart: o'zbek)
+const UI_LANG_NAMES: Record<string, string> = { uz: "o'zbek tili", ru: "rus tili (Русский)", en: "ingliz tili (English)", tr: "turk tili (Türkçe)" };
+
+function tutorSystem(lang: string, cfg: AiConfig, extra = "", ui = "uz"): string {
   const L = LANG_NAMES[lang] || "chet tili";
   return [
     `Sen "Til sayohati" o'quv platformasining AI ustozisan. O'quvchi o'zbek tilida so'zlashadi va ${L}ni o'rganmoqda.`,
@@ -301,6 +304,10 @@ function tutorSystem(lang: string, cfg: AiConfig, extra = ""): string {
     "- O'rinli bo'lsa, oxirida o'quvchiga bitta kichik mashq yoki savol taklif qil.",
     "- Til o'rganishga aloqasi yo'q savollarga juda qisqa javob berib, mavzuga qaytar.",
     cfg.tutorStyle ? `Administrator ko'rsatmasi: ${cfg.tutorStyle}` : "",
+    ui !== "uz"
+      ? `MUHIM: o'quvchining sayt tili — ${UI_LANG_NAMES[ui] || ui}. Yuqoridagi "o'zbek tilida / o'zbekcha" degan qoidalarni shu tilga almashtir: ` +
+        `barcha tushuntirish, tarjima, maslahat va savollarni FAQAT ${UI_LANG_NAMES[ui] || ui}da yoz (o'zbek tilida yozma). JSON javoblarning kalit nomlari o'zgarmaydi.`
+      : "",
     extra,
   ]
     .filter(Boolean)
@@ -324,24 +331,109 @@ function pickSentence(text: string): string {
   return parts[Math.floor(Math.random() * Math.min(parts.length, 12))];
 }
 
-function mockTask(type: string, content: string, lang: string) {
-  const L = LANG_NAMES[lang] || lang;
+// "Oddiy rejim" (AI kalitsiz) matnlari — sayt tilida (uz / ru / en / tr)
+const MOCK_TEXT: Record<string, {
+  langIn: Record<string, string>; // o'rganilayotgan tilda ("ruscha" ma'nosida)
+  translate: (s: string) => string;
+  explain: (s: string) => string;
+  words: (s: string) => string;
+  similar: (L: string, s: string) => string;
+  continueDlg: (L: string) => string;
+  rewrite: (s: string) => string;
+  reply: (L: string) => string;
+  hint: string;
+  note: string;
+  good: string;
+  far: string;
+  short: string;
+  oneSentence: string;
+  accepted: string;
+  chat: string;
+}> = {
+  uz: {
+    langIn: { ru: "rus tilida", en: "ingliz tilida", tr: "turk tilida" },
+    translate: (s) => `Quyidagi jumlani o'zbek tiliga tarjima qiling: "${s}"`,
+    explain: (s) => `Ushbu jumla mazmunini o'z so'zlaringiz bilan qisqacha tushuntiring: "${s}"`,
+    words: (s) => `Jumladagi kamida 3 ta so'zni ajratib, ma'nosini yozing: "${s}"`,
+    similar: (L, s) => `Shu jumlaga o'xshash, lekin o'zingiz haqingizda ${L} bitta gap tuzing: "${s}"`,
+    continueDlg: (L) => `Ushbu dialogni davom ettirib, yana 2 ta gap (${L}) yozing.`,
+    rewrite: (s) => `Dialogdagi ushbu jumlani boshqacha, lekin shu ma'noda qayta yozing: "${s}"`,
+    reply: (L) => `Agar siz suhbatdagi ikkinchi kishi bo'lganingizda, nima deb javob berardingiz? (${L} yozing)`,
+    hint: 'Javobingizni pastdagi maydonga yozing va "Tekshirish" tugmasini bosing.',
+    note: " (Oddiy tekshiruv rejimi: to'liq AI baholash uchun administrator API kalit qo'shishi kerak.)",
+    good: "Yaxshi! Javobingiz namunaga yaqin.",
+    far: "Javobingiz namunadan ancha farq qiladi — namunani ko'rib chiqing.",
+    short: "Javob juda qisqa — kengroq yozib ko'ring.",
+    oneSentence: "Kamida bitta to'liq gap bilan javob bering.",
+    accepted: "Javobingiz qabul qilindi. Davom eting!",
+    chat: "Hozircha AI ustoz to'liq rejimda ishlamayapti (administrator hali API kalit qo'shmagan). Shunga qaramay, men lug'atdan so'z qidirib bera olaman — so'zni yozing yoki pastdagi tezkor tugmalardan foydalaning.",
+  },
+  ru: {
+    langIn: { ru: "на русском языке", en: "на английском языке", tr: "на турецком языке" },
+    translate: (s) => `Переведите следующее предложение на русский язык: "${s}"`,
+    explain: (s) => `Кратко объясните смысл этого предложения своими словами: "${s}"`,
+    words: (s) => `Выделите в предложении не менее 3 слов и напишите их значение: "${s}"`,
+    similar: (L, s) => `Составьте похожее предложение о себе ${L}: "${s}"`,
+    continueDlg: (L) => `Продолжите этот диалог, написав ещё 2 реплики (${L}).`,
+    rewrite: (s) => `Перепишите эту реплику из диалога иначе, но с тем же смыслом: "${s}"`,
+    reply: (L) => `Что бы вы ответили, если бы были вторым участником разговора? (напишите ${L})`,
+    hint: 'Напишите ответ в поле ниже и нажмите «Проверить».',
+    note: " (Простой режим проверки: для полной оценки ИИ администратор должен добавить API-ключ.)",
+    good: "Хорошо! Ваш ответ близок к образцу.",
+    far: "Ваш ответ заметно отличается от образца — посмотрите образец.",
+    short: "Ответ слишком короткий — напишите подробнее.",
+    oneSentence: "Ответьте хотя бы одним полным предложением.",
+    accepted: "Ваш ответ принят. Продолжайте!",
+    chat: "Пока ИИ-учитель работает не в полном режиме (администратор ещё не добавил API-ключ). Тем не менее я могу найти слово в словаре — напишите слово или воспользуйтесь быстрыми кнопками ниже.",
+  },
+  en: {
+    langIn: { ru: "in Russian", en: "in English", tr: "in Turkish" },
+    translate: (s) => `Translate the following sentence into English: "${s}"`,
+    explain: (s) => `Briefly explain the meaning of this sentence in your own words: "${s}"`,
+    words: (s) => `Pick out at least 3 words from the sentence and write their meanings: "${s}"`,
+    similar: (L, s) => `Write a similar sentence about yourself ${L}: "${s}"`,
+    continueDlg: (L) => `Continue this dialogue by writing 2 more lines (${L}).`,
+    rewrite: (s) => `Rewrite this line of the dialogue differently but with the same meaning: "${s}"`,
+    reply: (L) => `What would you say if you were the second person in the conversation? (write ${L})`,
+    hint: 'Write your answer in the field below and press “Check”.',
+    note: " (Basic checking mode: the administrator needs to add an API key for full AI scoring.)",
+    good: "Good! Your answer is close to the sample.",
+    far: "Your answer differs a lot from the sample — have a look at the sample.",
+    short: "The answer is too short — try to write more.",
+    oneSentence: "Please answer with at least one complete sentence.",
+    accepted: "Your answer was accepted. Keep going!",
+    chat: "The AI tutor is not running in full mode yet (the administrator hasn't added an API key). I can still look words up in the dictionary — type a word or use the quick buttons below.",
+  },
+  tr: {
+    langIn: { ru: "Rusça olarak", en: "İngilizce olarak", tr: "Türkçe olarak" },
+    translate: (s) => `Aşağıdaki cümleyi Türkçeye çevirin: "${s}"`,
+    explain: (s) => `Bu cümlenin anlamını kendi sözlerinizle kısaca açıklayın: "${s}"`,
+    words: (s) => `Cümleden en az 3 kelime seçip anlamlarını yazın: "${s}"`,
+    similar: (L, s) => `Buna benzer, kendinizle ilgili bir cümle kurun (${L}): "${s}"`,
+    continueDlg: (L) => `Bu diyaloğu 2 cümle daha yazarak sürdürün (${L}).`,
+    rewrite: (s) => `Diyalogdaki bu cümleyi farklı ama aynı anlamda yeniden yazın: "${s}"`,
+    reply: (L) => `Konuşmadaki ikinci kişi olsaydınız ne cevap verirdiniz? (${L} yazın)`,
+    hint: 'Cevabınızı aşağıdaki alana yazın ve «Kontrol et» düğmesine basın.',
+    note: " (Basit kontrol modu: tam YZ puanlaması için yöneticinin bir API anahtarı eklemesi gerekir.)",
+    good: "İyi! Cevabınız örneğe yakın.",
+    far: "Cevabınız örnekten oldukça farklı — örneğe bakın.",
+    short: "Cevap çok kısa — daha ayrıntılı yazmayı deneyin.",
+    oneSentence: "En az bir tam cümleyle cevap verin.",
+    accepted: "Cevabınız kabul edildi. Devam edin!",
+    chat: "YZ öğretmen henüz tam modda çalışmıyor (yönetici henüz API anahtarı eklemedi). Yine de sözlükte kelime arayabilirim — bir kelime yazın veya aşağıdaki hızlı düğmeleri kullanın.",
+  },
+};
+
+function mockTask(type: string, content: string, lang: string, ui = "uz") {
+  const M = MOCK_TEXT[ui] || MOCK_TEXT.uz;
+  const L = M.langIn[lang] || lang;
   const sentence = pickSentence(content);
-  const textTemplates = [
-    `Quyidagi jumlani o'zbek tiliga tarjima qiling: "${sentence}"`,
-    `Ushbu jumla mazmunini o'z so'zlaringiz bilan qisqacha tushuntiring: "${sentence}"`,
-    `Jumladagi kamida 3 ta so'zni ajratib, ma'nosini yozing: "${sentence}"`,
-    `Shu jumlaga o'xshash, lekin o'zingiz haqingizda ${L}da bitta gap tuzing: "${sentence}"`,
-  ];
-  const dialogTemplates = [
-    `Ushbu dialogni davom ettirib, yana 2 ta gap (${L}da) yozing.`,
-    `Dialogdagi ushbu jumlani boshqacha, lekin shu ma'noda qayta yozing: "${sentence}"`,
-    `Agar siz suhbatdagi ikkinchi kishi bo'lganingizda, nima deb javob berardingiz? (${L}da yozing)`,
-  ];
+  const textTemplates = [M.translate(sentence), M.explain(sentence), M.words(sentence), M.similar(L, sentence)];
+  const dialogTemplates = [M.continueDlg(L), M.rewrite(sentence), M.reply(L)];
   const templates = type === "dialog" ? dialogTemplates : textTemplates;
   return {
     question: templates[Math.floor(Math.random() * templates.length)],
-    hint: 'Javobingizni pastdagi maydonga yozing va "Tekshirish" tugmasini bosing.',
+    hint: M.hint,
     sample: null,
     mock: true,
   };
@@ -355,8 +447,9 @@ function tokens(s: string) {
     .filter(Boolean);
 }
 
-function mockCheck(answer: string, sample?: string | null) {
-  const note = " (Oddiy tekshiruv rejimi: to'liq AI baholash uchun administrator API kalit qo'shishi kerak.)";
+function mockCheck(answer: string, sample?: string | null, ui = "uz") {
+  const M = MOCK_TEXT[ui] || MOCK_TEXT.uz;
+  const note = M.note;
   const trimmed = (answer || "").trim();
   if (sample) {
     const a = new Set(tokens(trimmed));
@@ -367,20 +460,20 @@ function mockCheck(answer: string, sample?: string | null) {
     return {
       correct: ratio >= 0.6,
       score,
-      feedback: (ratio >= 0.6 ? "Yaxshi! Javobingiz namunaga yaqin." : "Javobingiz namunadan ancha farq qiladi — namunani ko'rib chiqing.") + note,
+      feedback: (ratio >= 0.6 ? M.good : M.far) + note,
       corrected: ratio >= 0.6 ? null : sample,
       tips: [],
       mock: true,
     };
   }
   if (trimmed.length < 3) {
-    return { correct: false, score: 10, feedback: "Javob juda qisqa — kengroq yozib ko'ring." + note, corrected: null, tips: [], mock: true };
+    return { correct: false, score: 10, feedback: M.short + note, corrected: null, tips: [], mock: true };
   }
   const wordCount = trimmed.split(/\s+/).filter(Boolean).length;
   if (wordCount < 2) {
-    return { correct: false, score: 30, feedback: "Kamida bitta to'liq gap bilan javob bering." + note, corrected: null, tips: [], mock: true };
+    return { correct: false, score: 30, feedback: M.oneSentence + note, corrected: null, tips: [], mock: true };
   }
-  return { correct: true, score: 70, feedback: "Javobingiz qabul qilindi. Davom eting!" + note, corrected: null, tips: [], mock: true };
+  return { correct: true, score: 70, feedback: M.accepted + note, corrected: null, tips: [], mock: true };
 }
 
 // ---------------------------------------------------------------------------
@@ -407,6 +500,8 @@ Deno.serve(async (req) => {
     const action = String(body.action || "");
     const lang = String(body.lang || "en");
     const L = LANG_NAMES[lang] || "chet tili";
+    const ui = ["uz", "ru", "en", "tr"].includes(String(body.ui)) ? String(body.ui) : "uz";
+    const UIN = UI_LANG_NAMES[ui];
     const cfg = await getConfig(admin);
 
     /** Kunlik limitni tekshiradi va hisoblagichni oshiradi (adminlar uchun cheklov yo'q, 0 = cheksiz). */
@@ -489,10 +584,10 @@ Deno.serve(async (req) => {
             `Quyidagi o'quv materiali (${type === "dialog" ? "dialog" : "matn"}) asosida o'quvchiga BITTA qisqa, aniq va bajarsa bo'ladigan vazifa tuz.\n` +
             `Vazifa turi: ${kind}. O'quvchi darajasi: ${level}.${avoid}\n\n` +
             `Material:\n"""${String(content).slice(0, 3000)}"""\n\n` +
-            `FAQAT shu JSON formatida javob qaytar: {"question": "vazifa matni o'zbek tilida (kerakli ${L}dagi so'z yoki gaplar bilan)", ` +
-            `"hint": "o'zbekcha qisqa maslahat", "sample": "namunaviy to'g'ri javob"}`;
+            `FAQAT shu JSON formatida javob qaytar: {"question": "vazifa matni ${UIN}da (kerakli ${L}dagi so'z yoki gaplar bilan)", ` +
+            `"hint": "${UIN}da qisqa maslahat", "sample": "namunaviy to'g'ri javob"}`;
           const raw = await runAi(admin, cfg, {
-            system: tutorSystem(lang, cfg),
+            system: tutorSystem(lang, cfg, "", ui),
             messages: [{ role: "user", content: prompt }],
             json: true,
             temperature: 0.9,
@@ -510,7 +605,7 @@ Deno.serve(async (req) => {
           console.error("AI xatosi, oddiy rejimga o'tildi:", e);
         }
       }
-      return json(mockTask(type, String(content), lang));
+      return json(mockTask(type, String(content), lang, ui));
     }
 
     // ---------- javobni tekshirish ----------
@@ -529,11 +624,11 @@ Deno.serve(async (req) => {
             "Javobni tekshir: vazifaga mosmi, grammatika va mazmun to'g'rimi. Kichik imlo xatosi yoki noodatiy, lekin to'g'ri ifoda " +
             "\"noto'g'ri\" hisoblanmaydi; mazmun yoki grammatikadagi jiddiy xato esa noto'g'ri.\n\n" +
             'FAQAT shu JSON formatida javob qaytar: {"correct": true/false, "score": 0-100 oralig\'idagi butun son, ' +
-            '"feedback": "o\'zbek tilida 2-4 gapli iliq va aniq izoh: nima to\'g\'ri, nima xato", ' +
+            `"feedback": "${UIN}da 2-4 gapli iliq va aniq izoh: nima to'g'ri, nima xato", ` +
             `"corrected": "xato bo'lsa to'g'rilangan variant (${L}da), aks holda null", ` +
-            '"tips": ["1-3 ta qisqa maslahat o\'zbekcha"]}';
+            `"tips": ["1-3 ta qisqa maslahat (${UIN}da)"]}`;
           const raw = await runAi(admin, cfg, {
-            system: tutorSystem(lang, cfg),
+            system: tutorSystem(lang, cfg, "", ui),
             messages: [{ role: "user", content: prompt }],
             json: true,
             temperature: 0.3,
@@ -554,7 +649,7 @@ Deno.serve(async (req) => {
           console.error("AI xatosi, oddiy rejimga o'tildi:", e);
         }
       }
-      return json(mockCheck(String(answer), sample ? String(sample) : null));
+      return json(mockCheck(String(answer), sample ? String(sample) : null, ui));
     }
 
     // ---------- erkin suhbat (AI ustoz chat) ----------
@@ -564,9 +659,7 @@ Deno.serve(async (req) => {
       if (cfg.provider === "mock") {
         return json({
           mock: true,
-          reply:
-            "Hozircha AI ustoz to'liq rejimda ishlamayapti (administrator hali API kalit qo'shmagan). " +
-            "Shunga qaramay, men lug'atdan so'z qidirib bera olaman — so'zni yozing yoki pastdagi tezkor tugmalardan foydalaning.",
+          reply: (MOCK_TEXT[ui] || MOCK_TEXT.uz).chat,
         });
       }
       const limited = await consumeQuota();
@@ -576,7 +669,7 @@ Deno.serve(async (req) => {
         ? `\nO'quvchi hozir shu material ustida ishlayapti — savollar shunga tegishli bo'lishi mumkin:\nMavzu: ${String(ctx.title || "").slice(0, 200)}\n"""${String(ctx.text || "").slice(0, 2500)}"""`
         : "";
       try {
-        const reply = await runAi(admin, cfg, { system: tutorSystem(lang, cfg, extra), messages: history, temperature: 0.7 });
+        const reply = await runAi(admin, cfg, { system: tutorSystem(lang, cfg, extra, ui), messages: history, temperature: 0.7 });
         return json({ reply });
       } catch (e) {
         console.error("AI chat xatosi:", e);
@@ -593,11 +686,11 @@ Deno.serve(async (req) => {
       if (limited) return limited;
       try {
         const reply = await runAi(admin, cfg, {
-          system: tutorSystem(lang, cfg),
+          system: tutorSystem(lang, cfg, "", ui),
           messages: [{
             role: "user",
             content:
-              `"${text}" (${L}) ni tushuntirib ber: o'zbekcha tarjimasi, o'qilishi (lotin harflarida), so'z turkumi yoki grammatik tuzilishi, ` +
+              `"${text}" (${L}) ni tushuntirib ber (${UIN}da): tarjimasi, o'qilishi (lotin harflarida), so'z turkumi yoki grammatik tuzilishi, ` +
               "ma'no nozikliklari, tarjimasi bilan 2-3 ta misol gap va eslab qolish uchun bitta maslahat.",
           }],
           temperature: 0.5,
