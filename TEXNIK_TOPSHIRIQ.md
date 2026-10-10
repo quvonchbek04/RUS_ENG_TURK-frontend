@@ -31,8 +31,8 @@ jihozlangan veb-platforma yaratish.
 |---|---|
 | Mehmon | Faqat kirish/ro'yxatdan o'tish sahifalarini ko'radi |
 | O'quvchi (`user`) | Darslar, mashqlar, materiallar, AI ustoz, o'z natijalari |
-| Admin (`admin`) | O'quvchi imkoniyatlari + materiallarni yuklash va boshqarish, AI/Email holatini ko'rish, kontent statistikasi. **Foydalanuvchilarni ko'rmaydi** va boshqarmaydi (ro'yxat, email/telefon, progress, qo'shish, o'chirish, bloklash — hammasi yopiq) |
-| Super admin (`superadmin`) | Admin imkoniyatlari + **foydalanuvchilar bo'limi (faqat shu rol)**: ro'yxat, qo'shish/o'chirish, bloklash, parolni tiklash, admin tayinlash; AI sozlamalari, API kalitlar va Email xizmati |
+| Admin (`admin`) | O'quvchi imkoniyatlari + **faqat super admin bergan ruxsatlar doirasida**: material yuklash, tahrirlash, o'chirish va tartiblash (bo'limlar bo'yicha: yangilik, musiqa, video, dialog, lug'at, matn, rasm) va funksiyalar — **o'quvchilarni** ko'rish / qo'shish / bloklash / parolini tiklash / o'chirish, AI va API kalitlarni ko'rish, Email xizmati holatini ko'rish, statistikani ko'rish. Ruxsatsiz narsani ko'rmaydi va bajara olmaydi. **Adminlar va super admin ma'lumotlarini ko'rmaydi** (hech qanday ruxsat bilan ham); adminlarni boshqara olmaydi, rol bera olmaydi, sozlamalarni o'zgartira olmaydi. Berilgan ruxsatlarini profilidagi «🔐 Mening ruxsatlarim» bo'limida ko'radi |
+| Super admin (`superadmin`) | Hamma imkoniyat: **foydalanuvchilar va adminlar** (ro'yxat, qo'shish/o'chirish, bloklash, parolni tiklash, admin tayinlash); **adminlarning ruxsatlarini (yuklash va funksiyalar) belgilash**; ro'yxatdan o'tish usullari, email kodi va Telegram bot; AI sozlamalari, API kalitlar va Email xizmati. Uning ma'lumotlari boshqa hech kimga ko'rinmaydi |
 
 ---
 
@@ -54,9 +54,10 @@ jihozlangan veb-platforma yaratish.
    ├── Supabase Postgres .... profiles, progress, media_items, settings, ai_usage, email_codes (RLS bilan)
    ├── Supabase Storage ..... "media" bucket (audio, video, rasm)
    └── Edge Functions
-         ├── admin ......... ro'yxatdan o'tish + email kodlari, kirish, foydalanuvchilar (faqat super admin),
-         │                   rollar, AI sozlamalari, API kalitlar, Email xizmati
-         │                     └──> Brevo / Resend (HTTP API) — tasdiqlash kodlarini yuboradi
+         ├── admin ......... ro'yxatdan o'tish + email kodlari, Telegram bot (webhook), kirish, foydalanuvchilar
+         │                   (super admin / ruxsati bor admin), rollar va ruxsatlar, AI sozlamalari, API kalitlar, Email xizmati
+         │                     ├──> Brevo / Resend (HTTP API) — tasdiqlash kodlarini yuboradi
+         │                     └──> Telegram Bot API — kodlar va ro'yxatdan o'tish (bepul)
          └── ai ............ AI ustoz: vazifa, tekshiruv, chat, tushuntirish, kalitni sinash
                                └──> Gemini / OpenAI / Groq / OpenRouter / DeepSeek
 ```
@@ -72,16 +73,23 @@ sahifalarni tez ochadi. Foydalanuvchi progressi bitta `progress.state` (jsonb) m
 | № | Talab |
 |---|---|
 | F-1.1 | Ro'yxatdan o'tish formasida **email va telefon raqami bir vaqtda** kiritiladi (kamida bittasi majburiy, ikkalasi ham mumkin). Boshqa maydonlar: ism, parol (≥ 6 belgi), parolni takrorlash |
-| F-1.1a | **Email kiritilgan bo'lsa** (email yoki email + telefon): hisob ochilishidan oldin emailga **6 xonali tasdiqlash kodi** yuboriladi; foydalanuvchi kodni kiritgandan keyingina hisob yaratiladi. Kod 10 daqiqa amal qiladi, 5 marta noto'g'ri kiritish mumkin, qayta yuborish 60 soniyadan keyin |
+| F-1.1a | **Email kiritilgan bo'lsa** (email yoki email + telefon) va email kodi talabi **yoqilgan** bo'lsa (standart): hisob ochilishidan oldin emailga **6 xonali tasdiqlash kodi** yuboriladi; foydalanuvchi kodni kiritgandan keyingina hisob yaratiladi. Kod 10 daqiqa amal qiladi, 5 marta noto'g'ri kiritish mumkin, qayta yuborish 60 soniyadan keyin |
+| F-1.1e | **Super admin email kodi talabini yoqadi yoki o'chiradi** (Admin panel → ✉️ Email xizmati → «Ro'yxatdan o'tishda email tasdiqlash»). **Kodsiz** rejimda email tasdiqlanmasdan saqlanadi, kod so'ralmaydi va Email xizmati shart emas; forma (ro'yxatdan o'tish va profilda emailni almashtirish) sozlamaga qarab o'zi moslashadi. Sozlama `secure_settings.signup_email_code` (`on`/`off`) da saqlanadi, formaga ochiq `signup-config` amali orqali yetkaziladi. Telefon uchun kod har doim so'ralmaydi; parolni tiklash kodi har doim talab qilinadi |
 | F-1.1b | **Faqat telefon kiritilgan bo'lsa**: tasdiqlash kodi **talab qilinmaydi** (SMS yuborilmaydi) — hisob darhol ochiladi |
 | F-1.1c | Kodni **server o'zi avtomatik** yaratadi (kriptografik tasodifiy raqam) va yuboradi — admin yoki AI ishtiroki shart emas, admin tizimda bo'lmasa ham 24 soat ishlaydi. Kod bazada faqat HMAC-xesh ko'rinishida saqlanadi. Himoya: bitta IP dan soatiga ≤ 15 ta kod so'rovi, bitta emailga soatiga ≤ 5 ta kod; ro'yxatdan o'tish va parol tiklash urinishlari IP bo'yicha soatiga ≤ 20 |
 | F-1.1d | Yuborish xizmati (Brevo yoki Resend, HTTP API) super admin tomonidan «✉️ Email xizmati» bo'limida bir marta sozlanadi; sozlanmaguncha email bilan ro'yxatdan o'tish o'chiq, telefon bilan esa ishlaydi. API kalit klientga chiqmaydi (faqat maskalangan ko'rinadi) |
+| F-1.1f | **Ro'yxatdan o'tish usullarini super admin boshqaradi** (Admin panel → 🛡️ Ro'yxatdan o'tish): 👤 oddiy (ism + login + parol, tasdiqlashsiz), 📧 email (kod bilan yoki kodsiz), 📱 telefon (kodsiz yoki Telegram bot orqali tasdiqlash), ✈️ Telegram bot orqali (bepul, F-1.1i). Kamida bittasi yoqilgan bo'lishi shart. Forma faqat yoqilgan usullarni ko'rsatadi, server (`register`) yopiq usulni rad etadi (403). Super admin qo'shgan hisoblarga bu qoidalar ta'sir qilmaydi |
+| F-1.1g | **Oddiy usul:** ism, login (lotin harflari, raqamlar, `_ . -`, 3–40 belgi, noyob; ismdan avtomatik taklif qilinadi) va parol. Email/telefon yo'q, shuning uchun parolni faqat super admin tiklaydi. Ichki email `<login>@til-sayohati.app` |
+| F-1.1h | **Telegram orqali telefon tasdiqlash** (super admin yoqsa): foydalanuvchi raqamini kiritadi → sayt bir martalik token va bot havolasini beradi (10 daqiqa) → foydalanuvchi botda *Start* bosadi → bot «Raqamni ulashish» tugmasini beradi → bot ulashilgan kontakt **foydalanuvchining o'zinikini** (`contact.user_id = from.id`) va kiritilgan raqamga tengligini tekshiradi → bot 6 xonali kod yuboradi (foydalanuvchi tilida: uz/ru/en/tr) → kod saytga kiritiladi. Kod bazada faqat HMAC-xesh, 5 urinish, bir martalik. Bot token super admin panelida kiritiladi, webhook avtomatik o'rnatiladi va maxfiy sarlavha (`X-Telegram-Bot-Api-Secret-Token`) bilan himoyalanadi. Profilda telefonni almashtirish ham shu orqali tasdiqlanadi. Himoya: IP bo'yicha soatiga ≤ 15, raqam bo'yicha ≤ 6 so'rov |
+| F-1.1i | **✈️ Telegram bot orqali ro'yxatdan o'tish (bepul; super admin yoqsa, bot ulangan bo'lishi shart):** ro'yxatdan o'tish sahifasining **pastida** «✈️ Telegram bot orqali ro'yxatdan o'tish (bepul)» tugmasi va «🤖 Telegram botga o'tish · @bot» havolasi turadi (telefon maydonida ham bot havolasi bor). Tugma `tg-start` (`purpose = register-tg`, raqam yuborilmaydi) orqali bir martalik token yaratadi va bot havolasini (`t.me/<bot>?start=<token>`) ochadi → foydalanuvchi botda *Start* va «Raqamni ulashish» ni bosadi → bot kontakt **foydalanuvchining o'zinikini** tekshirib, raqamni qabul qiladi (so'rov holati `verified`) → sayt `tg-status` ni har 2 soniyada so'rab turib buni sezadi (kod yozish shart emas) → foydalanuvchi ism va parol kiritadi → `register` (`tgToken`) hisobni ichki email `tel998XXXXXXXXX@til-sayohati.app` bilan yaratadi; keyin telefon raqami + parol bilan kiradi. So'rov 10 daqiqa amal qiladi, hisob ochilgach o'chiriladi; IP bo'yicha soatiga ≤ 20 so'rov |
+| F-1.1j | **Raqam yozilganda kod Telegramga darhol keladi:** raqami botda avval tasdiqlangan foydalanuvchilar `tg_contacts` jadvalida saqlanadi (telefon → chat). Telefon Telegram orqali tasdiqlanadigan oqimda (ro'yxatdan o'tish, profilda raqamni almashtirish) raqam yuborilishi bilan server kodni shu chatga **darhol** yuboradi (`tg-start` javobi: `direct: true`) — botni qayta ochish shart emas. Raqam hali bog'lanmagan bo'lsa yoki bot bloklangan bo'lsa — oddiy oqim (bot havolasi). **Telegram cheklovi:** bot foydalanuvchiga birinchi bo'lib yoza olmaydi, shuning uchun har bir foydalanuvchi botni kamida bir marta ochishi shart (pullik Telegram Gateway ishlatilmagan) |
 | F-1.2 | Telefon raqami normallashtiriladi (9 xonali raqamga `998` qo'shiladi, `+998XXXXXXXXX` ko'rinishida saqlanadi). Bitta raqam faqat bitta hisobga biriktiriladi (band bo'lsa formada darhol aytiladi). Faqat telefon kiritilgan bo'lsa, ichki email `tel998XXXXXXXXX@til-sayohati.app` yaratiladi |
 | F-1.3 | Kirish bitta maydon orqali: **email, telefon raqami yoki login — qaysi biri qulay bo'lsa**. Email bilan ochilgan hisobga telefon/login bilan kirilganda, server (`admin` funksiyasi, `login` amali) telefon/login bo'yicha emailni topadi va kirishni o'zi bajaradi — emaillar klientga oshkor bo'lmaydi |
 | F-1.3a | Profil sahifasida foydalanuvchi email va telefonni keyin ham qo'shishi yoki almashtirishi mumkin (kamida bitta kirish usuli qolishi shart). Email qo'shish/almashtirish ham emailga yuborilgan kod bilan tasdiqlanadi; telefon kodsiz |
 | F-1.3b | Bitta login/email/telefon uchun 15 daqiqada 10 marta noto'g'ri parol kiritilsa, 15 daqiqaga vaqtincha qulflanadi |
 | F-1.4 | «Meni eslab qol» — belgilansa sessiya brauzer yopilganda ham saqlanadi |
 | F-1.5 | Emaili bor foydalanuvchilar uchun parolni tiklash: `/reset-password` sahifasida email kiritiladi → emailga 6 xonali kod keladi → kod va yangi parol kiritiladi (havola emas, kod). Faqat telefon bilan ochilgan hisobda email yo'q — parolni super admin tiklaydi |
+| F-1.5a | **Parolni Telegram orqali tiklash** (bot ulangan bo'lsa): `/reset-password` sahifasida «✈️ Telegram» tanlanadi → telefon raqami kiritiladi → `tg-reset-start` raqam botda tasdiqlangan bo'lsa kodni Telegram chatiga yuboradi (aks holda umumiy xato — hisob mavjudligi oshkor qilinmaydi) → kod va yangi parol → `reset-with-code` (`tgToken`, `phone`). Kod 10 daqiqa, 5 urinish, bir martalik; IP bo'yicha soatiga ≤ 15, raqam bo'yicha ≤ 5 so'rov |
 | F-1.6 | Bloklangan foydalanuvchi tizimga kira olmaydi |
 | F-1.7 | Yangi foydalanuvchining roli doim `user` (rol ro'yxatdan o'tish ma'lumotidan olinmaydi) |
 | F-1.8 | Super admin `quvonchbek / admin123` SQL o'rnatish vaqtida avtomatik yaratiladi; qayta o'rnatishda o'chirilmaydi, paroli o'zgartirilmaydi |
@@ -135,7 +143,7 @@ sahifalarni tez ochadi. Foydalanuvchi progressi bitta `progress.state` (jsonb) m
 | № | Talab |
 |---|---|
 | F-6.1 | Turlar: 🎵 musiqa/audio, 🎬 video, 🖼 rasm, 📄 matn, 💬 dialog, 📚 lug'at, 📰 yangilik. Har biri chap menyuda alohida bo'lim (soni bilan) |
-| F-6.2 | Yuklash faqat admin/super admin uchun: til (yoki barcha tillar), sarlavha, tavsif, darsga biriktirish, nashr holati |
+| F-6.2 | Yuklash faqat super admin va ruxsat berilgan adminlar uchun (admin — faqat o'ziga ruxsat berilgan turlar bo'yicha, F-8.1c): til (yoki barcha tillar), sarlavha, tavsif, darsga biriktirish, nashr holati |
 | F-6.3 | Audio, video, rasm — bir vaqtda bir nechta faylni yuklash (har biri ≤ 50 MB); sudrab tashlash (drag & drop) |
 | F-6.4 | Matn — PDF/DOCX/TXT dan avtomatik ajratib olish yoki qo'lda kiritish |
 | F-6.5 | Dialog — «A: Hello! \| Salom!» formatidagi matn (fayldan yoki qo'lda) + ixtiyoriy audio |
@@ -161,12 +169,16 @@ sahifalarni tez ochadi. Foydalanuvchi progressi bitta `progress.state` (jsonb) m
 ### 3.8. Admin panel
 | № | Talab |
 |---|---|
-| F-8.1 | **Statistika:** bugungi AI so'rovlar, faol kalitlar, materiallar, kurs kontenti jadvali (tillar bo'yicha); **faqat super adminga** qo'shimcha: foydalanuvchilar soni, shu hafta yangi, bugun faol, adminlar |
-| F-8.0 | **Admin panel bosh ko'rinishi:** katta oynalar. Super admin uchun: **👥 Foydalanuvchilar** (jami, o'quvchilar, adminlar, bugun faol, shu hafta yangi), AI va API kalitlar, Materiallar; so'nggi ro'yxatdan o'tganlar; tezkor amallar. Oddiy admin uchun: Materiallar, AI va API kalitlar, Email xizmati (foydalanuvchilar oynasi, so'nggi ro'yxatdan o'tganlar va «foydalanuvchi qo'shish» yo'q). Oyna bosilganda tegishli bo'lim ochiladi |
-| F-8.1a | **«👥 Foydalanuvchilar» oynasi** chap menyuning «Boshqaruv» bo'limida alohida punkt sifatida turadi — **faqat super adminga**. Oddiy admin uchun punkt ko'rinmaydi, `/admin?tab=users` havolasi esa «Umumiy» bo'limga qaytaradi |
+| F-8.1 | **Statistika:** bugungi AI so'rovlar, faol kalitlar, materiallar, kurs kontenti jadvali (tillar bo'yicha); **faqat super adminga** qo'shimcha: foydalanuvchilar soni, shu hafta yangi, bugun faol, adminlar. Bo'lim faqat `stats_view` ruxsati bor adminga ochiq |
+| F-8.0 | **Admin panel bosh ko'rinishi:** katta oynalar. Super admin uchun: **👥 Foydalanuvchilar** (jami, o'quvchilar, adminlar, bugun faol, shu hafta yangi), AI va API kalitlar, Ro'yxatdan o'tish; so'nggi ro'yxatdan o'tganlar; tezkor amallar. Oddiy admin uchun oynalar **ruxsatga qarab** chiqadi: Materiallar (doim), 👥 o'quvchilar (`users_view`), AI va API kalitlar (`ai_view`), Email xizmati (`mail_view`), statistika (`stats_view`); tepada «🔐 Mening ruxsatlarim» havolasi. Ruxsatsiz bo'lim yashiriladi va u uchun server so'rovi ham yuborilmaydi. Oyna bosilganda tegishli bo'lim ochiladi |
+| F-8.1a | **«👥 Foydalanuvchilar» oynasi** chap menyuning «Boshqaruv» bo'limida alohida punkt sifatida turadi — super adminga va `users_view` ruxsati bor adminga (u faqat **o'quvchilarni** ko'radi; admin va super admin ro'yxatda yo'q). Ruxsatsiz adminga punkt ko'rinmaydi, `/admin?tab=users` havolasi esa «Umumiy» bo'limga qaytaradi |
+| F-8.1c | **🔐 Ruxsatlar (faqat super admin):** barcha adminlar ro'yxati, har biri uchun **📤 Material yuklash** (7 ta bo'lim: yangilik, musiqa, video, dialog, lug'at, matn, rasm) va **⚙️ Funksiyalar** (8 ta: `users_view`, `users_add`, `users_block`, `users_reset`, `users_delete`, `ai_view`, `mail_view`, `stats_view` — tavsifi bilan) bo'yicha yoqish/o'chirish tugmalari, «Hammasi» / «Hech biri», saqlash holati; «🔒 Faqat super admin uchun» ro'yxati (hech kimga berilmaydigan imkoniyatlar). Ruxsat darhol kuchga kiradi. Yangi tayinlangan admin boshida hamma bo'limga yuklash va faqat ko'rish funksiyalarini (`ai_view`, `mail_view`, `stats_view`) oladi; o'quvchiga qaytarilganda ruxsatlar tozalanadi |
+| F-8.1f | **🔐 Mening ruxsatlarim (admin profilida):** admin Profil sahifasining tepasida (va admin panelda havola orqali) o'z ruxsatlarini ko'radi: yuklash bo'limlari (✓/✕, «n/7 bo'lim»), funksiyalar (✓/✕ tavsifi bilan, «n/8 funksiya»), «🔒 Faqat super admin uchun (sizda yo'q)» ro'yxati va «↻ Yangilash» tugmasi (ruxsatlarni serverdan qayta yuklaydi; sahifa ochilganda ham avtomatik yangilanadi). Super admin uchun — «hamma narsaga ruxsat bor» ko'rinishi |
+| F-8.1d | **Ruxsat bo'yicha ko'rinish:** admin faqat ruxsat berilgan bo'limlarda «+ Yuklash», tahrirlash, o'chirish va ↑↓ tugmalarini ko'radi; qolganlarida o'quvchi kabi faqat ko'radi (yashirin materiallar ham ko'rinmaydi). «Materiallar» bo'limida ruxsatsiz turlar «🔒 Faqat ko'rish» deb belgilanadi, tezkor amallar ham ruxsatga qarab chiqadi |
+| F-8.1e | **🛡️ Ro'yxatdan o'tish (faqat super admin):** har bir usul (oddiy / email / telefon / ✈️ Telegram bot orqali bepul) uchun yoqish-o'chirish tugmasi (Telegram usuli bot ulanmaguncha yoqilmaydi; bot uzilganda o'chadi, boshqa usul qolmasa uzib bo'lmaydi); email uchun «kod bilan / kodsiz», telefon uchun «kodsiz / Telegram bot orqali tasdiqlash»; Telegram bot bo'limi (token kiritish, ulash, tekshirish, uzish, BotFather bo'yicha qadamlar). O'zgarishlar darhol kuchga kiradi |
 | F-8.1b | **✉️ Email xizmati:** provayder (Brevo/Resend), API kalit (maskalangan), yuboruvchi email va nom, **test xat yuborish** tugmasi; holat belgisi (sozlangan/sozlanmagan). Saqlash va test — faqat super admin |
 | F-8.2 | **Foydalanuvchilar ro'yxati:** kompyuterda jadval (foydalanuvchi, email/telefon, rol, ro'yxatdan o'tgan sana, oxirgi kirish, amallar), telefonda kartochkalar; qidiruv (ism, login, email, telefon); filtr (barchasi, o'quvchilar, adminlar, bloklanganlar); saralash (yangi, eski, ism, oxirgi kirish); «Yangilash»; qo'shish (login yoki email + ixtiyoriy telefon + parol + ism + rol); rol o'zgartirish (faqat super admin); parolni tiklash; bloklash/ochish; o'chirish; foydalanuvchi kartasi (kirish ma'lumotlari, XP, seriya, darslar, oxirgi mashqlar, bugungi AI) |
-| F-8.3 | **Ruxsatlar: foydalanuvchilarni ko'rish va boshqarish faqat super adminda.** Oddiy admin ro'yxat, foydalanuvchi kartasi, email/telefon, progress va AI foydalanish hisobini ko'ra olmaydi, qo'sha/o'chira/bloklay olmaydi, parolni tiklay olmaydi, rol bera olmaydi. Bu ikki qatlamda majburlanadi: (1) `admin` funksiyasi 403 qaytaradi; (2) Postgres RLS (`0008_users_super_only.sql`) — `profiles`, `progress`, `ai_usage` jadvallarini o'qish faqat egasi va super adminga ochiq, shuning uchun to'g'ridan-to'g'ri API so'rovi ham ma'lumot bermaydi. Super adminni o'chirish/bloklash mumkin emas; o'zini o'chirish mumkin emas |
+| F-8.3 | **Ruxsatlar: foydalanuvchilarni ko'rish va boshqarish sukut bo'yicha faqat super adminda.** Oddiy admin sukut bo'yicha ro'yxat, foydalanuvchi kartasi, email/telefon, progress va AI foydalanish hisobini ko'ra olmaydi, qo'sha/o'chira/bloklay olmaydi, parolni tiklay olmaydi. Super admin unga `users_view/add/block/reset/delete` ruxsatlarini bersa — admin **faqat `role = user` (o'quvchi) qatorlari** ustida shu amallarni bajara oladi; super admin va boshqa adminlar unga hech qachon ko'rinmaydi, ularni boshqara olmaydi (server «topilmadi» / 403 qaytaradi). Admin qo'sha oladigan rol — faqat `user`; rol berish, adminlarni boshqarish va ruxsat belgilash faqat super admin. Funksiya ruxsatlari `profiles.permissions` da saqlanadi va `admin` funksiyasida majburlanadi (self-edit trigger bilan bloklangan). Yana bir himoya: materialda yuklovchi login'i (`uploaded_by`) saqlanmaydi. Bu ikki qatlamda majburlanadi: (1) `admin` funksiyasi 403 qaytaradi; (2) Postgres RLS (`0008_users_super_only.sql`) — `profiles`, `progress`, `ai_usage` jadvallarini o'qish faqat egasi va super adminga ochiq, shuning uchun to'g'ridan-to'g'ri API so'rovi ham ma'lumot bermaydi. Super adminni o'chirish/bloklash mumkin emas; o'zini o'chirish mumkin emas |
 | F-8.4 | **AI va API kalitlar:** provayder rejimi (avtomatik / aniq provayder / o'chiq), Gemini modeli, kunlik limit, ustoz uslubi; kalitlar ro'yxati (maskalangan, model, navbat, muvaffaqiyat/xato soni, oxirgi xato); qo'shish (provayder, nom, kalit, model, Base URL, navbat); **sinash** (javob vaqti va namuna); yoqish/o'chirish; tahrirlash; o'chirish |
 | F-8.5 | Kalitlar rotatsiyasi: biri xato bersa keyingisi ishlatiladi; yaroqsiz kalit (401/403) 3 marta ketma-ket xato bersa avtomatik o'chiriladi; limit (429) xatosida o'chirilmaydi |
 | F-8.6 | **Materiallar:** barcha bo'limlarga tezkor o'tish va sonlari |
@@ -187,9 +199,10 @@ sahifalarni tez ochadi. Foydalanuvchi progressi bitta `progress.state` (jsonb) m
 | N-1 | **Mobil moslashuv:** 360 px kenglikdan boshlab; telefonda pastki navigatsiya (Asosiy, Darslar, Mashq, AI ustoz, Menyu), chiquvchi yon menyu, katta bosish maydonlari (≥ 40 px), iOS'da kirish maydonida kattalashmaslik, `safe-area` qo'llab-quvvatlash |
 | N-2 | **PWA:** manifest va ikonkalar — telefon bosh ekraniga ilova sifatida qo'shish |
 | N-3 | **Tezlik:** sahifalar alohida yuklanadi (code splitting); kurs kontenti tilga qarab alohida faylda; PDF/DOCX kutubxonalari faqat yuklashda yuklanadi; statik fayllar keshlash sarlavhalari bilan |
-| N-4 | **Xavfsizlik:** barcha jadvallarda RLS; API kalitlar klientga chiqmaydi; rolni o'zgartirish trigger bilan himoyalangan; Edge Function'lar har so'rovda foydalanuvchini va rolini bazadan tekshiradi; Storage'ga yozish faqat adminlarga |
+| N-4 | **Xavfsizlik:** barcha jadvallarda RLS; API kalitlar klientga chiqmaydi; rolni va yuklash ruxsatlarini o'zgartirish trigger bilan himoyalangan (foydalanuvchi o'z ruxsatini o'zi o'zgartira olmaydi); Edge Function'lar har so'rovda foydalanuvchini va rolini bazadan tekshiradi; `media_items` va Storage'ga yozish `can_upload(tur)` funksiyasi orqali faqat ruxsat berilgan turlar uchun (Storage yo'lining birinchi papkasi — tur) |
 | N-5 | **Barqarorlik:** Supabase sekin javob bersa ham darslar 3,5 soniyada statik kontent bilan ochiladi; tarmoq xatolari tushunarli o'zbekcha xabar bilan ko'rsatiladi; progress sahifa yopilganda ham saqlanadi |
-| N-6 | **Interfeys tili:** o'zbek (lotin) |
+| N-6 | **Interfeys tili — 4 tilda:** o'zbek, rus, ingliz, turk. Til tanlagich kirish sahifasi tepasida, chap menyuda va Profil → Sozlamalarda; tanlov brauzerda saqlanadi, sahifa qayta yuklanmaydi. Menyular, tugmalar, xabarlar (jumladan serverdan kelgan xatolar), sana formatlari va **AI ustoz javoblari** tanlangan tilda. Dars materiallaridagi tushuntirishlar (grammatika matnlari, o'zbekcha tarjimalar) o'zbek tilida qoladi. Tarjimalar rontend/src/i18n/dict/*.js da (qatorlar: [uz, ru, en, tr]), 
+ode scripts/check-i18n.mjs — yetishmayotgan/takror kalitlarni tekshiradi |
 | N-7 | **Mavzu:** kunduzgi va tungi rejim (tizim sozlamasiga moslashadi) |
 | N-8 | **Brauzerlar:** Chrome, Edge, Safari, Firefox, Samsung Internet — so'nggi 2 versiya |
 | N-9 | **Qulaylik:** klaviatura bilan boshqaruv, fokus halqasi, `prefers-reduced-motion` hurmat qilinadi |
@@ -200,15 +213,17 @@ sahifalarni tez ochadi. Foydalanuvchi progressi bitta `progress.state` (jsonb) m
 
 | Jadval | Asosiy ustunlar | Kirish (RLS) |
 |---|---|---|
-| `profiles` | id, username, display_name, role (user/admin/superadmin), email, phone, is_blocked, last_seen_at, created_at | **o'zi va super admin** o'qiydi (oddiy admin — yo'q); o'zi faqat ismini o'zgartiradi |
+| `profiles` | id, username, display_name, role (user/admin/superadmin), email, phone, is_blocked, **upload_kinds (text[] — adminga ruxsat berilgan material turlari)**, **permissions (text[] — adminga berilgan funksiya ruxsatlari: users_view, users_add, users_block, users_reset, users_delete, ai_view, mail_view, stats_view; CHECK bilan cheklangan)**, last_seen_at, created_at | **o'zi va super admin** o'qiydi (oddiy admin — yo'q); o'zi faqat ismini o'zgartiradi |
 | `progress` | user_id, state (jsonb), updated_at | o'zi o'qiydi/yozadi; super admin o'qiydi |
-| `media_items` | id, kind, lang, title, description, storage_path, file_url, mime, size_bytes, content (jsonb), lesson_ref, position, is_published, uploaded_by, created_at | kirgan foydalanuvchilar nashr qilinganlarni o'qiydi; adminlar yozadi |
+| `media_items` | id, kind, lang, title, description, storage_path, file_url, mime, size_bytes, content (jsonb), lesson_ref, position, is_published, uploaded_by, created_at | kirgan foydalanuvchilar nashr qilinganlarni o'qiydi; yozish (qo'shish/tahrirlash/o'chirish) — faqat `can_upload(kind)` rost bo'lganda: super admin hamma tur, admin — `upload_kinds` ichidagi turlar |
 | `settings` | key, value (ai_provider, ai_model_gemini, ai_daily_limit, ai_tutor_style) | kirganlar o'qiydi; super admin/Edge Function yozadi |
 | `api_keys` | id, provider, label, key_value, base_url, model, priority, is_active, failure_count, success_count, last_used_at, last_error | klientdan butunlay yopiq (faqat service-role) |
 | `ai_usage` | user_id, day, count | o'zi va super admin o'qiydi; yozish faqat `bump_ai_usage()` orqali |
 | `login_attempts` | key (login/email/telefon/IP…), fails, window_start, locked_until | klientdan butunlay yopiq (kirish va kod yuborish cheklovlari uchun ham ishlatiladi) |
 | `email_codes` | email, purpose (register/reset/change-email), code_hash, attempts, expires_at, created_at; kalit (email, purpose) | klientdan butunlay yopiq (RLS yoqilgan, siyosat yo'q) |
-| `secure_settings` | key, value (mail_provider, mail_api_key, mail_from, mail_from_name) | klientdan butunlay yopiq; faqat Edge Function (service-role) |
+| `tg_verifications` | token, phone (`register-tg` da kontakt ulashilguncha bo'sh), purpose (register / phone-change / register-tg / reset), user_id, tg_user_id, chat_id, status (pending / await_contact / code_sent / verified), code_hash, attempts, expires_at | klientdan butunlay yopiq (RLS yoqilgan, siyosat yo'q) |
+| `tg_contacts` | phone (PK, faqat raqamlar), tg_user_id, chat_id, lang, updated_at — botda raqamini tasdiqlagan foydalanuvchilar (kod darhol shu chatga yuboriladi) | klientdan butunlay yopiq (RLS yoqilgan, siyosat yo'q) |
+| `secure_settings` | key, value (mail_provider, mail_api_key, mail_from, mail_from_name, signup_email_code, reg_login, reg_email, reg_phone, reg_telegram, signup_phone_telegram = on/off; tg_bot_token, tg_bot_username, tg_webhook_secret) | klientdan butunlay yopiq; faqat Edge Function (service-role) |
 
 `profiles.phone` — noyob (unique index). `phone_available(p_phone)` — ro'yxatdan o'tish formasi uchun ochiq funksiya.
 | `books`, `vocab_sets` | (1-versiyadan) | o'qish uchun saqlanadi; ma'lumotlari `media_items` ga ko'chirilgan |
@@ -230,19 +245,30 @@ Barcha so'rovlar: `POST /functions/v1/<nomi>`, sarlavha `Authorization: Bearer <
 |---|---|---|
 | `login` | **ochiq (tokensiz)** | `identifier` (email/telefon/login), `password` → `{session}`; urinishlar cheklovi bilan |
 | `send-email-code` | **ochiq** | `email`, `purpose` (register / reset) → emailga 6 xonali kod; 60 s kutish, IP va email bo'yicha soatlik cheklov |
-| `register` | **ochiq** | `email?`, `phone?`, `password`, `displayName`, `code?` — email bo'lsa `code` majburiy, faqat telefon bo'lsa kodsiz; hisobni server yaratadi |
-| `reset-with-code` | **ochiq** | `email`, `code`, `password` — parolni kod bilan tiklash |
+| `signup-config` | **ochiq** | → `{methods:{login,email,phone,telegram}, emailCode, phoneTelegram, tgBot, mailReady}` — ro'yxatdan o'tish formasi shunga moslashadi |
+| `tg-start` | **ochiq** (`phone-change` — kirgan foydalanuvchi) | `phone`, `purpose` (register / phone-change) → `{token, link}` yoki raqam botda avval tasdiqlangan bo'lsa `{direct: true, token, link}` (kod Telegramga darhol yuborilgan); `purpose = register-tg` (raqamsiz) → `{token, link}` — bot orqali ro'yxatdan o'tish; IP va raqam bo'yicha cheklov |
+| `tg-status` | **ochiq** | `token` → `{status: pending / await_contact / verified / expired, phone (maskalangan, faqat verified)}` — sayt bot kontaktni qabul qilganini so'rab turadi |
+| `tg-reset-start` | **ochiq** | `phone` → `{token}` — parolni tiklash kodi raqam bog'langan Telegram chatiga yuboriladi; raqam bog'lanmagan / hisob yo'q bo'lsa umumiy xato |
+| `get-signup-settings` | super admin | usullar, email kodi, Telegram holati (token maskalangan) |
+| `tg-save-bot` | super admin | `token` — botni ulaydi (getMe + setWebhook); bo'sh token — botni uzadi |
+| `tg-check` | super admin | bot va webhook holati (`getMe`, `getWebhookInfo`) |
+| `register` | **ochiq** | `email?`, `phone?`, `username?` (oddiy usul), `password`, `displayName`, `code?`, `tgToken?`, `tgCode?` — email bo'lsa va kod talabi yoqilgan bo'lsa `code` majburiy; faqat telefon bo'lsa yoki kod talabi o'chirilgan bo'lsa kodsiz; faqat `tgToken` (email, telefon va login yo'q) — Telegram bot orqali ro'yxatdan o'tish: so'rov `verified` bo'lishi shart, raqam so'rovdan olinadi; hisobni server yaratadi |
+| `reset-with-code` | **ochiq** | `email`, `code`, `password` — parolni email kodi bilan tiklash; yoki `phone`, `tgToken`, `code`, `password` — Telegram kodi bilan |
 | `update-my-contact` | har qanday kirgan foydalanuvchi | `email?` (+ `emailCode`, purpose `change-email`), `phone?` — o'z kirish ma'lumotlarini qo'shish/almashtirish |
-| `stats` | admin+ | statistika; foydalanuvchi sonlari (`users`, `byRole`, `newThisWeek`, `activeToday`) faqat super adminga, oddiy adminda `null` |
-| `list-users`, `user-detail` | **faqat super admin** | ro'yxat (oxirgi kirish bilan), foydalanuvchi kartasi |
-| `create-user` | **faqat super admin** | `identifier` (login/email/telefon), `phone?`, `password`, `displayName`, `role` (admin qo'shgan hisobga kod yuborilmaydi) |
-| `delete-user`, `reset-password`, `block-user` | **faqat super admin** | o'chirish, yangi parol, bloklash (`blocked`); super adminning o'ziga qo'llanmaydi |
-| `set-role` | super admin | `role`: user / admin |
-| `get-mail-settings` | admin+ | Email xizmati holati (kalit maskalangan) |
+| `stats` | super admin yoki `stats_view` | statistika; foydalanuvchi sonlari (`users`, `byRole`, `newThisWeek`, `activeToday`) faqat super adminga, oddiy adminda `null` |
+| `list-users`, `user-detail` | super admin (hammani) yoki `users_view` (faqat `role = user`) | ro'yxat (oxirgi kirish bilan), foydalanuvchi kartasi; adminga admin/super admin qatorlari qaytarilmaydi |
+| `create-user` | super admin yoki `users_add` | `identifier` (login/email/telefon), `phone?`, `password`, `displayName`, `role` (admin qo'shgan hisobga kod yuborilmaydi); `role = admin` / `create-admin` — faqat super admin, admin rolli hisobga standart ruxsatlar beriladi |
+| `delete-user` | super admin yoki `users_delete` | o'chirish; admin — faqat o'quvchini; super adminning o'ziga qo'llanmaydi |
+| `reset-password` | super admin yoki `users_reset` | yangi parol (admin — faqat o'quvchiga) |
+| `block-user` | super admin yoki `users_block` | bloklash (`blocked`); admin — faqat o'quvchini |
+| `set-role` | super admin | `role`: user / admin; `uploadKinds?`, `permissions?` (admin bo'lganda; berilmasa — avvalgilari yoki standart: hamma tur + ko'rish funksiyalari); o'quvchiga qaytarilganda ruxsatlar tozalanadi |
+| `set-permissions` | super admin | `id`, `uploadKinds[]?` (audio, video, image, text, dialog, vocab, news) va/yoki `permissions[]?` (users_view, users_add, users_block, users_reset, users_delete, ai_view, mail_view, stats_view) — adminning ruxsatlari |
+| `get-mail-settings` | super admin yoki `mail_view` | Email xizmati holati (kalit maskalangan) + `signupEmailCode` |
+| `save-signup-settings` | super admin | `login`, `email`, `phone`, `telegram`, `emailCode`, `phoneTelegram` (true/false) — faqat berilganlari o'zgaradi; kamida bitta usul yoqilgan bo'lishi shart; Telegram usullari bot ulangan bo'lsagina yoqiladi |
 | `save-mail-settings`, `test-mail` | super admin | `provider`, `apiKey`, `from`, `fromName`; test xat yuborish |
-| `get-ai-settings` | admin+ | AI holati |
+| `get-ai-settings` | super admin yoki `ai_view` | AI holati |
 | `save-ai-settings` | super admin | `provider`, `geminiModel`, `dailyLimit`, `tutorStyle` |
-| `list-api-keys` | admin+ | maskalangan ro'yxat |
+| `list-api-keys` | super admin yoki `ai_view` | maskalangan ro'yxat |
 | `add-api-key`, `update-api-key`, `toggle-api-key`, `delete-api-key` | super admin | kalitlarni boshqarish |
 
 **`ai`**
@@ -253,7 +279,7 @@ Barcha so'rovlar: `POST /functions/v1/<nomi>`, sarlavha `Authorization: Bearer <
 | `check` | `context`, `question`, `answer`, `lang`, `sample?` → `{correct, score, feedback, corrected, tips}` |
 | `chat` | `messages[]`, `lang`, `context?` → `{reply}` |
 | `explain` | `text`, `lang` → `{reply}` |
-| `test-key` (admin+) | `id` → `{ok, latencyMs, sample | error}` |
+| `test-key` (faqat super admin) | `id` → `{ok, latencyMs, sample | error}` |
 
 ---
 
@@ -271,19 +297,19 @@ Barcha so'rovlar: `POST /functions/v1/<nomi>`, sarlavha `Authorization: Bearer <
 | `/results` | Natijalar va xatolar |
 | `/media/:tur` | Materiallar (audio, video, image, text, dialog, vocab, news) |
 | `/ai` | AI ustoz |
-| `/profile` | Profil va sozlamalar |
-| `/admin` | Admin panel: Umumiy (oynalar) · `?tab=users` Foydalanuvchilar (**faqat super admin**) · `?tab=ai` AI va API kalitlar · `?tab=mail` Email xizmati · `?tab=content` Materiallar · `?tab=stats` Statistika |
+| `/profile` | Profil va sozlamalar; adminlarda tepada «🔐 Mening ruxsatlarim» (`/profile#perms`) |
+| `/admin` | Admin panel: Umumiy (oynalar) · `?tab=users` Foydalanuvchilar (super admin; adminga — `users_view` bilan, faqat o'quvchilar) · `?tab=perms` Ruxsatlar (**faqat super admin**) · `?tab=signup` Ro'yxatdan o'tish (**faqat super admin**) · `?tab=ai` AI va API kalitlar (`ai_view`) · `?tab=mail` Email xizmati (`mail_view`) · `?tab=content` Materiallar · `?tab=stats` Statistika (`stats_view`) |
 
 Chap menyu bo'limlari: **Asosiy** (Bosh sahifa, Darslar, AI ustoz, Natijalar) · **Mashg'ulotlar** (Lug'at mashqi,
 Lug'at, Dialog mashqi, Grammatika, Fe'llar) · **Materiallar** (Yangiliklar, Musiqa, Video, Dialoglar, Lug'atlar,
-Matnlar, Rasmlar) · **Boshqaruv** (Admin panel, AI va API kalitlar — adminlarga; 👥 Foydalanuvchilar — faqat super adminga). Yuqorida til tanlash (🇬🇧 🇷🇺 🇹🇷), pastda tungi rejim va profil.
+Matnlar, Rasmlar) · **Boshqaruv** (Admin panel; 👥 Foydalanuvchilar, 🔑 AI va API kalitlar — ruxsati bor adminga; 🔐 Mening ruxsatlarim — adminlarga; 🔐 Adminlar ruxsatlari va 🛡️ Ro'yxatdan o'tish — faqat super adminga). Yuqorida til tanlash (🇬🇧 🇷🇺 🇹🇷), pastda tungi rejim va profil.
 
 ---
 
 ## 8. Joylashtirish
 
 Batafsil: `DEPLOY.md`. Qisqacha:
-1. Supabase: `supabase/setup_full.sql` (0001…0008) → SQL Editor → Run; Auth'da «Confirm email» va
+1. Supabase: `supabase/setup_full.sql` (0001…0011) → SQL Editor → Run; Auth'da «Confirm email» va
    «Allow new users to sign up» o'chiriladi (hisoblar faqat `admin` funksiyasi orqali ochiladi, shunda email kodini
    chetlab o'tib bo'lmaydi); `admin` va `ai` funksiyalari JWT tekshiruvisiz joylanadi.
 2. GitHub: kod yuklanadi.
@@ -306,10 +332,24 @@ Batafsil: `DEPLOY.md`. Qisqacha:
 | T-2a | Faqat telefon bilan ro'yxatdan o'tish | Kod so'ralmaydi, hisob darhol ochiladi |
 | T-2b | Email kodini 5 marta noto'g'ri kiritish; kod eskirgach (10 daqiqa) kiritish; 60 soniyadan oldin qayta yuborish | Har holatda tushunarli xato; yangi kod so'rash kerak |
 | T-2c | Admin tizimda bo'lmagan (hech kim kirmagan) paytda email bilan ro'yxatdan o'tish | Kod baribir avtomatik keladi |
+| T-2d | Super admin «Kodsiz» rejimni tanlaydi; so'ng email bilan ro'yxatdan o'tish | Forma «kod yuboriladi» belgisiz, tugma «Biletni olish»; hisob kodsiz ochiladi; «Kod bilan» qaytarilsa — yana kod so'raladi |
+| T-4c | Super admin 🔐 Ruxsatlar bo'limida adminga faqat «Yangiliklar» va «Musiqa» ruxsatini beradi | O'sha admin shu ikki bo'limda «+ Yuklash» va tahrirlash tugmalarini ko'radi, Video/Dialog/… bo'limlarida yo'q; «Materiallar»da ular «🔒 Faqat ko'rish» |
+| T-4d | Ruxsatsiz admin video yuklashga urinadi (to'g'ridan-to'g'ri API so'rovi, `media_items` yoki Storage `video/…`) | Baza rad etadi («row-level security»); ekranda «ruxsatingiz yo'q» xabari |
+| T-4e | Admin o'z `profiles.upload_kinds` qiymatini REST orqali o'zgartirishga urinadi | O'zgarmaydi (trigger eski qiymatni qaytaradi) |
+| T-2e | Super admin «Oddiy» usulni yoqadi; foydalanuvchi ism + login + parol bilan ro'yxatdan o'tadi va shu login bilan kiradi | Hisob kodsiz ochiladi; login ismdan avtomatik taklif qilinadi; band login rad etiladi |
+| T-2f | Super admin faqat bitta usulni qoldiradi; yopilgan usul bilan `register` so'rovi yuboriladi | Forma faqat yoqilgan usulni ko'rsatadi; server 403 qaytaradi; oxirgi usulni o'chirib bo'lmaydi |
+| T-2g | Telegram yoqilgan: telefon bilan ro'yxatdan o'tish (botni ochish → Start → Raqamni ulashish → kodni kiritish) | Kod botdan keladi; to'g'ri kod bilan hisob ochiladi; boshqa odamning kontaktini ulashish yoki boshqa raqam rad etiladi (bot xabari) |
+| T-2h | Sayt tilini rus/ingliz/turk/o'zbekka almashtirish | Menyu, tugma, xabar va AI ustoz javobi tanlangan tilda; sahifa yangilangandan keyin ham saqlanadi |
 | T-3 | `quvonchbek / admin123` bilan kirish | Admin panel ochiladi, roli «Super admin» |
 | T-4 | Super admin admin qo'shadi va rol beradi | Muvaffaqiyatli; yangi admin materiallar yuklay oladi |
-| T-4a | Oddiy admin bilan kirish: chap menyu va admin panel | «👥 Foydalanuvchilar» punkti, oynasi, «so'nggi ro'yxatdan o'tganlar» va «foydalanuvchi qo'shish» **ko'rinmaydi**; statistikada foydalanuvchi sonlari yo'q; `/admin?tab=users` «Umumiy»ga qaytaradi |
-| T-4b | Oddiy admin `admin` funksiyasiga `list-users` / `create-user` / `delete-user` / `block-user` yuboradi; `profiles` jadvalini REST orqali o'qiydi | Funksiya 403 «faqat super admin uchun» qaytaradi; REST faqat o'z qatorini qaytaradi |
+| T-4a | Ruxsatsiz (yangi) admin bilan kirish: chap menyu va admin panel | «👥 Foydalanuvchilar» punkti, oynasi, «so'nggi ro'yxatdan o'tganlar» va «foydalanuvchi qo'shish» **ko'rinmaydi**; AI, Email, Statistika faqat berilgan ko'rish ruxsatlariga qarab chiqadi; `/admin?tab=users` «Umumiy»ga qaytaradi |
+| T-4b | Ruxsatsiz admin `admin` funksiyasiga `list-users` / `create-user` / `delete-user` / `block-user` yuboradi; `profiles` jadvalini REST orqali o'qiydi | Funksiya 403 «Bu amal uchun ruxsatingiz yo'q» qaytaradi; REST faqat o'z qatorini qaytaradi |
+| T-4f | Super admin adminga faqat `users_view` va `users_reset` ruxsatini beradi; admin Foydalanuvchilar bo'limini ochadi | Faqat o'quvchilar ko'rinadi (admin va super admin ro'yxatda yo'q), har bir qatorda faqat 🔑 tugmasi; «+ Foydalanuvchi», ⛔, 🗑 yo'q; `block-user` / `delete-user` 403; admin yoki super admin `id` si bilan `user-detail` / `reset-password` — «topilmadi» |
+| T-4g | Admin Profil sahifasini ochadi | «🔐 Mening ruxsatlarim»: yuklash bo'limlari va funksiyalar ✓/✕, «Faqat super admin uchun» ro'yxati; super admin ruxsatni o'zgartirgach «↻ Yangilash» yangi holatni ko'rsatadi |
+| T-4h | Admin `profiles.permissions` ni REST orqali o'zgartirishga urinadi; super admin `set-permissions` bilan `permissions` beradi | Admin o'zgartira olmaydi (trigger eski qiymatni qaytaradi); super admin o'zgartirishi darhol kuchga kiradi |
+| T-4i | Admin `create-user` orqali `role: admin` yaratishga yoki `set-role` / `set-permissions` / `get-signup-settings` ga urinadi | 403 (faqat super admin) |
+| T-2i | Telegram bot orqali ro'yxatdan o'tish yoqilgan: sahifa pastidagi tugma → botda Start + Raqamni ulashish → saytga qaytish | Sayt o'zi «✅ Telegramda raqamingiz tasdiqlandi» ga o'tadi (kod yozilmaydi); ism + parol bilan hisob ochiladi; telefon raqami + parol bilan kirish ishlaydi; boshqa odamning kontakti rad etiladi |
+| T-2j | Raqami botda avval tasdiqlangan foydalanuvchi telefon bilan ro'yxatdan o'tadi / profilda raqamni almashtiradi / parolni Telegram orqali tiklaydi | Raqam yuborilishi bilan kod Telegram chatiga darhol keladi («✈️ Kod Telegramga yuborildi»); bog'lanmagan raqamga — bot havolasi ko'rsatiladi |
 | T-5 | O'quvchini bloklash | U kira olmaydi; blokdan chiqarilgach kiradi |
 | T-6 | Gemini kalitini qo'shish → «Sinash» | ✅ «Ishlayapti (… ms)»; AI ustoz holati «AI faol» |
 | T-7 | Kalitni noto'g'ri qiymat bilan qo'shish → sinash | ❌ aniq xato matni; kalit ishlatilmaydi |
@@ -326,16 +366,25 @@ Batafsil: `DEPLOY.md`. Qisqacha:
 
 ## 10. Cheklovlar va tavsiyalar
 
-- **SMS orqali tasdiqlash** joriy versiyada yo'q: telefon bilan ro'yxatdan o'tishda kod so'ralmaydi (telefon raqami
-  parol bilan ishlaydi, raqam egaligi tekshirilmaydi). Kerak bo'lsa, SMS xizmati (Twilio, Eskiz.uz va h.k.) ulanib,
-  telefon uchun ham OTP qo'shilishi mumkin.
+- **SMS orqali tasdiqlash** yo'q. Telefon raqami egaligi **Telegram bot orqali** tekshiriladi (super admin yoqsa; bepul,
+  lekin foydalanuvchida Telegram bo'lishi va botni bir marta ochishi kerak). Yoqilmasa, telefon kodsiz ro'yxatdan o'tadi
+  (egalik tekshirilmaydi). Kerak bo'lsa, SMS xizmati (Twilio, Eskiz.uz) yoki Telegram Gateway keyinroq qo'shilishi mumkin.
+- **Oddiy usul** (ism + login + parol) tasdiqlashsiz — spamdan himoya faqat IP bo'yicha cheklov (soatiga ≤ 20). Ochiq
+  ro'yxatdan o'tish kerak bo'lmasa, bu usulni panelda o'chirib qo'ying.
+- **Sayt tili** faqat interfeysni qamrab oladi; dars matnlaridagi tushuntirishlar o'zbek tilida (so'z tarjimalari ham
+  o'zbekcha). Boshqa tillarda tushuntirish kerak bo'lsa, kontent fayllari (`data-src`) alohida tarjima qilinishi kerak.
 - **Email kodlari** uchinchi tomon xizmati orqali yuboriladi (Brevo bepul rejasi — kuniga 300 ta xat). Supabase Edge
   Functions SMTP portlarini bloklagani uchun faqat HTTP API (Brevo/Resend) ishlatiladi. Xizmat sozlanmasa, email bilan
   ro'yxatdan o'tish va parolni tiklash ishlamaydi.
 - Telefon bilan ochilgan hisobda email yo'q, shuning uchun parolni «email kodi» bilan tiklab bo'lmaydi — super admin
   Foydalanuvchilar bo'limidan parolni tiklaydi yoki foydalanuvchi profilida email qo'shib oladi.
-- Oddiy adminlar foydalanuvchilarni ko'rmaydi (o'quvchi shaxsiy ma'lumotlarini himoyalash uchun). Agar kelajakda
-  o'qituvchilarga o'z o'quvchilarining natijalarini ko'rsatish kerak bo'lsa, buning uchun alohida «guruh» tushunchasi qo'shiladi.
+- Oddiy adminlar sukut bo'yicha foydalanuvchilarni ko'rmaydi (o'quvchi shaxsiy ma'lumotlarini himoyalash uchun); super admin kerakli
+  adminga o'quvchilarni ko'rish/boshqarish ruxsatini bera oladi — u hamma o'quvchini ko'radi. Agar kelajakda o'qituvchilarga faqat
+  o'z o'quvchilarining natijalarini ko'rsatish kerak bo'lsa, buning uchun alohida «guruh» tushunchasi qo'shiladi.
+- **Telegram bot** foydalanuvchiga birinchi bo'lib yoza olmaydi: har bir foydalanuvchi botni kamida bir marta (sayt bergan havola orqali)
+  ochishi shart; shundan keyin kodlar (ro'yxatdan o'tish, raqamni almashtirish, parolni tiklash) raqam yozilishi bilan Telegramga o'zi keladi.
+  Telegram'ning pullik «Gateway» xizmati raqamga to'g'ridan-to'g'ri yozadi — hozir ishlatilmagan.
+- Telegram orqali kelgan hisobda ham email yo'q (ichki email) — parolni «Telegram» usuli bilan tiklash mumkin (raqam botda tasdiqlangan bo'lgani uchun).
 - Bepul Supabase rejasi: 500 MB baza, 1 GB fayl saqlash, har bir fayl ≤ 50 MB. Ko'p video uchun pullik reja
   yoki tashqi video xosting (YouTube havolasi) tavsiya etiladi.
 - Matnni ovoz bilan o'qish sifati qurilmadagi ovozlarga bog'liq (Profil → Talaffuz ovozi).

@@ -71,7 +71,6 @@ export default [
   ["Juda ko'p noto'g'ri urinish. {n} daqiqadan keyin qayta urinib ko'ring.", 'Слишком много неверных попыток. Попробуйте через {n} мин.', 'Too many wrong attempts. Try again in {n} minutes.', 'Çok fazla hatalı deneme. {n} dakika sonra tekrar deneyin.'],
   ['Hisobingiz bloklangan', 'Ваш аккаунт заблокирован', 'Your account is blocked', 'Hesabınız engellendi'],
   ["Bu amal uchun ruxsatingiz yo'q", 'У вас нет прав на это действие', 'You do not have permission for this action', 'Bu işlem için izniniz yok'],
-  ["Foydalanuvchilar bo'limi faqat super admin uchun", 'Раздел пользователей доступен только супер-админу', 'The Users section is for the super admin only', 'Kullanıcılar bölümü yalnızca süper yönetici içindir'],
   ['Profil topilmadi', 'Профиль не найден', 'Profile not found', 'Profil bulunamadı'],
   ["Emailni o'chirib bo'lmaydi — faqat boshqasiga almashtirish mumkin", 'Email нельзя удалить — его можно только заменить другим', 'The email cannot be removed — it can only be replaced', 'E-posta silinemez — yalnızca başkasıyla değiştirilebilir'],
   ["Telefonni olib tashlash uchun avval email qo'shing (kirish usuli qolishi kerak)", 'Чтобы убрать телефон, сначала добавьте email (должен остаться способ входа)', 'To remove the phone, first add an email (a sign-in method must remain)', 'Telefonu kaldırmak için önce e-posta ekleyin (bir giriş yöntemi kalmalı)'],
@@ -116,4 +115,26 @@ export default [
   ["AI ustoz hozir javob bera olmadi. Birozdan keyin qayta urinib ko'ring.", 'ИИ-учитель сейчас не смог ответить. Попробуйте чуть позже.', 'The AI tutor could not answer right now. Please try again shortly.', 'YZ öğretmen şu anda yanıt veremedi. Biraz sonra tekrar deneyin.'],
   ['Matn kerak', 'Нужен текст', 'Text is required', 'Metin gerekli'],
   ['AI hozir javob bera olmadi', 'ИИ сейчас не смог ответить', 'The AI could not answer right now', 'YZ şu anda yanıt veremedi'],
+  // Adminlarning funksiya ruxsatlari va Telegram bot orqali ro'yxatdan o'tish
+  ['Bu amal faqat super admin uchun', 'Это действие доступно только супер-админу', 'This action is for the super admin only', 'Bu işlem yalnızca süper yönetici içindir'],
+  ["Admin qo'shishni faqat super admin bajaradi", 'Добавлять администраторов может только супер-админ', 'Only the super admin can add admins', 'Yönetici eklemeyi yalnızca süper yönetici yapabilir'],
+  ["Telegram orqali ro'yxatdan o'tish yoqilmagan", 'Регистрация через Telegram не включена', 'Sign-up via Telegram is not enabled', 'Telegram ile kayıt etkin değil'],
+  [
+    "Avval Telegram botda raqamingizni tasdiqlang: botni oching va «Raqamni ulashish» tugmasini bosing.",
+    'Сначала подтвердите номер в Telegram-боте: откройте бота и нажмите «Поделиться номером».',
+    'First verify your number in the Telegram bot: open the bot and press “Share number”.',
+    'Önce numaranızı Telegram botunda doğrulayın: botu açıp «Numarayı paylaş» düğmesine basın.',
+  ],
+  [
+    "Bu raqam uchun Telegram orqali tiklash mavjud emas. Email orqali tiklang yoki administratorga murojaat qiling.",
+    'Для этого номера восстановление через Telegram недоступно. Восстановите по email или обратитесь к администратору.',
+    'Recovery via Telegram is not available for this number. Recover by email or contact the administrator.',
+    'Bu numara için Telegram ile kurtarma kullanılamıyor. E-posta ile kurtarın veya yöneticiyle iletişime geçin.',
+  ],
+  [
+    "Avval boshqa ro'yxatdan o'tish usulini (login, email yoki telefon) yoqing, keyin botni uzing",
+    'Сначала включите другой способ регистрации (логин, email или телефон), затем отключайте бота',
+    'First turn on another sign-up method (login, email or phone), then disconnect the bot',
+    'Önce başka bir kayıt yöntemini (kullanıcı adı, e-posta veya telefon) açın, sonra botun bağlantısını kesin',
+  ],
 ];

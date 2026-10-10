@@ -12,7 +12,7 @@
 //             { action: "check", context, question, answer, lang, sample? }
 //             { action: "chat", messages: [{role, content}], lang, context? }
 //             { action: "explain", text, lang }
-//             { action: "test-key", id }            (faqat admin)
+//             { action: "test-key", id }            (faqat super admin)
 //
 // Eslatma: fayl ATAYLAB nisbiy importlarsiz — Dashboard orqali ham joylashtiriladi.
 
@@ -539,7 +539,7 @@ Deno.serve(async (req) => {
 
     // ---------- kalitni sinash (admin) ----------
     if (action === "test-key") {
-      if (!isStaff) return json({ error: "Bu amal uchun ruxsatingiz yo'q" }, 403);
+      if (profile?.role !== "superadmin") return json({ error: "Bu amal uchun ruxsatingiz yo'q" }, 403);
       const { data: key } = await admin
         .from("api_keys")
         .select("id, provider, key_value, base_url, model, failure_count, success_count")

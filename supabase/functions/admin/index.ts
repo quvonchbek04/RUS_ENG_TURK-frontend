@@ -7,7 +7,9 @@
 // So'rov: POST { action, ...payload }   Header: Authorization: Bearer <sessiya tokeni>
 // Ochiq (tokensiz) amallar: "login" (email/telefon/login + parol), "send-email-code" (emailga 6 xonali kod),
 // "register" (email — kod bilan tasdiqlanadi (super admin o'chirib qo'ysa — kodsiz), telefon — kodsiz),
-// "reset-with-code" (parolni kod bilan tiklash), "signup-config" (ro'yxatdan o'tish rejimi: kod kerakmi).
+// "reset-with-code" (parolni kod bilan tiklash — email yoki Telegram), "signup-config" (ro'yxatdan o'tish rejimi: kod kerakmi),
+// "tg-start" / "tg-status" / "tg-reset-start" (Telegram bot: telefon tasdiqlash, bot orqali ro'yxatdan o'tish, parolni tiklash).
+// Adminlarning funksiya ruxsatlari (profiles.permissions) shu yerda majburlanadi; super admin ma'lumotlari boshqalarga qaytarilmaydi.
 //
 // Eslatma: fayl ATAYLAB hech qanday nisbiy importga ega emas — Supabase
 // Dashboard'dagi muharrir orqali (CLI'siz) joylashtirilganda ham ishlaydi.
@@ -36,6 +38,10 @@ const PROVIDERS = ["gemini", "openai", "groq", "openrouter", "deepseek", "custom
 const PROVIDER_MODES = ["auto", "mock", ...PROVIDERS];
 // Yuklanadigan material turlari (media_items.kind bilan bir xil). Adminlarga ruxsat shu turlar bo'yicha beriladi.
 const MEDIA_KINDS = ["audio", "video", "image", "text", "dialog", "vocab", "news"];
+// Adminga beriladigan funksiya ruxsatlari (faqat o'quvchilar ustida / ko'rish). Super admin hammasiga ega.
+// Adminlarni boshqarish, rol berish va sozlamalar (ro'yxatdan o'tish, AI, email, Telegram) — faqat super admin, ruxsat berib bo'lmaydi.
+const FUNC_PERMS = ["users_view", "users_add", "users_block", "users_reset", "users_delete", "ai_view", "mail_view", "stats_view"];
+const DEFAULT_ADMIN_PERMS = ["ai_view", "mail_view", "stats_view"];
 
 type Profile = Record<string, unknown>;
 
@@ -49,10 +55,19 @@ function publicUser(p: Profile, extra: Record<string, unknown> = {}) {
     phone: p.phone,
     isBlocked: p.is_blocked,
     uploadKinds: (p.upload_kinds as string[] | null | undefined) || [],
+    permissions: (p.permissions as string[] | null | undefined) || [],
     lastSeenAt: p.last_seen_at,
     createdAt: p.created_at,
     ...extra,
   };
+}
+
+/** Funksiya ruxsatlari ro'yxatini tekshiradi: faqat ma'lum ruxsatlar, takrorsiz, standart tartibda. Noto'g'ri bo'lsa — null. */
+function sanitizePerms(v: unknown): string[] | null {
+  if (!Array.isArray(v)) return null;
+  const given = [...new Set(v.map((x) => String(x)))];
+  if (!given.every((k) => FUNC_PERMS.includes(k))) return null;
+  return FUNC_PERMS.filter((k) => given.includes(k));
 }
 
 /** Ruxsat ro'yxatini tekshiradi: faqat ma'lum turlar, takrorsiz, standart tartibda. Noto'g'ri bo'lsa — null. */
@@ -196,12 +211,13 @@ type SignupCfg = {
   phone: boolean; // telefon bilan
   emailCode: boolean; // email kodi talab qilinadimi
   phoneTelegram: boolean; // telefon Telegram bot orqali tasdiqlanadimi
+  telegram: boolean; // Telegram bot orqali ro'yxatdan o'tish (alohida usul, kod yozmasdan)
   tgToken: string;
   tgBot: string;
   tgSecret: string;
 };
 
-const SIGNUP_KEYS = ["reg_login", "reg_email", "reg_phone", "signup_email_code", "signup_phone_telegram", "tg_bot_token", "tg_bot_username", "tg_webhook_secret"];
+const SIGNUP_KEYS = ["reg_login", "reg_email", "reg_phone", "reg_telegram", "signup_email_code", "signup_phone_telegram", "tg_bot_token", "tg_bot_username", "tg_webhook_secret"];
 
 async function getSignupCfg(admin: Admin): Promise<SignupCfg> {
   const { data } = await admin.from("secure_settings").select("key, value").in("key", SIGNUP_KEYS);
@@ -215,6 +231,7 @@ async function getSignupCfg(admin: Admin): Promise<SignupCfg> {
     phone: isOn("reg_phone", true),
     emailCode: isOn("signup_email_code", true),
     phoneTelegram: String(m.signup_phone_telegram || "").toLowerCase() === "on",
+    telegram: String(m.reg_telegram || "").toLowerCase() === "on",
     tgToken: m.tg_bot_token || "",
     tgBot: m.tg_bot_username || "",
     tgSecret: m.tg_webhook_secret || "",
@@ -225,6 +242,13 @@ const tgReady = (c: SignupCfg) => !!(c.tgToken && c.tgBot && c.tgSecret);
 
 /** Telegram tasdiqlash amalda yoqilgan va bot to'liq sozlanganmi. */
 const tgActive = (c: SignupCfg) => c.phoneTelegram && tgReady(c);
+
+/** Telegram bot orqali ro'yxatdan o'tish usuli amalda yoqilganmi. */
+const tgRegActive = (c: SignupCfg) => c.telegram && tgReady(c);
+
+function maskPhone(d: string): string {
+  return d.length > 5 ? `+${d.slice(0, 3)} ${"•".repeat(d.length - 5)}${d.slice(-2)}` : `+${d}`;
+}
 
 function randomToken(bytes = 18): string {
   const a = new Uint8Array(bytes);
@@ -262,7 +286,10 @@ async function tgCall(token: string, method: string, payload: Record<string, unk
 // Bot xabarlari foydalanuvchining Telegram tilida (uz / ru / en / tr)
 const TG_TEXT: Record<string, Record<string, string>> = {
   uz: {
-    welcome: "👋 Salom! Men «Til sayohati» saytida telefon raqamini tasdiqlaydigan botman.\n\nSaytdagi ro'yxatdan o'tish sahifasida telefon raqamingizni kiritib, «Telegramni ochish» tugmasini bosing — havola meni shu yerga olib keladi.",
+    welcome: "👋 Salom! Men «Til sayohati» saytida ro'yxatdan o'tish va telefon raqamini tasdiqlashga yordam beradigan botman.\n\nSaytdagi ro'yxatdan o'tish sahifasida «Telegram bot orqali ro'yxatdan o'tish» yoki «Telegramni ochish» tugmasini bosing — havola meni shu yerga olib keladi.",
+    verified: "✅ Raqamingiz tasdiqlandi!\n\nEndi saytga qayting — ro'yxatdan o'tish shu yerda davom etadi (ism va parol kiritasiz).",
+    codeOnly: "🔐 «Til sayohati» tasdiqlash kodi: <code>{code}</code>\n\nKodni saytga kiriting. U 10 daqiqa amal qiladi. Agar siz so'ramagan bo'lsangiz, e'tibor bermang va kodni hech kimga bermang.",
+    resetCode: "🔑 «Til sayohati» parolni tiklash kodi: <code>{code}</code>\n\nKodni saytga kiriting. U 10 daqiqa amal qiladi. Agar siz so'ramagan bo'lsangiz, e'tibor bermang va kodni hech kimga bermang.",
     expired: "⌛ Havola eskirgan yoki noto'g'ri. Saytga qaytib, «Qaytadan boshlash» yoki «Telegramni ochish» tugmasini qayta bosing.",
     askContact: "📱 Raqamingizni tasdiqlash uchun pastdagi «Raqamni ulashish» tugmasini bosing.",
     share: "📱 Raqamni ulashish",
@@ -273,7 +300,10 @@ const TG_TEXT: Record<string, Record<string, string>> = {
     help: "Kod olish uchun saytdagi «Telegramni ochish» tugmasidan foydalaning.",
   },
   ru: {
-    welcome: "👋 Здравствуйте! Я бот, который подтверждает номер телефона на сайте «Til sayohati».\n\nНа странице регистрации сайта введите номер телефона и нажмите «Открыть Telegram» — ссылка приведёт вас сюда.",
+    welcome: "👋 Здравствуйте! Я бот, который помогает с регистрацией и подтверждением номера телефона на сайте «Til sayohati».\n\nНа странице регистрации нажмите «Регистрация через Telegram-бота» или «Открыть Telegram» — ссылка приведёт вас сюда.",
+    verified: "✅ Номер подтверждён!\n\nТеперь вернитесь на сайт — регистрация продолжится там (введёте имя и пароль).",
+    codeOnly: "🔐 Код подтверждения «Til sayohati»: <code>{code}</code>\n\nВведите код на сайте. Он действует 10 минут. Если вы его не запрашивали, проигнорируйте сообщение и никому не сообщайте код.",
+    resetCode: "🔑 Код для восстановления пароля «Til sayohati»: <code>{code}</code>\n\nВведите код на сайте. Он действует 10 минут. Если вы его не запрашивали, проигнорируйте сообщение и никому не сообщайте код.",
     expired: "⌛ Ссылка устарела или неверна. Вернитесь на сайт и снова нажмите «Начать заново» или «Открыть Telegram».",
     askContact: "📱 Чтобы подтвердить номер, нажмите кнопку «Поделиться номером» ниже.",
     share: "📱 Поделиться номером",
@@ -284,7 +314,10 @@ const TG_TEXT: Record<string, Record<string, string>> = {
     help: "Чтобы получить код, используйте кнопку «Открыть Telegram» на сайте.",
   },
   en: {
-    welcome: "👋 Hello! I'm the bot that verifies phone numbers on the “Til sayohati” website.\n\nOn the website's sign-up page enter your phone number and press “Open Telegram” — the link will bring you here.",
+    welcome: "👋 Hello! I'm the bot that helps with sign-up and phone verification on the “Til sayohati” website.\n\nOn the sign-up page press “Sign up with the Telegram bot” or “Open Telegram” — the link will bring you here.",
+    verified: "✅ Your number is verified!\n\nNow go back to the website — sign-up continues there (you'll enter a name and a password).",
+    codeOnly: "🔐 “Til sayohati” verification code: <code>{code}</code>\n\nEnter the code on the website. It is valid for 10 minutes. If you didn't request it, ignore this message and never share the code.",
+    resetCode: "🔑 “Til sayohati” password recovery code: <code>{code}</code>\n\nEnter the code on the website. It is valid for 10 minutes. If you didn't request it, ignore this message and never share the code.",
     expired: "⌛ This link has expired or is invalid. Go back to the website and press “Start over” or “Open Telegram” again.",
     askContact: "📱 To verify your number, press the “Share number” button below.",
     share: "📱 Share number",
@@ -295,7 +328,10 @@ const TG_TEXT: Record<string, Record<string, string>> = {
     help: "To get a code, use the “Open Telegram” button on the website.",
   },
   tr: {
-    welcome: "👋 Merhaba! Ben «Til sayohati» sitesinde telefon numarasını doğrulayan botum.\n\nSitenin kayıt sayfasında telefon numaranızı girip «Telegram'ı aç» düğmesine basın — bağlantı sizi buraya getirecek.",
+    welcome: "👋 Merhaba! Ben «Til sayohati» sitesinde kayıt ve telefon doğrulamaya yardım eden botum.\n\nKayıt sayfasında «Telegram botuyla kayıt ol» veya «Telegram'ı aç» düğmesine basın — bağlantı sizi buraya getirecek.",
+    verified: "✅ Numaranız doğrulandı!\n\nŞimdi siteye dönün — kayıt orada devam eder (ad ve parola girersiniz).",
+    codeOnly: "🔐 «Til sayohati» doğrulama kodu: <code>{code}</code>\n\nKodu sitede girin. 10 dakika geçerlidir. Siz istemediyseniz bu mesajı yok sayın ve kodu kimseyle paylaşmayın.",
+    resetCode: "🔑 «Til sayohati» parola kurtarma kodu: <code>{code}</code>\n\nKodu sitede girin. 10 dakika geçerlidir. Siz istemediyseniz bu mesajı yok sayın ve kodu kimseyle paylaşmayın.",
     expired: "⌛ Bağlantının süresi dolmuş veya geçersiz. Siteye dönüp «Baştan başla» veya «Telegram'ı aç» düğmesine yeniden basın.",
     askContact: "📱 Numaranızı doğrulamak için aşağıdaki «Numarayı paylaş» düğmesine basın.",
     share: "📱 Numarayı paylaş",
@@ -359,7 +395,22 @@ async function processTgUpdate(admin: Admin, cfg: SignupCfg, update: any) {
       return;
     }
     const d = normalizePhone(String(msg.contact.phone_number || ""));
-    if (!d || d !== row.phone) {
+    if (!d) {
+      await send(L.ownOnly);
+      return;
+    }
+    // Raqam egasi tasdiqlandi — keyingi safar (raqam yozilganda) kod to'g'ridan-to'g'ri shu chatga yuboriladi
+    await admin.from("tg_contacts").upsert({ phone: d, tg_user_id: fromId, chat_id: chatId, lang: tgLangOf(msg.from.language_code), updated_at: new Date().toISOString() });
+    // Telegram orqali ro'yxatdan o'tish: raqam kontaktdan olinadi, kod kerak emas — sayt holatni so'rab turadi
+    if (row.purpose === "register-tg") {
+      await admin
+        .from("tg_verifications")
+        .update({ phone: d, status: "verified", expires_at: new Date(Date.now() + CODE_TTL_MS).toISOString() })
+        .eq("token", row.token);
+      await send(L.verified, { remove_keyboard: true });
+      return;
+    }
+    if (d !== row.phone) {
       await send(L.mismatch.replace("{phone}", "+" + row.phone), { remove_keyboard: true });
       return;
     }
@@ -378,6 +429,38 @@ async function processTgUpdate(admin: Admin, cfg: SignupCfg, update: any) {
   }
 
   await send(L.help);
+}
+
+/** Raqam avval bot orqali tasdiqlangan bo'lsa (tg_contacts) — kodni DARHOL shu Telegram chatiga yuboradi va so'rov tokenini qaytaradi.
+ *  Bog'lanmagan bo'lsa yoki yuborib bo'lmasa (bot bloklangan) — null (foydalanuvchi bot havolasi orqali o'tadi). */
+async function sendCodeToLinked(admin: Admin, cfg: SignupCfg, phone: string, purpose: string, userId: string | null): Promise<string | null> {
+  const { data: c } = await admin.from("tg_contacts").select("tg_user_id, chat_id, lang").eq("phone", phone).maybeSingle();
+  if (!c) return null;
+  const token = randomToken(18);
+  const code = randomCode();
+  await admin.from("tg_verifications").delete().eq("phone", phone).eq("purpose", purpose);
+  const { error } = await admin.from("tg_verifications").insert({
+    token,
+    phone,
+    purpose,
+    user_id: userId,
+    tg_user_id: c.tg_user_id,
+    chat_id: c.chat_id,
+    status: "code_sent",
+    code_hash: await hmacHex(`${token}|${phone}|${code}`),
+    attempts: 0,
+    expires_at: new Date(Date.now() + CODE_TTL_MS).toISOString(),
+  });
+  if (error) return null;
+  const L = TG_TEXT[tgLangOf(c.lang as string)];
+  try {
+    await tgCall(cfg.tgToken, "sendMessage", { chat_id: c.chat_id, text: (purpose === "reset" ? L.resetCode : L.codeOnly).replace("{code}", code), parse_mode: "HTML" });
+  } catch (e) {
+    console.error("Telegramga kod yuborilmadi:", (e as Error).message);
+    await admin.from("tg_verifications").delete().eq("token", token);
+    return null;
+  }
+  return token;
 }
 
 /** Telegram kodini tekshiradi. consume=true bo'lsa to'g'ri kod bir martalik — so'rov o'chiriladi. Xato bo'lsa matn qaytaradi. */
@@ -413,7 +496,7 @@ async function verifyTg(admin: Admin, token: string, phone: string, code: unknow
 /** Ochiq sozlamalar (ro'yxatdan o'tish formasi shunga moslashadi). Maxfiy qiymatlar (token, secret) chiqmaydi. */
 function publicSignup(c: SignupCfg, mailReady: boolean) {
   return {
-    methods: { login: c.login, email: c.email, phone: c.phone },
+    methods: { login: c.login, email: c.email, phone: c.phone, telegram: tgRegActive(c) },
     emailCode: c.emailCode,
     phoneTelegram: tgActive(c),
     tgBot: tgReady(c) ? c.tgBot : "",
@@ -467,7 +550,7 @@ async function emailTaken(admin: Admin, email: string, exceptId?: string): Promi
   return !!data?.length;
 }
 
-const PUBLIC_ACTIONS = new Set(["login", "send-email-code", "register", "reset-with-code", "signup-config", "tg-start"]);
+const PUBLIC_ACTIONS = new Set(["login", "send-email-code", "register", "reset-with-code", "signup-config", "tg-start", "tg-status", "tg-reset-start"]);
 
 /** Tokensiz (yoki o'z tokeni bilan) ishlaydigan ochiq amallar: kirish, kod yuborish, ro'yxatdan o'tish, parolni tiklash. */
 async function handlePublic(action: string, body: Record<string, unknown>, req: Request): Promise<Response> {
@@ -482,7 +565,51 @@ async function handlePublic(action: string, body: Record<string, unknown>, req: 
     return json(publicSignup(await getSignupCfg(admin), !!(mail.apiKey && mail.from)));
   }
 
-  // ---------- Telegram orqali telefon tasdiqlashni boshlash: bot havolasini qaytaradi ----------
+  // ---------- Telegram bot orqali ro'yxatdan o'tishni boshlash: raqam yozilmaydi — botda kontakt ulashiladi ----------
+  if (action === "tg-start" && body.purpose === "register-tg") {
+    const cfg = await getSignupCfg(admin);
+    if (!tgRegActive(cfg)) return json({ error: "Telegram orqali ro'yxatdan o'tish yoqilmagan" }, 403);
+    if (!(await allow(admin, `tgreg:${ip}`, 20, 3_600_000))) return json({ error: "Juda ko'p so'rov. Bir ozdan keyin qayta urinib ko'ring." }, 429);
+    const token = randomToken(18);
+    await admin.from("tg_verifications").delete().lt("expires_at", new Date().toISOString());
+    const { error } = await admin.from("tg_verifications").insert({
+      token,
+      phone: null,
+      purpose: "register-tg",
+      user_id: null,
+      status: "pending",
+      expires_at: new Date(Date.now() + CODE_TTL_MS).toISOString(),
+    });
+    if (error) return json({ error: error.message }, 400);
+    return json({ ok: true, token, bot: cfg.tgBot, link: `https://t.me/${cfg.tgBot}?start=${token}` });
+  }
+
+  // Sayt so'rovi holatini so'rab turadi (bot kontakt olganda 'verified' bo'ladi). Token — 144 bitli maxfiy, taxmin qilib bo'lmaydi.
+  if (action === "tg-status") {
+    const token = String(body.token || "");
+    if (token.length < 10 || token.length > 64) return json({ status: "expired" });
+    const { data: row } = await admin.from("tg_verifications").select("status, phone, purpose, expires_at").eq("token", token).maybeSingle();
+    if (!row || row.purpose !== "register-tg" || new Date(row.expires_at as string).getTime() < Date.now()) return json({ status: "expired" });
+    return json({ status: row.status, phone: row.status === "verified" && row.phone ? maskPhone(String(row.phone)) : "" });
+  }
+
+  // ---------- Parolni Telegram orqali tiklash: kod raqam bog'langan Telegram chatiga yuboriladi ----------
+  if (action === "tg-reset-start") {
+    const cfg = await getSignupCfg(admin);
+    const unavailable = json({ error: "Bu raqam uchun Telegram orqali tiklash mavjud emas. Email orqali tiklang yoki administratorga murojaat qiling." }, 400);
+    if (!tgReady(cfg)) return unavailable;
+    const d = normalizePhone(String(body.phone || ""));
+    if (!d) return json({ error: "Telefon raqamini to'g'ri kiriting (masalan: +998 90 123 45 67)" }, 400);
+    if (!(await allow(admin, `tgrip:${ip}`, 15, 3_600_000))) return json({ error: "Juda ko'p so'rov. Bir ozdan keyin qayta urinib ko'ring." }, 429);
+    if (!(await allow(admin, `tgrph:${d}`, 5, 3_600_000))) return json({ error: "Bu raqam uchun juda ko'p so'rov yuborildi. 1 soatdan keyin qayta urinib ko'ring." }, 429);
+    const { data: prof } = await admin.from("profiles").select("id").eq("phone", "+" + d).maybeSingle();
+    if (!prof) return unavailable;
+    const token = await sendCodeToLinked(admin, cfg, d, "reset", prof.id as string);
+    if (!token) return unavailable;
+    return json({ ok: true, token });
+  }
+
+  // ---------- Telegram orqali telefon tasdiqlashni boshlash: kod bog'langan chatga darhol yuboriladi yoki bot havolasi qaytariladi ----------
   if (action === "tg-start") {
     const cfg = await getSignupCfg(admin);
     if (!tgActive(cfg)) return json({ error: "Telegram orqali tasdiqlash yoqilmagan" }, 400);
@@ -504,6 +631,10 @@ async function handlePublic(action: string, body: Record<string, unknown>, req: 
     }
     if (!(await allow(admin, `tgip:${ip}`, 15, 3_600_000))) return json({ error: "Juda ko'p so'rov. Bir ozdan keyin qayta urinib ko'ring." }, 429);
     if (!(await allow(admin, `tgph:${d}`, 6, 3_600_000))) return json({ error: "Bu raqam uchun juda ko'p so'rov yuborildi. 1 soatdan keyin qayta urinib ko'ring." }, 429);
+
+    // Raqam avval bot orqali tasdiqlangan bo'lsa — kod darhol Telegramga ketadi (botni qayta ochish shart emas)
+    const direct = await sendCodeToLinked(admin, cfg, d, purpose, userId);
+    if (direct) return json({ ok: true, direct: true, token: direct, bot: cfg.tgBot, link: `https://t.me/${cfg.tgBot}` });
 
     const token = randomToken(18);
     await admin.from("tg_verifications").delete().lt("expires_at", new Date().toISOString());
@@ -592,8 +723,13 @@ async function handlePublic(action: string, body: Record<string, unknown>, req: 
     const password = String(body.password || "");
     if (password.length < 6) return json({ error: "Parol kamida 6 belgidan iborat bo'lishi kerak" }, 400);
 
-    const simple = !email && !hasPhone;
-    if (simple) {
+    // Telegram bot orqali: email/telefon/login yo'q, faqat botda tasdiqlangan so'rov tokeni (raqam kontaktdan olingan)
+    const regTgToken = String(body.tgToken || "");
+    const tgReg = !email && !hasPhone && !loginName && !!regTgToken;
+    const simple = !email && !hasPhone && !tgReg;
+    if (tgReg) {
+      if (!tgRegActive(cfg)) return json({ error: "Telegram orqali ro'yxatdan o'tish yoqilmagan" }, 403);
+    } else if (simple) {
       if (!cfg.login) return json({ error: "Email yoki telefon raqamidan kamida bittasini kiriting" }, 400);
     } else {
       if (email && !cfg.email) return json({ error: "Email orqali ro'yxatdan o'tish o'chirilgan" }, 403);
@@ -602,7 +738,19 @@ async function handlePublic(action: string, body: Record<string, unknown>, req: 
 
     let phone: string | null = null;
     let phoneDigits = "";
-    if (hasPhone) {
+    if (tgReg) {
+      const { data: row } = await admin.from("tg_verifications").select("*").eq("token", regTgToken).maybeSingle();
+      if (!row || row.purpose !== "register-tg" || new Date(row.expires_at as string).getTime() < Date.now()) {
+        return json({ error: "Telegram tasdiqlash so'rovi topilmadi. Qaytadan boshlang.", tgError: true }, 400);
+      }
+      if (row.status !== "verified" || !row.phone) {
+        return json({ error: "Avval Telegram botda raqamingizni tasdiqlang: botni oching va «Raqamni ulashish» tugmasini bosing.", tgError: true }, 400);
+      }
+      phoneDigits = String(row.phone);
+      phone = "+" + phoneDigits;
+      const { data: taken } = await admin.from("profiles").select("id").eq("phone", phone).maybeSingle();
+      if (taken) return json({ error: "Bu telefon raqami allaqachon ro'yxatdan o'tgan. Kirish sahifasidan foydalaning." }, 400);
+    } else if (hasPhone) {
       const d = normalizePhone(phoneRaw);
       if (!d) return json({ error: "Telefon raqamini to'g'ri kiriting (masalan: +998 90 123 45 67)" }, 400);
       phoneDigits = d;
@@ -634,7 +782,7 @@ async function handlePublic(action: string, body: Record<string, unknown>, req: 
 
     // Tasdiqlash kodlari (qaysi biri talab qilinsa). Telegram kodi avval tekshiriladi (sarflanmaydi), email kodi sarflanadi,
     // oxirida Telegram so'rovi o'chiriladi — shunda biri xato bo'lsa, ikkinchisini qayta so'rash shart emas.
-    const needTg = !!phone && tgActive(cfg);
+    const needTg = !!phone && !tgReg && tgActive(cfg);
     const needEmailCode = !!email && cfg.emailCode;
     const tgToken = String(body.tgToken || "");
     if (needTg) {
@@ -657,7 +805,7 @@ async function handlePublic(action: string, body: Record<string, unknown>, req: 
       const msg = /already|registered|exists/i.test(error.message) ? "Bu email, telefon yoki login allaqachon ro'yxatdan o'tgan" : error.message;
       return json({ error: msg }, 400);
     }
-    if (needTg) await admin.from("tg_verifications").delete().eq("token", tgToken);
+    if (needTg || tgReg) await admin.from("tg_verifications").delete().eq("token", tgToken);
     return json({ ok: true, email: authEmail });
   }
 
@@ -666,6 +814,21 @@ async function handlePublic(action: string, body: Record<string, unknown>, req: 
     if (!(await allow(admin, `rst:${ip}`, 20, 3_600_000))) return json({ error: "Juda ko'p urinish. Bir ozdan keyin qayta urinib ko'ring." }, 429);
     const email = normEmail(body.email);
     const password = String(body.password || "");
+
+    // Telegram orqali: raqam + botdan kelgan kod
+    if (!email && body.tgToken) {
+      const d = normalizePhone(String(body.phone || ""));
+      if (!d) return json({ error: "Telefon raqamini to'g'ri kiriting (masalan: +998 90 123 45 67)" }, 400);
+      if (password.length < 6) return json({ error: "Parol kamida 6 belgidan iborat bo'lishi kerak" }, 400);
+      const bad = await verifyTg(admin, String(body.tgToken), d, body.code, "reset", null, true);
+      if (bad) return json({ error: bad, tgError: true }, 400);
+      const { data: prof } = await admin.from("profiles").select("id").eq("phone", "+" + d).maybeSingle();
+      if (!prof) return json({ error: "Hisob topilmadi" }, 404);
+      const { error } = await admin.auth.admin.updateUserById(prof.id as string, { password });
+      if (error) return json({ error: error.message }, 400);
+      return json({ ok: true });
+    }
+
     if (!EMAIL_RE.test(email)) return json({ error: "Email manzili noto'g'ri" }, 400);
     if (password.length < 6) return json({ error: "Parol kamida 6 belgidan iborat bo'lishi kerak" }, 400);
     const bad = await verifyCode(admin, email, "reset", body.code);
@@ -782,11 +945,14 @@ Deno.serve(async (req) => {
     if (userErr || !user) return json({ error: "Kirish talab qilinadi" }, 401);
 
     const admin = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false } });
-    const { data: callerProfile } = await admin.from("profiles").select("role, is_blocked").eq("id", user.id).single();
+    const { data: callerProfile } = await admin.from("profiles").select("role, is_blocked, permissions").eq("id", user.id).single();
     const callerRole = (callerProfile?.role as string) || "user";
     if (callerProfile?.is_blocked) return json({ error: "Hisobingiz bloklangan" }, 403);
     const isStaff = callerRole === "admin" || callerRole === "superadmin";
     const isSuper = callerRole === "superadmin";
+    const callerPerms = (callerProfile?.permissions as string[] | null | undefined) || [];
+    /** Funksiya ruxsati: super adminda doim bor; adminda — faqat super admin bergan bo'lsa; o'quvchida hech qachon. */
+    const can = (perm: string) => isSuper || (callerRole === "admin" && callerPerms.includes(perm));
 
     const body = await req.json().catch(() => ({}));
     const action = String(body.action || "");
@@ -798,13 +964,13 @@ Deno.serve(async (req) => {
       return data as Profile | null;
     }
 
-    // Foydalanuvchilar ro'yxati va ularni boshqarish — FAQAT super admin uchun.
-    // Oddiy admin (masalan o'qituvchi) materiallar va AI bilan ishlay oladi, lekin foydalanuvchilarni ko'rmaydi.
-    const superOnly = () => json({ error: "Foydalanuvchilar bo'limi faqat super admin uchun" }, 403);
+    // Foydalanuvchilar ro'yxati va ularni boshqarish: super admin — hammani; oddiy admin — faqat unga berilgan ruxsatlar doirasida
+    // va FAQAT o'quvchilarni (adminlar va super admin ma'lumotlari hech kimga ko'rinmaydi).
+    const superOnly = () => json({ error: "Bu amal faqat super admin uchun" }, 403);
 
-    /** Super admin o'zidan boshqa hammani boshqara oladi; super adminning o'zini — hech kim. */
+    /** Super admin o'zidan boshqa hammani boshqara oladi; super adminning o'zini — hech kim. Oddiy admin — faqat o'quvchilarni. */
     function canManage(target: Profile) {
-      return isSuper && target.role !== "superadmin";
+      return isSuper ? target.role !== "superadmin" : callerRole === "admin" && target.role === "user";
     }
 
     // =====================================================================
@@ -880,8 +1046,10 @@ Deno.serve(async (req) => {
     // FOYDALANUVCHILAR
     // =====================================================================
     if (action === "list-users") {
-      if (!isSuper) return superOnly();
-      const { data: profiles, error } = await admin.from("profiles").select("*").order("created_at", { ascending: true });
+      if (!can("users_view")) return forbid();
+      let pq = admin.from("profiles").select("*").order("created_at", { ascending: true });
+      if (!isSuper) pq = pq.eq("role", "user"); // adminga faqat o'quvchilar ko'rinadi
+      const { data: profiles, error } = await pq;
       if (error) return json({ error: error.message }, 400);
       // Auth ma'lumotlari (oxirgi kirish vaqti) — bir necha sahifa bo'lishi mumkin
       const lastSignIn: Record<string, string | null> = {};
@@ -895,9 +1063,10 @@ Deno.serve(async (req) => {
     }
 
     if (action === "user-detail") {
-      if (!isSuper) return superOnly();
+      if (!can("users_view")) return forbid();
       const target = await getTarget(String(body.id || ""));
       if (!target) return json({ error: "Foydalanuvchi topilmadi" }, 404);
+      if (!isSuper && target.role !== "user") return json({ error: "Foydalanuvchi topilmadi" }, 404);
       const { data: prog } = await admin
         .from("progress")
         .select("state, updated_at")
@@ -908,10 +1077,12 @@ Deno.serve(async (req) => {
       return json({ user: publicUser(target), progress: prog?.state || {}, progressUpdatedAt: prog?.updated_at || null, aiUsedToday: usage?.count || 0 });
     }
 
-    // Faqat super admin: 'user' yoki 'admin' yaratadi
+    // Super admin: 'user' yoki 'admin' yaratadi. Oddiy admin ("Foydalanuvchi qo'shish" ruxsati bilan) — faqat o'quvchi.
     if (action === "create-user" || action === "create-admin") {
-      if (!isSuper) return superOnly();
-      const role = action === "create-admin" || body.role === "admin" ? "admin" : "user";
+      if (!can("users_add")) return forbid();
+      const wantsAdmin = action === "create-admin" || body.role === "admin";
+      if (wantsAdmin && !isSuper) return json({ error: "Admin qo'shishni faqat super admin bajaradi" }, 403);
+      const role = wantsAdmin ? "admin" : "user";
       const ident = resolveIdentifier(String(body.identifier || body.username || ""));
       if (!ident) {
         return json({ error: "Login (kamida 3 belgi: harf, raqam, _ . -), email yoki telefon raqamini to'g'ri kiriting" }, 400);
@@ -945,17 +1116,25 @@ Deno.serve(async (req) => {
       }
       const uid = created.user!.id;
       // Yangi adminga (agar belgilanmagan bo'lsa) hamma tur ruxsat etiladi — super admin keyin "Ruxsatlar" bo'limida o'zgartiradi
-      if (role !== "user") await admin.from("profiles").update({ role, upload_kinds: sanitizeKinds(body.uploadKinds) ?? MEDIA_KINDS }).eq("id", uid);
+      // Funksiya ruxsatlari: standart — faqat ko'rish (AI, email, statistika); foydalanuvchilar bilan ishlash ruxsatini super admin alohida beradi
+      if (role !== "user") {
+        await admin.from("profiles").update({
+          role,
+          upload_kinds: sanitizeKinds(body.uploadKinds) ?? MEDIA_KINDS,
+          permissions: sanitizePerms(body.permissions) ?? DEFAULT_ADMIN_PERMS,
+        }).eq("id", uid);
+      }
       const prof = await getTarget(uid);
       return json({ user: publicUser(prof || { id: uid, username: ident.username, display_name: displayName, role }) });
     }
 
     if (action === "delete-user" || action === "delete-admin") {
-      if (!isSuper) return superOnly();
+      if (!can("users_delete")) return forbid();
       const targetId = String(body.id || "");
       if (targetId === user.id) return json({ error: "O'zingizni o'chira olmaysiz" }, 400);
       const target = await getTarget(targetId);
       if (!target) return json({ error: "Foydalanuvchi topilmadi" }, 404);
+      if (!isSuper && target.role !== "user") return json({ error: "Foydalanuvchi topilmadi" }, 404);
       if (target.role === "superadmin") return json({ error: "Super adminni o'chirib bo'lmaydi" }, 400);
       if (!canManage(target)) return json({ error: "Adminni faqat super admin o'chira oladi" }, 403);
       const { error } = await admin.auth.admin.deleteUser(targetId);
@@ -974,28 +1153,42 @@ Deno.serve(async (req) => {
       // O'quvchiga qaytarilganda ruxsatlar tozalanadi (keyin qayta admin qilinsa, yangidan beriladi).
       const current = (target.upload_kinds as string[] | null) || [];
       const upload_kinds = role === "admin" ? sanitizeKinds(body.uploadKinds) ?? (current.length ? current : MEDIA_KINDS) : [];
-      const { error } = await admin.from("profiles").update({ role, upload_kinds }).eq("id", target.id as string);
+      const currentPerms = (target.permissions as string[] | null) || [];
+      const permissions = role === "admin" ? sanitizePerms(body.permissions) ?? (target.role === "admin" ? currentPerms : DEFAULT_ADMIN_PERMS) : [];
+      const { error } = await admin.from("profiles").update({ role, upload_kinds, permissions }).eq("id", target.id as string);
       if (error) return json({ error: error.message }, 400);
-      return json({ user: publicUser({ ...target, role, upload_kinds }) });
+      return json({ user: publicUser({ ...target, role, upload_kinds, permissions }) });
     }
 
-    // Adminlarning yuklash ruxsatlari (qaysi turdagi materialni qo'sha/tahrirlay/o'chira olishi) — faqat super admin
+    // Adminlarning ruxsatlari — faqat super admin: yuklash (qaysi turdagi materialni qo'sha/tahrirlay/o'chira olishi)
+    // va funksiyalar (foydalanuvchilarni ko'rish/qo'shish/bloklash…, AI, email, statistika). Ikkalasidan kamida bittasi yuboriladi.
     if (action === "set-permissions") {
       if (!isSuper) return json({ error: "Ruxsatlarni faqat super admin belgilaydi" }, 403);
       const target = await getTarget(String(body.id || ""));
       if (!target) return json({ error: "Foydalanuvchi topilmadi" }, 404);
       if (target.role !== "admin") return json({ error: "Ruxsatlar faqat adminlar uchun belgilanadi (super adminda hamma ruxsat bor)" }, 400);
-      const kinds = sanitizeKinds(body.uploadKinds);
-      if (!kinds) return json({ error: "Ruxsatlar ro'yxati noto'g'ri" }, 400);
-      const { error } = await admin.from("profiles").update({ upload_kinds: kinds }).eq("id", target.id as string);
+      const patch: Record<string, unknown> = {};
+      if (body.uploadKinds !== undefined) {
+        const kinds = sanitizeKinds(body.uploadKinds);
+        if (!kinds) return json({ error: "Ruxsatlar ro'yxati noto'g'ri" }, 400);
+        patch.upload_kinds = kinds;
+      }
+      if (body.permissions !== undefined) {
+        const perms = sanitizePerms(body.permissions);
+        if (!perms) return json({ error: "Ruxsatlar ro'yxati noto'g'ri" }, 400);
+        patch.permissions = perms;
+      }
+      if (!Object.keys(patch).length) return json({ error: "Ruxsatlar ro'yxati noto'g'ri" }, 400);
+      const { error } = await admin.from("profiles").update(patch).eq("id", target.id as string);
       if (error) return json({ error: error.message }, 400);
-      return json({ user: publicUser({ ...target, upload_kinds: kinds }) });
+      return json({ user: publicUser({ ...target, ...patch }) });
     }
 
     if (action === "reset-password") {
-      if (!isSuper) return superOnly();
+      if (!can("users_reset")) return forbid();
       const target = await getTarget(String(body.id || ""));
       if (!target) return json({ error: "Foydalanuvchi topilmadi" }, 404);
+      if (!isSuper && target.role !== "user") return json({ error: "Foydalanuvchi topilmadi" }, 404);
       if (target.id !== user.id && !canManage(target)) return forbid();
       const password = String(body.password || "");
       if (password.length < 6) return json({ error: "Parol kamida 6 belgidan iborat bo'lishi kerak" }, 400);
@@ -1005,9 +1198,10 @@ Deno.serve(async (req) => {
     }
 
     if (action === "block-user") {
-      if (!isSuper) return superOnly();
+      if (!can("users_block")) return forbid();
       const target = await getTarget(String(body.id || ""));
       if (!target) return json({ error: "Foydalanuvchi topilmadi" }, 404);
+      if (!isSuper && target.role !== "user") return json({ error: "Foydalanuvchi topilmadi" }, 404);
       if (target.id === user.id) return json({ error: "O'zingizni bloklay olmaysiz" }, 400);
       if (!canManage(target)) return forbid();
       const blocked = Boolean(body.blocked);
@@ -1020,7 +1214,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "stats") {
-      if (!isStaff) return forbid();
+      if (!can("stats_view")) return forbid();
       const today = new Date().toISOString().slice(0, 10);
       const [{ data: roles }, { data: media }, { data: usage }, { count: keyCount }] = await Promise.all([
         admin.from("profiles").select("role, created_at, last_seen_at"),
@@ -1082,7 +1276,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "get-ai-settings") {
-      if (!isStaff) return forbid();
+      if (!can("ai_view")) return forbid();
       return json(await aiSettingsSnapshot());
     }
 
@@ -1115,7 +1309,7 @@ Deno.serve(async (req) => {
     // EMAIL XIZMATI (kod yuborish uchun): Brevo yoki Resend
     // =====================================================================
     if (action === "get-mail-settings") {
-      if (!isStaff) return forbid();
+      if (!can("mail_view")) return forbid();
       const cfg = await getMailConfig(admin);
       return json({
         provider: cfg.provider,
@@ -1142,6 +1336,7 @@ Deno.serve(async (req) => {
         phone: c.phone,
         emailCode: c.emailCode,
         phoneTelegram: c.phoneTelegram,
+        telegram: c.telegram,
         mailReady: !!(mail.apiKey && mail.from),
         tg: { connected: tgReady(c), username: c.tgBot, maskedToken: c.tgToken ? maskKey(c.tgToken) : "" },
       };
@@ -1163,15 +1358,17 @@ Deno.serve(async (req) => {
         phone: pick("phone", cur.phone),
         emailCode: pick("emailCode", cur.emailCode),
         phoneTelegram: pick("phoneTelegram", cur.phoneTelegram),
+        telegram: pick("telegram", cur.telegram),
       };
-      if (!next.login && !next.email && !next.phone) return json({ error: "Kamida bitta ro'yxatdan o'tish usuli yoqilgan bo'lishi kerak" }, 400);
-      if (next.phoneTelegram && !tgReady(cur)) return json({ error: "Avval Telegram botni ulang (pastda bot tokenini kiriting)" }, 400);
+      if (!next.login && !next.email && !next.phone && !next.telegram) return json({ error: "Kamida bitta ro'yxatdan o'tish usuli yoqilgan bo'lishi kerak" }, 400);
+      if ((next.phoneTelegram || next.telegram) && !tgReady(cur)) return json({ error: "Avval Telegram botni ulang (pastda bot tokenini kiriting)" }, 400);
       const onOff = (v: boolean) => (v ? "on" : "off");
       const { error } = await admin.from("secure_settings").upsert(
         [
           { key: "reg_login", value: onOff(next.login) },
           { key: "reg_email", value: onOff(next.email) },
           { key: "reg_phone", value: onOff(next.phone) },
+          { key: "reg_telegram", value: onOff(next.telegram) },
           { key: "signup_email_code", value: onOff(next.emailCode) },
           { key: "signup_phone_telegram", value: onOff(next.phoneTelegram) },
         ],
@@ -1187,6 +1384,8 @@ Deno.serve(async (req) => {
       const cur = await getSignupCfg(admin);
       const token = String(body.token || "").trim();
       if (!token) {
+        // Bot uzilganda Telegram usuli ham o'chadi — hech qanday usul qolmasa, uzishga ruxsat berilmaydi
+        if (!cur.login && !cur.email && !cur.phone) return json({ error: "Avval boshqa ro'yxatdan o'tish usulini (login, email yoki telefon) yoqing, keyin botni uzing" }, 400);
         if (cur.tgToken) await tgCall(cur.tgToken, "deleteWebhook", {}).catch(() => {});
         await admin.from("secure_settings").upsert(
           [
@@ -1194,6 +1393,7 @@ Deno.serve(async (req) => {
             { key: "tg_bot_username", value: "" },
             { key: "tg_webhook_secret", value: "" },
             { key: "signup_phone_telegram", value: "off" },
+            { key: "reg_telegram", value: "off" },
           ],
           { onConflict: "key" },
         );
@@ -1290,7 +1490,7 @@ Deno.serve(async (req) => {
     // API KALITLAR (qiymat hech qachon to'liq qaytarilmaydi — faqat maskalangan)
     // =====================================================================
     if (action === "list-api-keys") {
-      if (!isStaff) return forbid();
+      if (!can("ai_view")) return forbid();
       const { data: keys, error } = await admin
         .from("api_keys")
         .select("id, provider, label, key_value, base_url, model, priority, is_active, failure_count, success_count, last_used_at, last_error, created_at")

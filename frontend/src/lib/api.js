@@ -42,6 +42,7 @@ export function publicProfile(p) {
     phone: p.phone,
     isBlocked: p.is_blocked,
     uploadKinds: p.upload_kinds || [],
+    permissions: p.permissions || [],
     lastSeenAt: p.last_seen_at,
     createdAt: p.created_at,
   };
@@ -218,22 +219,24 @@ export const api = {
     const phoneRaw = String(phone || '').trim();
     const login = String(username || '').trim();
     const hasPhone = phoneRaw.replace(/\D/g, '').length > 3; // "+998 " yolg'iz qolsa — bo'sh hisoblanadi
+    // Telegram bot orqali: email/telefon/login yo'q — raqam botda kontakt ulashilganda serverda aniqlanadi (tgToken, kod yo'q)
+    const viaBot = !e && !hasPhone && !login && !!tgToken;
     // Oddiy usul: faqat login (ism) + parol — email ham, telefon ham kiritilmaydi
-    if (!e && !hasPhone && !login) throw E('Email yoki telefon raqamidan kamida bittasini kiriting');
+    if (!e && !hasPhone && !login && !viaBot) throw E('Email yoki telefon raqamidan kamida bittasini kiriting');
 
     if (hasPhone && !normalizePhone(phoneRaw)) throw E("Telefon raqamini to'g'ri kiriting (masalan: +998 90 123 45 67)");
     if (e && !isValidEmail(e)) throw E("Email manzilini to'g'ri kiriting (masalan: ism@gmail.com)");
     if (e && isSyntheticEmail(e)) throw E("Bu email manzilidan foydalanib bo'lmaydi");
-    if (!e && !hasPhone && !/^[a-zA-Z0-9_.-]{3,40}$/.test(login)) {
+    if (!e && !hasPhone && !viaBot && !/^[a-zA-Z0-9_.-]{3,40}$/.test(login)) {
       throw E("Login 3–40 belgidan iborat bo'lsin: lotin harflari, raqamlar, _ . - belgilari");
     }
 
-    // Hisob server tomonda yaratiladi: usullarni (login / email / telefon) va tasdiqlash kodlarini super admin belgilaydi
+    // Hisob server tomonda yaratiladi: usullarni (login / email / telefon / Telegram bot) va tasdiqlash kodlarini super admin belgilaydi
     const res = await callFunction('admin', {
       action: 'register',
       email: e,
       phone: hasPhone ? phoneRaw : '',
-      username: !e && !hasPhone ? login : '',
+      username: !e && !hasPhone && !viaBot ? login : '',
       password,
       displayName,
       code,
@@ -250,11 +253,16 @@ export const api = {
   /** Ro'yxatdan o'tish rejimi: { emailCode: email kodi talab qilinadimi, mailReady: email xizmati sozlanganmi }.
    *  Server javob bermasa — xavfsizroq standart (kod talab qilinadi). */
   signupConfig: async () => {
-    const fallback = { methods: { login: true, email: true, phone: true }, emailCode: true, phoneTelegram: false, tgBot: '', mailReady: true };
+    const fallback = { methods: { login: true, email: true, phone: true, telegram: false }, emailCode: true, phoneTelegram: false, tgBot: '', mailReady: true };
     try {
       const res = await callFunction('admin', { action: 'signup-config' });
       return {
-        methods: { login: res?.methods?.login !== false, email: res?.methods?.email !== false, phone: res?.methods?.phone !== false },
+        methods: {
+          login: res?.methods?.login !== false,
+          email: res?.methods?.email !== false,
+          phone: res?.methods?.phone !== false,
+          telegram: !!res?.methods?.telegram, // Telegram bot orqali (bepul) — standart o'chiq
+        },
         emailCode: res?.emailCode !== false,
         phoneTelegram: !!res?.phoneTelegram,
         tgBot: res?.tgBot || '',
@@ -265,9 +273,19 @@ export const api = {
     }
   },
 
-  /** Telegram orqali telefon tasdiqlashni boshlaydi: bot havolasi va so'rov tokenini qaytaradi.
+  /** Telegram orqali telefon tasdiqlashni boshlaydi: so'rov tokeni va bot havolasini qaytaradi.
+   *  Raqam avval botda tasdiqlangan bo'lsa — kod Telegramga DARHOL yuboriladi (`direct: true`), havola faqat botni ochish uchun.
    *  purpose: 'register' | 'phone-change' (profilda raqamni almashtirish — kirgan foydalanuvchi). */
   tgStart: ({ phone, purpose = 'register' }) => callFunction('admin', { action: 'tg-start', phone, purpose }),
+
+  /** Telegram bot orqali ro'yxatdan o'tishni boshlaydi (raqam yozilmaydi — botda kontakt ulashiladi). → { token, link, bot } */
+  tgRegisterStart: () => callFunction('admin', { action: 'tg-start', purpose: 'register-tg' }),
+
+  /** Bot kontaktni qabul qilganini so'rab turadi. → { status: 'pending' | 'await_contact' | 'verified' | 'expired', phone (maskalangan) } */
+  tgStatus: (token) => callFunction('admin', { action: 'tg-status', token }),
+
+  /** Parolni Telegram orqali tiklash: kod raqam bog'langan Telegram chatiga yuboriladi. → { token } */
+  tgResetStart: (phone) => callFunction('admin', { action: 'tg-reset-start', phone }),
 
   /** Emailga 6 xonali tasdiqlash kodini yuboradi. purpose: 'register' | 'reset' | 'change-email' */
   sendEmailCode: (email, purpose) => callFunction('admin', { action: 'send-email-code', email: String(email || '').trim().toLowerCase(), purpose }),
@@ -341,6 +359,11 @@ export const api = {
   resetPasswordWithCode: async ({ email, code, password }) => {
     if (String(password || '').length < 6) throw E("Parol kamida 6 belgidan iborat bo'lishi kerak");
     return callFunction('admin', { action: 'reset-with-code', email: String(email || '').trim().toLowerCase(), code, password });
+  },
+
+  resetPasswordWithTelegram: async ({ phone, token, code, password }) => {
+    if (String(password || '').length < 6) throw E("Parol kamida 6 belgidan iborat bo'lishi kerak");
+    return callFunction('admin', { action: 'reset-with-code', phone, tgToken: token, code, password });
   },
 
   updatePassword: async (password) => {
@@ -462,7 +485,6 @@ export const api = {
     const cleanTitle = String(title || '').trim().slice(0, 300);
     if (!cleanTitle) throw E('Sarlavha kerak');
     const user = await currentUser();
-    const { data: prof } = await supabase.from('profiles').select('username').eq('id', user.id).single();
 
     let storagePath = null;
     let fileUrl = null;
@@ -514,7 +536,7 @@ export const api = {
         position,
         is_published: isPublished,
         created_by: user.id,
-        uploaded_by: prof?.username || null,
+        uploaded_by: null, // yuklovchining login'i saqlanmaydi — admin va super admin ma'lumotlari hech kimga ko'rinmasligi uchun
       })
       .select('*')
       .single();
@@ -576,8 +598,8 @@ export const api = {
   createUser: (payload) => callFunction('admin', { action: 'create-user', ...payload }),
   deleteUser: (id) => callFunction('admin', { action: 'delete-user', id }),
   setRole: (id, role) => callFunction('admin', { action: 'set-role', id, role }),
-  /** Adminning yuklash ruxsatlari: uploadKinds — ruxsat berilgan material turlari (faqat super admin). */
-  setPermissions: (id, uploadKinds) => callFunction('admin', { action: 'set-permissions', id, uploadKinds }),
+  /** Adminning ruxsatlari (faqat super admin): patch = { uploadKinds?: ruxsat berilgan material turlari, permissions?: funksiya ruxsatlari }. */
+  setPermissions: (id, patch) => callFunction('admin', { action: 'set-permissions', id, ...patch }),
   resetUserPassword: (id, password) => callFunction('admin', { action: 'reset-password', id, password }),
   blockUser: (id, blocked) => callFunction('admin', { action: 'block-user', id, blocked }),
 

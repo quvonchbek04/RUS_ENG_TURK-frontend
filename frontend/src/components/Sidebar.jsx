@@ -5,6 +5,7 @@ import { api } from '../lib/api.js';
 import { useCurrentLang, useTheme } from '../lib/hooks.js';
 import { MEDIA_META, MEDIA_ORDER } from '../lib/media.js';
 import { isAdminRole, getStreak } from '../lib/lessonProgress.js';
+import { can } from '../lib/roles.js';
 import { t } from '../i18n/index.js';
 import { LanguageSwitcher } from '../i18n/react.jsx';
 import { LANG_OPTIONS } from './ui.jsx';
@@ -170,14 +171,19 @@ export default function Sidebar({ collapsed = false, onToggleCollapse, onNavigat
           <>
             <SectionLabel collapsed={collapsed}>{t('Boshqaruv')}</SectionLabel>
             <NavRow icon="👑" label={t('Admin panel')} to="/admin" active={is('/admin') && (!adminTab || adminTab === 'home')} collapsed={collapsed} />
+            {can(user, 'users_view') && (
+              <NavRow icon="👥" label={t('Foydalanuvchilar')} to="/admin?tab=users" active={is('/admin') && adminTab === 'users'} collapsed={collapsed} />
+            )}
             {isSuper && (
               <>
-                <NavRow icon="👥" label={t('Foydalanuvchilar')} to="/admin?tab=users" active={is('/admin') && adminTab === 'users'} collapsed={collapsed} />
                 <NavRow icon="🔐" label={t('Adminlar ruxsatlari')} to="/admin?tab=perms" active={is('/admin') && adminTab === 'perms'} collapsed={collapsed} />
                 <NavRow icon="🛡️" label={t("Ro'yxatdan o'tish")} to="/admin?tab=signup" active={is('/admin') && adminTab === 'signup'} collapsed={collapsed} />
               </>
             )}
-            <NavRow icon="🔑" label={t('AI va API kalitlar')} to="/admin?tab=ai" active={is('/admin') && adminTab === 'ai'} collapsed={collapsed} />
+            {can(user, 'ai_view') && (
+              <NavRow icon="🔑" label={t('AI va API kalitlar')} to="/admin?tab=ai" active={is('/admin') && adminTab === 'ai'} collapsed={collapsed} />
+            )}
+            {!isSuper && <NavRow icon="🔐" label={t('Mening ruxsatlarim')} to="/profile#perms" active={false} collapsed={collapsed} />}
           </>
         )}
       </nav>

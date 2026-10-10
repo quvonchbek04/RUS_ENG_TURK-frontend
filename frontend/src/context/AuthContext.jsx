@@ -26,11 +26,13 @@ export function AuthProvider({ children }) {
       /* e'tiborsiz */
     }
     // ?role=admin — oddiy admin ko'rinishini tekshirish uchun (faqat dev demo rejimida);
-    // ?kinds=news,audio — shu admin faqat shu turlarni yuklay oladi (bo'lmasa — hammasi)
+    // ?kinds=news,audio — shu admin faqat shu turlarni yuklay oladi (bo'lmasa — hammasi);
+    // ?perms=users_view,ai_view — shu admin faqat shu funksiya ruxsatlariga ega (bo'lmasa — ko'rish ruxsatlari)
     const q = new URLSearchParams(window.location.search);
     const role = q.get('role') === 'admin' ? 'admin' : 'superadmin';
     const uploadKinds = q.has('kinds') ? q.get('kinds').split(',').filter(Boolean) : ['audio', 'video', 'image', 'text', 'dialog', 'vocab', 'news'];
-    setUser({ id: 'demo', username: 'demo', displayName: 'Demo foydalanuvchi', role, uploadKinds, createdAt: new Date().toISOString() });
+    const permissions = q.has('perms') ? q.get('perms').split(',').filter(Boolean) : ['ai_view', 'mail_view', 'stats_view'];
+    setUser({ id: 'demo', username: 'demo', displayName: 'Demo foydalanuvchi', role, uploadKinds, permissions, createdAt: new Date().toISOString() });
     setProgress(saved);
     setBooting(false);
   }, [demo]);

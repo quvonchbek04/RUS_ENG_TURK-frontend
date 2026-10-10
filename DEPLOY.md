@@ -13,9 +13,10 @@ Taxminiy vaqt: 20–30 daqiqa. Kerak bo'ladi: GitHub, Netlify va Supabase hisobl
    AI sozlamalari va **super admin** (login `quvonchbek`, parol `admin123`).
    > Avvalgi versiya o'rnatilgan bo'lsa — faqat `supabase/migrations/0004_seed_superadmin.sql`,
    > `0005_v2_platform.sql`, `0006_email_phone_login.sql`, `0007_email_codes.sql`,
-   > `0008_users_super_only.sql`, `0009_admin_permissions.sql` va `0010_signup_methods_telegram.sql` ni
-   > ketma-ket ishga tushirish kifoya (eski ma'lumotlar saqlanadi, kutubxona va lug'at to'plamlari yangi
-   > "Materiallar" bo'limiga avtomatik ko'chiriladi; mavjud adminlarga hamma bo'limga yuklash ruxsati beriladi).
+   > `0008_users_super_only.sql`, `0009_admin_permissions.sql`, `0010_signup_methods_telegram.sql` va
+   > `0011_admin_function_permissions.sql` ni ketma-ket ishga tushirish kifoya (eski ma'lumotlar saqlanadi,
+   > kutubxona va lug'at to'plamlari yangi "Materiallar" bo'limiga avtomatik ko'chiriladi; mavjud adminlarga
+   > hamma bo'limga yuklash ruxsati va "faqat ko'rish" funksiya ruxsatlari — AI, email, statistika — beriladi).
    > Shundan keyin **`admin` va `ai` funksiyalarini yangi kod bilan qayta joylang** (1.5-band).
 3. **Authentication → Sign In / Providers:**
    - **Email provider** — yoqilgan bo'lsin; **Confirm email** — **O'CHIRING** (tasdiqlash kodini Supabase emas,
@@ -84,30 +85,48 @@ git push -u origin main
    - 👤 **Oddiy: ism + login + parol** — email ham, telefon ham kerak emas, tasdiqlash yo'q (parolni faqat admin tiklaydi);
    - 📧 **Email bilan** — *tasdiqlash kodi bilan* (tavsiya; Email xizmati kerak) yoki *kodsiz* (email shunchaki saqlanadi,
      Email xizmati kerak emas — Brevo tayyor bo'lmaguncha vaqtincha qulay, lekin birovning emailini yozish mumkin);
-   - 📱 **Telefon bilan** — *kodsiz* yoki **Telegram bot orqali tasdiqlash** (pastdagi qadamlarga qarang).
+   - 📱 **Telefon bilan** — *kodsiz* yoki **Telegram bot orqali tasdiqlash** (pastdagi qadamlarga qarang);
+   - ✈️ **Telegram bot orqali (bepul)** — telefon raqami yozilmaydi: foydalanuvchi ro'yxatdan o'tish sahifasining
+     **pastidagi** "✈️ Telegram bot orqali ro'yxatdan o'tish" tugmasini bosadi → bot ochiladi → *Start* → *Raqamni ulashish*;
+     sayt buni o'zi sezadi (kod yozish shart emas), keyin foydalanuvchi ism va parol kiritadi. Keyin telefon raqami + parol bilan kiradi.
    Kamida bitta usul yoqilgan bo'lishi shart. Forma faqat yoqilgan usullarni ko'rsatadi; server ham yopiq usulni qabul qilmaydi.
    Siz o'zingiz qo'shgan hisoblarga (Foydalanuvchilar bo'limi) bu qoidalar ta'sir qilmaydi.
    **Telegram botni ulash (bir marta):**
    1. Telegram'da **@BotFather** → `/newbot` → nom va username (oxiri `bot` bilan, masalan `til_sayohati_bot`) bering;
    2. BotFather bergan **tokenni** (`123456789:AAH…`) nusxalab, shu bo'limdagi "Telegram bot" maydoniga joylang → **Ulash**.
       Webhook avtomatik o'rnatiladi (qo'shimcha sozlash kerak emas; `admin` funksiyasi joylangan va JWT tekshiruvi o'chiq bo'lishi shart);
-   3. **Tekshirish** tugmasi bot va webhook ishlayotganini ko'rsatadi; keyin "Telefon raqami bilan" blokida
-      **"Telegram bot orqali tasdiqlash"** ni tanlang.
-   Qanday ishlaydi: foydalanuvchi raqamini kiritadi → "Telegramni ochish" → botda *Start* → *Raqamni ulashish* (bot
-   ulashilgan raqam o'sha foydalanuvchiniki va kiritilgan raqamga teng ekanini tekshiradi) → bot 6 xonali kod yuboradi →
-   foydalanuvchi kodni saytga kiritadi. Bepul. Foydalanuvchida Telegram bo'lishi kerak. Profilda raqamni almashtirish ham shu orqali tasdiqlanadi.
+   3. **Tekshirish** tugmasi bot va webhook ishlayotganini ko'rsatadi; keyin kerakli usulni yoqing: **"Telegram bot orqali
+      (bepul)"** qatorini yoki "Telefon raqami bilan" blokida **"Telegram bot orqali tasdiqlash"** ni.
+   Telefon tasdiqlash qanday ishlaydi: foydalanuvchi raqamini kiritadi → agar raqam botda **avval tasdiqlangan** bo'lsa, 6 xonali kod
+   **darhol Telegramga yuboriladi** (botni qayta ochish shart emas); aks holda "Telegramni ochish" → botda *Start* → *Raqamni
+   ulashish* (bot ulashilgan raqam o'sha foydalanuvchiniki va kiritilgan raqamga teng ekanini tekshiradi) → bot kod yuboradi →
+   foydalanuvchi kodni saytga kiritadi. Bepul. Foydalanuvchida Telegram bo'lishi kerak. Profilda raqamni almashtirish ham shu orqali
+   tasdiqlanadi. Parolni unutganda ham: "Parolni tiklash" sahifasida **✈️ Telegram** tanlanadi — kod raqam bog'langan Telegram chatiga keladi.
+   > ⚠️ Telegram qoidasi: bot foydalanuvchiga **birinchi bo'lib yoza olmaydi**. Shuning uchun har bir foydalanuvchi botni hech bo'lmaganda
+   > **bir marta** (sayt bergan havola orqali) ochishi shart; shundan keyin kodlar raqam yozilishi bilan Telegramga o'zi keladi.
+   > Botni oldindan ochmagan foydalanuvchi uchun raqam yozilgach bot havolasi ko'rsatiladi. Ro'yxatdan o'tish sahifasining pastida
+   > ham "🤖 Telegram botga o'tish" havolasi bor. (Telegram'ning pullik "Gateway" xizmati raqamga to'g'ridan-to'g'ri yozadi — bu loyihada ishlatilmagan.)
 6. **Admin panel → 👥 Foydalanuvchilar** (chap menyuda ham bor) — ro'yxat, qidiruv, rol berish, bloklash,
    parolni tiklash, o'chirish; "+ Foydalanuvchi / admin" orqali yangi o'quvchi yoki admin qo'shing
    (login yoki email + ixtiyoriy telefon + parol; admin qo'shgan foydalanuvchilarga kod yuborilmaydi).
-   > 🔒 **Bu bo'lim faqat super adminga ko'rinadi.** Oddiy admin foydalanuvchilar ro'yxatini, ularning
-   > email/telefonini va progressini ko'rmaydi, qo'sha/o'chira/bloklay olmaydi (server ham, ma'lumotlar bazasi
-   > ham ruxsat bermaydi). Oddiy admin faqat materiallar yuklaydi va AI/email holatini ko'radi.
+   > 🔒 **Bu bo'lim sukut bo'yicha faqat super adminga ko'rinadi.** Oddiy admin foydalanuvchilar ro'yxatini ko'rmaydi,
+   > qo'sha/o'chira/bloklay olmaydi — server ham, ma'lumotlar bazasi ham ruxsat bermaydi. Super admin
+   > "🔐 Ruxsatlar" bo'limida unga alohida funksiya ruxsatlarini berishi mumkin (keyingi band); u holda admin
+   > **faqat o'quvchilarni** ko'radi va boshqaradi. **Super admin va boshqa adminlar** ro'yxatda adminga umuman ko'rinmaydi.
    > Yangi admin tayinlash — Foydalanuvchilar bo'limida rolni "Admin" qilish (faqat super admin).
-7. **Admin panel → 🔐 Ruxsatlar** (chap menyuda ham bor, faqat super adminga) — har bir admin uchun qaysi bo'limlarda
-   (Yangiliklar, Musiqa, Video, Dialoglar, Lug'atlar, Matnlar, Rasmlar) material **yuklash, tahrirlash, o'chirish va
-   tartiblash** mumkinligini belgilaysiz: bo'limni bosib ruxsat berasiz/olib tashlaysiz, "Hammasi" / "Hech biri" tugmalari bor.
-   Yangi admin boshida hamma bo'limga ruxsat oladi — keyin cheklaysiz. Ruxsat berilmagan bo'limni admin faqat ko'ra oladi
-   (o'quvchi kabi). Cheklov server va baza darajasida ham majburlanadi.
+7. **Admin panel → 🔐 Ruxsatlar** (chap menyuda ham bor, faqat super adminga) — har bir admin uchun nimalarga ruxsati
+   borligini belgilaysiz:
+   - **📤 Material yuklash** — qaysi bo'limlarda (Yangiliklar, Musiqa, Video, Dialoglar, Lug'atlar, Matnlar, Rasmlar) material
+     yuklash, tahrirlash, o'chirish va tartiblash mumkin;
+   - **⚙️ Funksiyalar** — 👁️ o'quvchilarni ko'rish · ➕ o'quvchi qo'shish · ⛔ bloklash · 🔑 parolni tiklash · 🗑️ o'quvchini o'chirish ·
+     🤖 AI va API kalitlarni ko'rish · ✉️ Email xizmati holatini ko'rish · 📊 statistikani ko'rish.
+   Bo'limni/funksiyani bosib ruxsat berasiz yoki olib tashlaysiz; "Hammasi" / "Hech biri" tugmalari bor. Yangi admin boshida
+   hamma bo'limga yuklash va faqat ko'rish funksiyalarini (AI, email, statistika) oladi — keyin cheklaysiz yoki kengaytirasiz.
+   Ruxsat berilmagan narsani admin ko'ra olmaydi ham, bajara olmaydi ham (bo'lim yashiriladi, server va baza rad etadi).
+   **Adminlarni boshqarish, rol berish, ro'yxatdan o'tish usullari/Telegram bot, AI sozlamalari va API kalitlarni o'zgartirish,
+   email xizmatini sozlash — faqat super admin**, ruxsat berib bo'lmaydi.
+   Har bir admin o'z ruxsatlarini **Profil → 🔐 Mening ruxsatlarim** bo'limida (yoki chap menyudagi "Mening ruxsatlarim"
+   orqali) ko'radi: nimaga ruxsati bor (✓), nimaga yo'q (✕) va nimalar faqat super adminga tegishli.
 8. **Chap menyu → Materiallar** — musiqa, video, rasm, matn, dialog, lug'at va yangiliklarni yuklang
    (admin — faqat o'ziga ruxsat berilgan bo'limlarga).
 9. **Sayt tili:** foydalanuvchi o'zbek, rus, ingliz yoki turk tilini tanlashi mumkin — kirish sahifasi yuqorisida, chap menyu
@@ -143,7 +162,10 @@ node scripts/build-content.mjs
 | Ro'yxatdan o'tish sahifasida usullar yo'q / "ro'yxatdan o'tish yopiq" | Hech bir usul yoqilmagan: Admin panel → 🛡️ Ro'yxatdan o'tish |
 | Ro'yxatdan o'tish sozlamalari saqlanmayapti / Telegram ishlamayapti | `0010_signup_methods_telegram.sql` ishga tushirilmagan yoki `admin` funksiyasi yangilanmagan |
 | Admin yuklayotganda "ruxsatingiz yo'q" xabarini ko'ryapti | Super admin unga shu bo'limga ruxsat bermagan: Admin panel → 🔐 Ruxsatlar. Ruxsat berilgach admin sahifani yangilasin. `0009_admin_permissions.sql` ishga tushirilmagan bo'lsa, yuklash hamma uchun ishlamay qolishi mumkin |
-| Admin "Foydalanuvchilar bo'limi faqat super admin uchun" xabarini ko'ryapti | Bu to'g'ri ishlashi: foydalanuvchilar faqat super adminga ko'rinadi (`0008_users_super_only.sql`) |
+| Admin "Bu amal uchun ruxsatingiz yo'q" / "faqat super admin uchun" xabarini ko'ryapti | Bu to'g'ri ishlashi: admin faqat super admin bergan funksiyalardan foydalanadi (Admin panel → 🔐 Ruxsatlar → ⚙️ Funksiyalar). Ruxsat berilgach admin sahifani yangilasin (yoki Profil → "Mening ruxsatlarim" → ↻ Yangilash). `0011_admin_function_permissions.sql` ishga tushirilmagan bo'lsa, funksiya ruxsatlari ishlamaydi |
+| Telegram orqali ro'yxatdan o'tishda "ro'yxatdan o'tish tugmasi" ko'rinmayapti | Admin panel → 🛡️ Ro'yxatdan o'tish → "Telegram bot orqali (bepul)" yoqilmagan yoki bot ulanmagan; `0011_admin_function_permissions.sql` va `admin` funksiyasi yangilangan bo'lishi shart |
+| Telegram botda "Raqamni ulashish" bosildi, lekin sayt davom etmayapti | Sayt holatni har 2 soniyada so'raydi — sahifa ochiq qolsin; so'rov 10 daqiqada eskiradi ("↻ Qaytadan boshlash"). Tekshirish tugmasida webhook ulanganini ko'ring |
+| Raqam yozilganda kod Telegramga darhol kelmayapti | Raqam botda hali tasdiqlanmagan — foydalanuvchi bir marta botni havola orqali ochib, *Raqamni ulashish* ni bosishi kerak (Telegram bot birinchi bo'lib yoza olmaydi). Bot bloklangan bo'lsa ham shunday |
 | Telefon bilan kirib bo'lmayapti (email bilan esa kiradi) | `admin` funksiyasi joylanmagan yoki `0006_email_phone_login.sql` ishga tushirilmagan |
 | "Juda ko'p noto'g'ri urinish" | 15 daqiqada 10 marta noto'g'ri parol — 15 daqiqa kuting yoki admin parolni tiklasin |
 | Fayl yuklanmayapti, "bucket topilmadi" | `setup_full.sql` (yoki `0005_v2_platform.sql`) ishga tushirilmagan |
