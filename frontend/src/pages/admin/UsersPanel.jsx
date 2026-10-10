@@ -4,12 +4,13 @@ import { resultPct } from '../../components/PracticeResult.jsx';
 import { api } from '../../lib/api.js';
 import { countCompletedMonths, getStreak } from '../../lib/lessonProgress.js';
 import { formatPhone } from '../../lib/identity.js';
+import { ROLE_LABEL, can } from '../../lib/roles.js';
+import { t } from '../../i18n/index.js';
 
-export const ROLE_LABEL = { superadmin: 'Super admin', admin: 'Admin', user: "O'quvchi" };
 const ROLE_BADGE = { superadmin: 'badge-gold', admin: 'badge-pine', user: '' };
 
 const SORTS = [
-  ['new', 'Yangi qo\'shilganlar'],
+  ['new', "Yangi qo'shilganlar"],
   ['old', 'Eski'],
   ['name', 'Ism (A–Z)'],
   ['login', 'Oxirgi kirish'],
@@ -47,32 +48,34 @@ function UserDetail({ id, onClose }) {
   const p = d?.progress || {};
   const history = p.practiceHistory || [];
   return (
-    <Modal open onClose={onClose} title={d ? d.user.displayName || d.user.username : 'Foydalanuvchi'}>
+    <Modal open onClose={onClose} title={d ? d.user.displayName || d.user.username : t('Foydalanuvchi')}>
       {error && <div className="alert alert-error">{error}</div>}
       {!d && !error && <div className="skeleton h-40" />}
       {d && (
         <div>
           <div className="card-soft p-3.5 mb-4 text-sm space-y-1" style={{ color: 'var(--ink)' }}>
-            <div>🔑 Login: <b className="font-mono">{d.user.username}</b></div>
+            <div>
+              🔑 {t('Login:')} <b className="font-mono">{d.user.username}</b>
+            </div>
             {d.user.email && <div>📧 {d.user.email}</div>}
             {d.user.phone && <div>📱 {formatPhone(d.user.phone)}</div>}
             <div>
-              👤 {ROLE_LABEL[d.user.role]} · ro'yxatdan o'tgan: {formatDate(d.user.createdAt)}
-              {d.user.isBlocked && <span className="badge badge-brick ml-2">Bloklangan</span>}
+              👤 {t("{role} · ro'yxatdan o'tgan: {date}", { role: ROLE_LABEL[d.user.role], date: formatDate(d.user.createdAt) })}
+              {d.user.isBlocked && <span className="badge badge-brick ml-2">{t('Bloklangan')}</span>}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2.5 mb-4">
             <StatCard icon="⭐" label="XP" value={p.xpTotal || 0} tone="gold" />
-            <StatCard icon="🔥" label="Seriya" value={getStreak(p)} tone="brick" />
-            <StatCard icon="✅" label="Darslar" value={countCompletedMonths(p)} />
-            <StatCard icon="🤖" label="Bugun AI" value={d.aiUsedToday} tone="sky" />
+            <StatCard icon="🔥" label={t('Seriya')} value={getStreak(p)} tone="brick" />
+            <StatCard icon="✅" label={t('Darslar')} value={countCompletedMonths(p)} />
+            <StatCard icon="🤖" label={t('Bugun AI')} value={d.aiUsedToday} tone="sky" />
           </div>
           <div className="text-sm mb-2" style={{ color: 'var(--ink)' }}>
-            Tillar bo'yicha: {['en', 'ru', 'tr'].map((l) => `${LANG_BY_KEY[l].flag} ${countCompletedMonths(p, l)} dars`).join(' · ')}
+            {t("Tillar bo'yicha:")} {['en', 'ru', 'tr'].map((l) => `${LANG_BY_KEY[l].flag} ${t('{n} dars', { n: countCompletedMonths(p, l) })}`).join(' · ')}
           </div>
-          <div className="label mt-4">Oxirgi mashqlar</div>
+          <div className="label mt-4">{t('Oxirgi mashqlar')}</div>
           {history.length === 0 ? (
-            <div className="text-sm muted">Mashq bajarilmagan.</div>
+            <div className="text-sm muted">{t('Mashq bajarilmagan.')}</div>
           ) : (
             <div className="space-y-1.5">
               {history.slice(0, 8).map((r) => (
@@ -87,16 +90,22 @@ function UserDetail({ id, onClose }) {
               ))}
             </div>
           )}
-          <div className="text-xs faint mt-4">Progress yangilangan: {formatDateTime(d.progressUpdatedAt)}</div>
+          <div className="text-xs faint mt-4">{t('Progress yangilangan: {date}', { date: formatDateTime(d.progressUpdatedAt) })}</div>
         </div>
       )}
     </Modal>
   );
 }
 
-/** Admin panel → "Foydalanuvchilar" oynasi: ro'yxat, qidiruv, saralash, qo'shish va boshqarish. */
+/** Admin panel → "Foydalanuvchilar" oynasi: ro'yxat, qidiruv, saralash, qo'shish va boshqarish.
+ *  Super admin hammani boshqaradi. Oddiy admin faqat o'quvchilarni ko'radi va faqat super admin bergan ruxsatlar doirasida
+ *  boshqaradi (qo'shish / bloklash / parol / o'chirish); adminlar va super admin unga umuman ko'rinmaydi. */
 export default function UsersPanel({ me, openForm = false }) {
   const isSuper = me.role === 'superadmin';
+  const mayAdd = can(me, 'users_add');
+  const mayReset = can(me, 'users_reset');
+  const mayBlock = can(me, 'users_block');
+  const mayDelete = can(me, 'users_delete');
   const [users, setUsers] = useState(null);
   const [limited, setLimited] = useState(false);
   const [error, setError] = useState('');
@@ -128,16 +137,15 @@ export default function UsersPanel({ me, openForm = false }) {
     const q = query.trim().toLowerCase();
     const list = (users || []).filter(
       (u) =>
-        (roleFilter === 'all' ||
-          (roleFilter === 'staff' ? u.role !== 'user' : roleFilter === 'blocked' ? u.isBlocked : u.role === roleFilter)) &&
+        (roleFilter === 'all' || (roleFilter === 'staff' ? u.role !== 'user' : roleFilter === 'blocked' ? u.isBlocked : u.role === roleFilter)) &&
         (!q || [u.displayName, u.username, u.email, u.phone].some((x) => String(x || '').toLowerCase().includes(q)))
     );
-    const t = (d) => (d ? new Date(d).getTime() : 0);
+    const ts = (d) => (d ? new Date(d).getTime() : 0);
     const sorters = {
-      new: (a, b) => t(b.createdAt) - t(a.createdAt),
-      old: (a, b) => t(a.createdAt) - t(b.createdAt),
+      new: (a, b) => ts(b.createdAt) - ts(a.createdAt),
+      old: (a, b) => ts(a.createdAt) - ts(b.createdAt),
       name: (a, b) => String(a.displayName || a.username).localeCompare(String(b.displayName || b.username), 'uz'),
-      login: (a, b) => t(b.lastSignInAt || b.lastSeenAt) - t(a.lastSignInAt || a.lastSeenAt),
+      login: (a, b) => ts(b.lastSignInAt || b.lastSeenAt) - ts(a.lastSignInAt || a.lastSeenAt),
     };
     return [...list].sort(sorters[sort]);
   }, [users, query, roleFilter, sort]);
@@ -166,8 +174,11 @@ export default function UsersPanel({ me, openForm = false }) {
       setUsers((prev) => [...(prev || []), user]);
       const ways = [user.email || (form.identifier.includes('@') ? form.identifier : null), user.phone ? formatPhone(user.phone) : null, user.username]
         .filter(Boolean)
-        .join(' yoki ');
-      setNotice(`✅ "${user.displayName || user.username}" qo'shildi (${ROLE_LABEL[user.role]}). Kirish: ${ways} + parol`);
+        .join(t(' yoki '));
+      setNotice(
+        t('✅ "{name}" qo\'shildi ({role}). Kirish: {ways} + parol', { name: user.displayName || user.username, role: ROLE_LABEL[user.role], ways }) +
+          (user.role === 'admin' ? ' ' + t('Ruxsatlari: hamma bo\'limga yuklash va faqat ko\'rish funksiyalari (AI, email, statistika) — "🔐 Ruxsatlar" bo\'limida o\'zgartiring.') : '')
+      );
       setForm({ identifier: '', phone: '+998 ', password: '', displayName: '', role: 'user' });
       setShowForm(false);
     } catch (err) {
@@ -188,55 +199,67 @@ export default function UsersPanel({ me, openForm = false }) {
   };
 
   function Actions({ u }) {
-    if (!canManage(u)) return <span className="text-xs faint">—</span>;
+    if (!canManage(u) || !(isSuper || mayReset || mayBlock || mayDelete)) return <span className="text-xs faint">—</span>;
+    const name = u.displayName || u.username;
     return (
       <div className="flex flex-nowrap gap-1.5 justify-end">
         {isSuper && (
           <button
             type="button"
             className="btn btn-ghost btn-sm"
-            title={u.role === 'admin' ? "Oddiy o'quvchiga aylantirish" : 'Admin qilish'}
+            title={u.role === 'admin' ? t("Oddiy o'quvchiga aylantirish") : t('Admin qilish')}
             onClick={() => {
               const role = u.role === 'admin' ? 'user' : 'admin';
-              if (confirm(`"${u.displayName || u.username}" ${role === 'admin' ? 'ADMIN qilinsinmi' : "oddiy o'quvchiga aylantirilsinmi"}?`)) {
-                act(() => api.setRole(u.id, role), "Rol o'zgartirildi");
+              if (confirm(role === 'admin' ? t('"{name}" ADMIN qilinsinmi?', { name }) : t('"{name}" oddiy o\'quvchiga aylantirilsinmi?', { name }))) {
+                act(
+                  () => api.setRole(u.id, role),
+                  role === 'admin'
+                    ? t('Admin qilindi. Hozircha hamma bo\'limga yuklash va faqat ko\'rish funksiyalari berilgan — "🔐 Ruxsatlar" bo\'limida cheklashingiz yoki kengaytirishingiz mumkin.')
+                    : t("O'quvchiga aylantirildi (ruxsatlari olib tashlandi)")
+                );
               }
             }}
           >
-            {u.role === 'admin' ? '⬇' : '⬆'} <span className="hidden xl:inline">{u.role === 'admin' ? "O'quvchi" : 'Admin'}</span>
+            {u.role === 'admin' ? '⬇' : '⬆'} <span className="hidden xl:inline">{u.role === 'admin' ? t("O'quvchi") : t('Admin')}</span>
           </button>
         )}
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm"
-          title="Parolni tiklash"
-          onClick={() => {
-            const pw = prompt(`"${u.displayName || u.username}" uchun yangi parol (kamida 6 belgi):`);
-            if (pw) act(() => api.resetUserPassword(u.id, pw), `Parol yangilandi: ${pw}`);
-          }}
-        >
-          🔑
-        </button>
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm"
-          title={u.isBlocked ? 'Blokdan chiqarish' : 'Bloklash'}
-          onClick={() => act(() => api.blockUser(u.id, !u.isBlocked), u.isBlocked ? 'Blok olib tashlandi' : 'Foydalanuvchi bloklandi')}
-        >
-          {u.isBlocked ? '🔓' : '⛔'}
-        </button>
-        <button
-          type="button"
-          className="btn btn-danger btn-sm"
-          title="O'chirish"
-          onClick={() => {
-            if (confirm(`"${u.displayName || u.username}" butunlay o'chirilsinmi? Uning barcha progressi ham o'chadi.`)) {
-              act(() => api.deleteUser(u.id), "Foydalanuvchi o'chirildi");
-            }
-          }}
-        >
-          🗑
-        </button>
+        {mayReset && (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            title={t('Parolni tiklash')}
+            onClick={() => {
+              const pw = prompt(t('"{name}" uchun yangi parol (kamida 6 belgi):', { name }));
+              if (pw) act(() => api.resetUserPassword(u.id, pw), t('Parol yangilandi: {pw}', { pw }));
+            }}
+          >
+            🔑
+          </button>
+        )}
+        {mayBlock && (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            title={u.isBlocked ? t('Blokdan chiqarish') : t('Bloklash')}
+            onClick={() => act(() => api.blockUser(u.id, !u.isBlocked), u.isBlocked ? t('Blok olib tashlandi') : t('Foydalanuvchi bloklandi'))}
+          >
+            {u.isBlocked ? '🔓' : '⛔'}
+          </button>
+        )}
+        {mayDelete && (
+          <button
+            type="button"
+            className="btn btn-danger btn-sm"
+            title={t("O'chirish")}
+            onClick={() => {
+              if (confirm(t('"{name}" butunlay o\'chirilsinmi? Uning barcha progressi ham o\'chadi.', { name }))) {
+                act(() => api.deleteUser(u.id), t("Foydalanuvchi o'chirildi"));
+              }
+            }}
+          >
+            🗑
+          </button>
+        )}
       </div>
     );
   }
@@ -245,69 +268,69 @@ export default function UsersPanel({ me, openForm = false }) {
     <div>
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="flex-1 min-w-[200px]">
-          <div className="h2">👥 Foydalanuvchilar ro'yxati</div>
+          <div className="h2">{t("👥 Foydalanuvchilar ro'yxati")}</div>
           <div className="text-sm muted">
-            Jami {counts.all} · o'quvchilar {counts.user} · adminlar {counts.staff} · bugun faol {counts.today}
-            {counts.blocked ? ` · bloklangan ${counts.blocked}` : ''}
+            {isSuper ? t("Jami {all} · o'quvchilar {user} · adminlar {staff} · bugun faol {today}", counts) : t("O'quvchilar {user} · bugun faol {today}", counts)}
+            {counts.blocked ? t(' · bloklangan {n}', { n: counts.blocked }) : ''}
           </div>
         </div>
-        <button type="button" className="btn btn-ghost" onClick={refresh} disabled={loading} title="Yangilash">
-          {loading ? <span className="spinner" /> : '↻'} Yangilash
+        <button type="button" className="btn btn-ghost" onClick={refresh} disabled={loading} title={t('Yangilash')}>
+          {loading ? <span className="spinner" /> : '↻'} {t('Yangilash')}
         </button>
-        <button type="button" className="btn btn-gold" onClick={() => setShowForm((v) => !v)}>
-          {showForm ? 'Yopish' : isSuper ? '+ Foydalanuvchi / admin' : '+ Foydalanuvchi'}
-        </button>
+        {mayAdd && (
+          <button type="button" className="btn btn-gold" onClick={() => setShowForm((v) => !v)}>
+            {showForm ? t('Yopish') : isSuper ? t('+ Foydalanuvchi / admin') : t('+ Foydalanuvchi')}
+          </button>
+        )}
       </div>
 
-      {limited && (
-        <div className="alert alert-warn mb-4 text-sm">
-          ⚠️ "admin" Edge Function'ga ulanib bo'lmadi — faqat ro'yxat ko'rsatilmoqda. Qo'shish/o'chirish uchun funksiyani joylang (DEPLOY.md).
-        </div>
-      )}
+      {limited && <div className="alert alert-warn mb-4 text-sm">{t('⚠️ "admin" Edge Function\'ga ulanib bo\'lmadi — faqat ro\'yxat ko\'rsatilmoqda. Qo\'shish/o\'chirish uchun funksiyani joylang (DEPLOY.md).')}</div>}
 
-      {showForm && (
+      {showForm && mayAdd && (
         <form onSubmit={onCreate} className="card p-4 sm:p-5 mb-5 anim-rise">
           <div className="font-bold mb-1" style={{ color: 'var(--ink)' }}>
-            Yangi {form.role === 'admin' ? 'admin' : "o'quvchi"} qo'shish
+            {form.role === 'admin' ? t("Yangi admin qo'shish") : t("Yangi o'quvchi qo'shish")}
           </div>
-          <p className="text-xs muted mb-3">Login yoki email + ixtiyoriy telefon. Ikkalasi kiritilsa, foydalanuvchi istalgani bilan kira oladi.</p>
+          <p className="text-xs muted mb-3">{t('Login yoki email + ixtiyoriy telefon. Ikkalasi kiritilsa, foydalanuvchi istalgani bilan kira oladi.')}</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <label className="field">
-              <span className="label">Login yoki email</span>
-              <input className="input" value={form.identifier} onChange={(e) => setForm((f) => ({ ...f, identifier: e.target.value }))} placeholder="ali123 yoki ali@mail.uz" required />
+              <span className="label">{t('Login yoki email')}</span>
+              <input className="input" value={form.identifier} onChange={(e) => setForm((f) => ({ ...f, identifier: e.target.value }))} placeholder="ali123 / ali@mail.uz" required />
             </label>
             <label className="field !mt-0">
-              <span className="label">Telefon (ixtiyoriy)</span>
+              <span className="label">{t('Telefon (ixtiyoriy)')}</span>
               <input className="input" type="tel" value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} placeholder="+998 90 123 45 67" />
             </label>
             <label className="field !mt-0">
-              <span className="label">Parol (min 6)</span>
+              <span className="label">{t('Parol (min 6)')}</span>
               <input className="input" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} minLength={6} required autoComplete="new-password" />
             </label>
             <label className="field !mt-0">
-              <span className="label">Ism</span>
-              <input className="input" value={form.displayName} onChange={(e) => setForm((f) => ({ ...f, displayName: e.target.value }))} placeholder="Ixtiyoriy" />
+              <span className="label">{t('Ism')}</span>
+              <input className="input" value={form.displayName} onChange={(e) => setForm((f) => ({ ...f, displayName: e.target.value }))} placeholder={t('Ixtiyoriy')} />
             </label>
-            <label className="field !mt-0">
-              <span className="label">Rol</span>
-              <select className="select" value={form.role} onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}>
-                <option value="user">O'quvchi</option>
-                {isSuper && <option value="admin">Admin</option>}
-              </select>
-            </label>
+            {isSuper && (
+              <label className="field !mt-0">
+                <span className="label">{t('Rol')}</span>
+                <select className="select" value={form.role} onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}>
+                  <option value="user">{t("O'quvchi")}</option>
+                  <option value="admin">{t('Admin')}</option>
+                </select>
+              </label>
+            )}
           </div>
           <button type="submit" className="btn btn-primary mt-4" disabled={creating}>
-            {creating ? <><span className="spinner" /> Qo'shilmoqda…</> : "+ Qo'shish"}
+            {creating ? <><span className="spinner" /> {t("Qo'shilmoqda…")}</> : t("+ Qo'shish")}
           </button>
         </form>
       )}
 
       <div className="card p-3 mb-4 flex flex-wrap items-center gap-2">
-        <input className="input flex-1 min-w-[200px]" placeholder="🔍 Ism, login, email yoki telefon…" value={query} onChange={(e) => setQuery(e.target.value)} />
-        <select className="select !w-auto" value={sort} onChange={(e) => setSort(e.target.value)} aria-label="Saralash">
+        <input className="input flex-1 min-w-[200px]" placeholder={t('🔍 Ism, login, email yoki telefon…')} value={query} onChange={(e) => setQuery(e.target.value)} />
+        <select className="select !w-auto" value={sort} onChange={(e) => setSort(e.target.value)} aria-label={t('Saralash')}>
           {SORTS.map(([k, l]) => (
             <option key={k} value={k}>
-              ↕ {l}
+              ↕ {t(l)}
             </option>
           ))}
         </select>
@@ -317,9 +340,11 @@ export default function UsersPanel({ me, openForm = false }) {
             ['user', "O'quvchilar"],
             ['staff', 'Adminlar'],
             ['blocked', 'Bloklanganlar'],
-          ].map(([k, l]) => (
+          ]
+            .filter(([k]) => isSuper || (k !== 'staff' && k !== 'user')) // oddiy admin faqat o'quvchilarni ko'radi — rol bo'yicha filtr kerak emas
+            .map(([k, l]) => (
             <button key={k} type="button" className={`chip ${roleFilter === k ? 'chip-active' : ''}`} onClick={() => setRoleFilter(k)}>
-              {l} · {counts[k]}
+              {t(l)} · {counts[k]}
             </button>
           ))}
         </div>
@@ -328,7 +353,7 @@ export default function UsersPanel({ me, openForm = false }) {
       {error && <div className="alert alert-error mb-4">{error}</div>}
       {notice && <div className="alert alert-success mb-4">{notice}</div>}
       {!users && !error && <div className="skeleton h-40" />}
-      {users && filtered.length === 0 && <EmptyState icon="👥" title="Foydalanuvchi topilmadi" text="Qidiruv yoki filtrni o'zgartirib ko'ring." />}
+      {users && filtered.length === 0 && <EmptyState icon="👥" title={t('Foydalanuvchi topilmadi')} text={t("Qidiruv yoki filtrni o'zgartirib ko'ring.")} />}
 
       {/* Kompyuter: jadval */}
       {filtered.length > 0 && (
@@ -336,24 +361,24 @@ export default function UsersPanel({ me, openForm = false }) {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-[11px] uppercase tracking-wider muted" style={{ background: 'var(--panel-2)' }}>
-                <th className="py-3 px-4 font-bold">Foydalanuvchi</th>
-                <th className="py-3 px-3 font-bold">Kirish (email / telefon)</th>
-                <th className="py-3 px-3 font-bold">Rol</th>
-                <th className="py-3 px-3 font-bold">Ro'yxatdan o'tgan</th>
-                <th className="py-3 px-3 font-bold">Oxirgi kirish</th>
-                <th className="py-3 px-4 font-bold text-right">Amallar</th>
+                <th className="py-3 px-4 font-bold">{t('Foydalanuvchi')}</th>
+                <th className="py-3 px-3 font-bold">{t('Kirish (email / telefon)')}</th>
+                <th className="py-3 px-3 font-bold">{t('Rol')}</th>
+                <th className="py-3 px-3 font-bold">{t("Ro'yxatdan o'tgan")}</th>
+                <th className="py-3 px-3 font-bold">{t('Oxirgi kirish')}</th>
+                <th className="py-3 px-4 font-bold text-right">{t('Amallar')}</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((u) => (
                 <tr key={u.id} className="border-t" style={{ borderColor: 'var(--line)', opacity: u.isBlocked ? 0.65 : 1 }}>
                   <td className="py-2.5 px-4">
-                    <button type="button" className="flex items-center gap-3 text-left" onClick={() => setDetailId(u.id)} title="Batafsil">
+                    <button type="button" className="flex items-center gap-3 text-left" onClick={() => setDetailId(u.id)} title={t('Batafsil')}>
                       <Avatar u={u} size={36} />
                       <span className="min-w-0">
                         <span className="block font-bold truncate max-w-[220px]" style={{ color: 'var(--ink)' }}>
                           {u.displayName || u.username}
-                          {u.id === me.id && <span className="text-xs muted font-normal"> (siz)</span>}
+                          {u.id === me.id && <span className="text-xs muted font-normal"> {t('(siz)')}</span>}
                         </span>
                         <span className="block text-xs faint font-mono">@{u.username}</span>
                       </span>
@@ -364,7 +389,7 @@ export default function UsersPanel({ me, openForm = false }) {
                   </td>
                   <td className="py-2.5 px-3">
                     <span className={`badge ${ROLE_BADGE[u.role]}`}>{ROLE_LABEL[u.role] || u.role}</span>
-                    {u.isBlocked && <span className="badge badge-brick ml-1">Bloklangan</span>}
+                    {u.isBlocked && <span className="badge badge-brick ml-1">{t('Bloklangan')}</span>}
                   </td>
                   <td className="py-2.5 px-3 muted whitespace-nowrap">{formatDate(u.createdAt)}</td>
                   <td className="py-2.5 px-3 muted whitespace-nowrap">{u.lastSignInAt || u.lastSeenAt ? formatDateTime(u.lastSignInAt || u.lastSeenAt) : '—'}</td>
@@ -387,7 +412,7 @@ export default function UsersPanel({ me, openForm = false }) {
               <div className="flex-1 min-w-0">
                 <div className="font-bold truncate" style={{ color: 'var(--ink)' }}>
                   {u.displayName || u.username}
-                  {u.id === me.id && <span className="text-xs muted font-normal"> (siz)</span>}
+                  {u.id === me.id && <span className="text-xs muted font-normal"> {t('(siz)')}</span>}
                 </div>
                 <Contacts u={u} />
               </div>
@@ -396,7 +421,7 @@ export default function UsersPanel({ me, openForm = false }) {
             <div className="flex items-center gap-2 mt-2.5 pt-2.5 border-t" style={{ borderColor: 'var(--line)' }}>
               <span className="text-[11px] faint flex-1">
                 {formatDate(u.createdAt)}
-                {u.isBlocked && <span className="badge badge-brick ml-1">Bloklangan</span>}
+                {u.isBlocked && <span className="badge badge-brick ml-1">{t('Bloklangan')}</span>}
               </span>
               <Actions u={u} />
             </div>
