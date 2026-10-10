@@ -1,0 +1,199 @@
+# 14. O'qish va ta'lim
+14.1|класс, занятие|Занятие начинается в девять.|sınıf, ders|Ders dokuzda başlıyor.
+14.2|урок|Сегодняшний урок лёгкий.|ders|Bugünkü ders kolay.
+14.3|предмет; тема|Мой любимый предмет — история.|ders, konu|En sevdiğim ders tarih.
+14.4|курс|Я прохожу курс английского языка.|kurs|Bir İngilizce kursuna gidiyorum.
+14.5|экзамен|Завтра у меня экзамен.|sınav|Yarın sınavım var.
+14.6|оценка|Она получила хорошую оценку.|not|İyi bir not aldı.
+14.7|отметка; знак|Он получил высокую оценку.|not; işaret|Yüksek bir not aldı.
+14.8|домашнее задание|Я делаю домашнее задание в пять.|ödev|Ödevimi saat beşte yaparım.
+14.9|вопрос|У меня есть вопрос.|soru|Bir sorum var.
+14.10|проблема|У нас проблема.|sorun|Bir sorunumuz var.
+14.11|решение|Я нашёл решение.|çözüm|Bir çözüm buldum.
+14.12|идея|Это хорошая идея.|fikir|Bu iyi bir fikir.
+14.13|пример|Приведи пример.|örnek|Bana bir örnek ver.
+14.14|правило|Соблюдай правило.|kural|Kurala uy.
+14.15|предложение|Напиши одно предложение.|cümle|Bir cümle yaz.
+14.16|слово|Я не знаю этого слова.|kelime|Bu kelimeyi bilmiyorum.
+14.17|буква, письмо|Напиши первую букву.|harf, mektup|İlk harfi yaz.
+14.18|алфавит|В алфавите много букв.|alfabe|Alfabede çok harf var.
+14.19|грамматика|Английская грамматика лёгкая.|dil bilgisi|İngilizce dil bilgisi kolay.
+14.20|словарный запас|Мне нужно больше слов.|kelime hazinesi|Daha fazla kelime bilgisine ihtiyacım var.
+14.21|словарь|Пользуйся словарём.|sözlük|Sözlük kullan.
+14.22|произношение|У неё чёткое произношение.|telaffuz|Telaffuzu net.
+14.23|акцент|У него сильный акцент.|aksan|Güçlü bir aksanı var.
+14.24|значение|Какое значение у этого слова?|anlam|Bu kelimenin anlamı ne?
+14.25|перевод|Перевод правильный.|çeviri|Çeviri doğru.
+14.26|язык|Английский — мировой язык.|dil|İngilizce küresel bir dildir.
+14.27|английский язык|Я учу английский каждый день.|İngilizce|Her gün İngilizce çalışırım.
+14.28|узбекский язык|Моя мама говорит по-узбекски.|Özbekçe|Annem Özbekçe konuşuyor.
+14.29|русский язык|Он изучает русский язык.|Rusça|Rusça öğreniyor.
+14.30|книга|Эта книга интересная.|kitap|Bu kitap ilginç.
+14.31|тетрадь|Я пишу в тетради.|defter|Defterime yazarım.
+14.32|ручка|Мне нужна ручка.|tükenmez kalem|Bir kaleme ihtiyacım var.
+14.33|карандаш|Используй карандаш.|kurşun kalem|Kurşun kalem kullan.
+14.34|бумага|Мне нужен лист бумаги.|kâğıt|Bir yaprak kâğıda ihtiyacım var.
+14.35|страница|Откройте десятую страницу.|sayfa|Onuncu sayfayı açın.
+14.36|доска|Учитель пишет на доске.|tahta|Öğretmen tahtaya yazıyor.
+14.37|мел|Мне нужно немного мела.|tebeşir|Biraz tebeşire ihtiyacım var.
+14.38|читательский билет|Я потерял читательский билет.|kütüphane kartı|Kütüphane kartımı kaybettim.
+14.39|учёная степень|У неё университетская степень.|diploma, derece|Üniversite diploması var.
+14.40|диплом|Он получил диплом в прошлом году.|diploma|Geçen yıl diplomasını aldı.
+14.41|сертификат|Я получил сертификат.|sertifika|Bir sertifika aldım.
+14.42|стипендия|Она выиграла стипендию.|burs|Burs kazandı.
+14.43|образование|Образование важно.|eğitim|Eğitim önemlidir.
+14.44|знание|Знание — сила.|bilgi|Bilgi güçtür.
+14.45|навык|Чтение — важный навык.|beceri|Okumak önemli bir beceridir.
+14.46|опыт|У него большой опыт.|deneyim|Çok deneyimi var.
+14.47|прогресс|Ты делаешь успехи.|ilerleme|İlerleme kaydediyorsun.
+14.48|ошибка|Я сделал ошибку.|hata|Bir hata yaptım.
+14.49|история|Я люблю историю.|tarih|Tarihi severim.
+14.50|география|География интересная.|coğrafya|Coğrafya ilginç.
+14.51|математика|Математика трудная.|matematik|Matematik zor.
+14.52|наука|Он любит науку.|bilim, fen|Fen bilimlerini sever.
+14.53|биология|Биология изучает жизнь.|biyoloji|Biyoloji yaşamla ilgilidir.
+14.54|химия|Химия — мой любимый предмет.|kimya|Kimya en sevdiğim ders.
+14.55|физика|Физика трудная.|fizik|Fizik zor.
+14.56|литература|Она изучает литературу.|edebiyat|Edebiyat okuyor.
+14.57|искусство|Я люблю современное искусство.|sanat|Modern sanatı severim.
+14.58|музыка|Она слушает музыку.|müzik|Müzik dinliyor.
+14.59|спорт|Футбол — мой любимый вид спорта.|spor|Futbol en sevdiğim spor.
+# 15. Ish va pul
+15.1|работа|Он нашёл новую работу.|iş|Yeni bir iş buldu.
+15.2|карьера|У неё отличная карьера.|kariyer|Harika bir kariyeri var.
+15.3|профессия|Преподавание — благородная профессия.|meslek|Öğretmenlik asil bir meslektir.
+15.4|компания|Он работает в большой компании.|şirket|Büyük bir şirkette çalışıyor.
+15.5|бизнес|У них небольшой бизнес.|iş, işletme|Küçük bir işletmeleri var.
+15.6|промышленность|Нефтяная промышленность большая.|sanayi|Petrol sanayisi büyük.
+15.7|торговля|Торговля помогает странам развиваться.|ticaret|Ticaret ülkelerin büyümesine yardım eder.
+15.8|зарплата|У него хорошая зарплата.|maaş|Maaşı iyi.
+15.9|заработная плата|Оплата низкая.|ücret|Ücret düşük.
+15.10|доход|У них высокий доход.|gelir|Gelirleri yüksek.
+15.11|прибыль|Магазин получил прибыль.|kâr|Dükkân kâr etti.
+15.12|убыток|У компании были убытки.|zarar|Şirket zarar etti.
+15.13|цена|Цена слишком высокая.|fiyat|Fiyat çok yüksek.
+15.14|деньги|У меня нет денег.|para|Hiç param yok.
+15.15|наличные|У меня только наличные.|nakit|Sadece nakit param var.
+15.16|монета|Я нашёл монету.|bozuk para|Bir bozuk para buldum.
+15.17|карта|Можно оплатить картой?|kart|Kartla ödeyebilir miyim?
+15.18|банковский счёт|Я открыл банковский счёт.|banka hesabı|Bir banka hesabı açtım.
+15.19|кредит|Он взял кредит.|kredi|Kredi çekti.
+15.20|долг|У него большой долг.|borç|Büyük bir borcu var.
+15.21|налог|Мы платим налог каждый год.|vergi|Her yıl vergi öderiz.
+15.22|бюджет|Наш бюджет небольшой.|bütçe|Bütçemiz küçük.
+15.23|сбережения|У меня есть немного сбережений.|birikim|Biraz birikimim var.
+15.24|инвестиция|Это было хорошее вложение.|yatırım|İyi bir yatırımdı.
+15.25|договор|Мы подписали договор.|sözleşme|Bir sözleşme imzaladık.
+15.26|совещание|Совещание начинается в десять.|toplantı|Toplantı onda başlıyor.
+15.27|собеседование|У меня собеседование на работу.|mülakat|Bir iş mülakatım var.
+15.28|заявление|Я отправил своё заявление.|başvuru|Başvurumu gönderdim.
+15.29|резюме|Пришли мне своё резюме.|özgeçmiş|Bana özgeçmişini gönder.
+15.30|проект|У нас новый проект.|proje|Yeni bir projemiz var.
+15.31|задача|Это лёгкая задача.|görev|Bu kolay bir görev.
+15.32|цель|Моя цель — выучить английский.|hedef; gol|Hedefim İngilizce öğrenmek.
+15.33|срок|Крайний срок — пятница.|son tarih|Son tarih cuma.
+15.34|документ|Пожалуйста, подпишите этот документ.|belge|Lütfen bu belgeyi imzalayın.
+15.35|файл|Я сохранил файл.|dosya|Dosyayı kaydettim.
+15.36|электронная почта|Я отправил тебе письмо по электронной почте.|e-posta|Sana bir e-posta gönderdim.
+15.37|сообщение|Я получил твоё сообщение.|mesaj|Mesajını aldım.
+15.38|посылка|Посылка пришла сегодня.|koli|Koli bugün geldi.
+15.39|заказ|Я хочу сделать заказ.|sipariş|Sipariş vermek istiyorum.
+15.40|доставка|Доставка занимает два дня.|teslimat|Teslimat iki gün sürüyor.
+15.41|обслуживание, услуга|Обслуживание очень хорошее.|hizmet|Hizmet çok iyi.
+15.42|продукт|Этот продукт популярен.|ürün|Bu ürün popüler.
+15.43|качество|Качество отличное.|kalite|Kalite mükemmel.
+15.44|служба поддержки клиентов|Позвоните в службу поддержки.|müşteri hizmetleri|Müşteri hizmetlerini arayın.
+15.45|реклама|Я видел рекламу по телевизору.|reklam|Televizyonda bir reklam gördüm.
+15.46|распродажа|Сегодня распродажа.|indirim satışı|Bugün indirim var.
+15.47|скидка|Они дают скидку.|indirim|İndirim yapıyorlar.
+15.48|бренд|Это известный бренд.|marka|Bu ünlü bir marka.
+15.49|продавец-консультант|Продавец мне помог.|satış görevlisi|Satış görevlisi bana yardım etti.
+15.50|кассир|Кассир дал мне чек.|kasiyer|Kasiyer bana fiş verdi.
+15.51|повышение зарплаты|Он попросил повышения зарплаты.|maaş artışı|Maaş artışı istedi.
+15.52|отпуск|Мы в отпуске.|tatil|Tatildeyiz.
+15.53|пенсия|На пенсию выходят в шестьдесят.|emeklilik|Emeklilik altmışta başlar.
+15.54|безработный|Сейчас он безработный.|işsiz|Şu an işsiz.
+15.55|сотрудник|У каждого сотрудника есть пропуск.|çalışan|Her çalışanın bir kartı var.
+15.56|работодатель|Работодатель добрый.|işveren|İşveren nazik.
+# 16. Texnologiya va media
+16.1|технология|Технологии быстро меняются.|teknoloji|Teknoloji hızla değişiyor.
+16.2|интернет|Я пользуюсь интернетом каждый день.|internet|Her gün internet kullanırım.
+16.3|веб-сайт|Посетите наш сайт.|web sitesi|Web sitemizi ziyaret edin.
+16.4|приложение|Я скачал новое приложение.|uygulama|Yeni bir uygulama indirdim.
+16.5|программа|Эта программа бесплатная.|program|Bu program ücretsiz.
+16.6|программное обеспечение|Нам нужно новое программное обеспечение.|yazılım|Yeni bir yazılıma ihtiyacımız var.
+16.7|экран|Экран разбит.|ekran|Ekran kırık.
+16.8|клавиатура|Клавиатура грязная.|klavye|Klavye kirli.
+16.9|мышь|Мне нужна новая мышка.|fare|Yeni bir fareye ihtiyacım var.
+16.10|ноутбук|Мой ноутбук новый.|dizüstü bilgisayar|Dizüstü bilgisayarım yeni.
+16.11|планшет|Она читает на планшете.|tablet|Tablette okuyor.
+16.12|камера|Камера дорогая.|kamera|Kamera pahalı.
+16.13|фотография|Это хорошая фотография.|fotoğraf|Bu güzel bir fotoğraf.
+16.14|видео|Мы посмотрели видео.|video|Bir video izledik.
+16.15|звук|Звук тихий.|ses|Ses düşük.
+16.16|песня|Мне нравится эта песня.|şarkı|Bu şarkıyı seviyorum.
+16.17|фильм|Вчера вечером мы смотрели фильм.|film|Dün akşam bir film izledik.
+16.18|сериал|Моя сестра обожает этот сериал.|dizi|Kız kardeşim bu diziye bayılıyor.
+16.19|новости|Я смотрю новости каждый вечер.|haberler|Her akşam haberleri izlerim.
+16.20|газета|Он читает газету.|gazete|Gazete okuyor.
+16.21|журнал|Она купила журнал.|dergi|Bir dergi aldı.
+16.22|канал|Переключи канал.|kanal|Kanalı değiştir.
+16.23|пароль|Я забыл пароль.|şifre|Şifremi unuttum.
+16.24|аккаунт, счёт|У меня есть онлайн-аккаунт.|hesap|Çevrimiçi bir hesabım var.
+16.25|сеть|Сеть медленная.|ağ|Ağ yavaş.
+16.26|сигнал|Здесь нет сигнала.|sinyal|Burada sinyal yok.
+16.27|соединение|Связь плохая.|bağlantı|Bağlantı kötü.
+16.28|данные|Данные сохранены.|veri|Veriler kaydedildi.
+16.29|информация|Мне нужно больше информации.|bilgi|Daha fazla bilgiye ihtiyacım var.
+16.30|ссылка|Нажми на ссылку.|bağlantı (link)|Bağlantıya tıkla.
+16.31|скачивать|Скачай файл.|indirmek|Dosyayı indir.
+16.32|загружать|Загрузи своё фото.|yüklemek|Fotoğrafını yükle.
+16.33|нажимать (кликать)|Нажми на кнопку.|tıklamak|Düğmeye tıkla.
+16.34|печатать (на клавиатуре)|Введи здесь своё имя.|yazmak (klavyede)|Adını buraya yaz.
+16.35|печатать (на принтере)|Распечатай эту страницу, пожалуйста.|yazdırmak|Lütfen bu sayfayı yazdır.
+16.36|копировать|Сделай копию этого документа.|kopyalamak|Bu kâğıdın bir kopyasını çıkar.
+16.37|удалять|Удали старый файл.|silmek|Eski dosyayı sil.
+# 17. Hissiyotlar va sifatlar (ot)
+17.1|радость|Дети прыгали от радости.|sevinç|Çocuklar sevinçten zıpladı.
+17.2|грусть|Я почувствовал грусть.|hüzün|Hüzün hissettim.
+17.3|гнев|Он закричал в гневе.|öfke|Öfkeyle bağırdı.
+17.4|мечта, сон|У меня большая мечта.|hayal, rüya|Büyük bir hayalim var.
+17.5|сюрприз, удивление|Это был приятный сюрприз.|sürpriz|Güzel bir sürprizdi.
+17.6|дружба|Дружба важна.|arkadaşlık|Arkadaşlık önemlidir.
+17.7|мир (покой)|Мы хотим мира.|barış|Barış istiyoruz.
+17.8|война|Война — это ужасно.|savaş|Savaş korkunçtur.
+17.9|свобода|Свобода бесценна.|özgürlük|Özgürlük çok değerlidir.
+17.10|справедливость|Мы хотим справедливости.|adalet|Adalet istiyoruz.
+17.11|правда|Скажи мне правду.|gerçek|Bana gerçeği söyle.
+17.12|ложь; лгать|Не лги.|yalan; yalan söylemek|Yalan söyleme.
+17.13|секрет|Это секрет.|sır|Bu bir sır.
+17.14|удача|Удачи!|şans|Bol şans!
+17.15|успех|Упорный труд ведёт к успеху.|başarı|Sıkı çalışma başarı getirir.
+17.16|неудача|Неудача — это урок.|başarısızlık|Başarısızlık bir derstir.
+17.17|риск|Это большой риск.|risk|Bu büyük bir risk.
+17.18|шанс|Дай мне шанс.|şans, fırsat|Bana bir şans ver.
+17.19|возможность|Это отличная возможность.|fırsat|Bu harika bir fırsat.
+17.20|выбор|У тебя есть выбор.|seçim|Bir seçimin var.
+17.21|решение|Это было трудное решение.|karar|Zor bir karardı.
+17.22|причина|В чём причина?|sebep|Sebebi ne?
+17.23|эффект|Лекарство не подействовало.|etki|İlacın hiçbir etkisi olmadı.
+17.24|цель|Какова цель этого визита?|amaç|Bu ziyaretin amacı ne?
+17.25|факт|Это факт.|gerçek, olgu|Bu bir gerçek.
+17.26|мнение|Я уважаю твоё мнение.|fikir|Fikrine saygı duyuyorum.
+17.27|совет|Спасибо за совет.|tavsiye|Tavsiye için teşekkürler.
+17.28|внимание|Будьте внимательны, пожалуйста.|dikkat|Lütfen dikkat edin.
+17.29|интерес|Он интересуется музыкой.|ilgi|Müziğe ilgisi var.
+17.30|привычка|Это плохая привычка.|alışkanlık|Bu kötü bir alışkanlık.
+17.31|традиция|Это семейная традиция.|gelenek|Bu bir aile geleneği.
+17.32|культура|Я люблю узбекскую культуру.|kültür|Özbek kültürünü seviyorum.
+17.33|религия|Религия важна для многих людей.|din|Din birçok insan için önemlidir.
+17.34|общество|Общество меняется.|toplum|Toplum değişiyor.
+17.35|закон|Все должны соблюдать закон.|yasa, kanun|Herkes yasalara uymalı.
+17.36|правительство|Правительство приняло новый закон.|hükümet|Hükümet yeni bir yasa çıkardı.
+17.37|политика|Он интересуется политикой.|siyaset|Siyasetle ilgileniyor.
+17.38|выборы|Выборы в следующем месяце.|seçim|Seçim gelecek ay.
+17.39|права|У каждого есть права.|haklar|Herkesin hakları vardır.
+17.40|долг, обязанность|Это мой долг.|görev|Bu benim görevim.
+17.41|преступление|Преступность — это проблема.|suç|Suç bir sorundur.
+17.42|тюрьма|Он в тюрьме.|hapishane|Hapiste.
+17.43|суд|Дело рассматривается в суде.|mahkeme|Dava mahkemede.

@@ -1,0 +1,226 @@
+# 8. Transport
+8.1|машина|У моего отца новая машина.|araba|Babamın yeni bir arabası var.
+8.2|автобус|Я езжу на работу на автобусе.|otobüs|İşe otobüsle giderim.
+8.3|самолёт|Самолёт приземляется в шесть.|uçak|Uçak altıda iniyor.
+8.4|такси|Давай возьмём такси.|taksi|Hadi taksiye binelim.
+8.5|велосипед|Я езжу в школу на велосипеде.|bisiklet|Okula bisikletle giderim.
+8.6|мотоцикл|Он ездит на мотоцикле.|motosiklet|Motosiklet kullanıyor.
+8.7|грузовик|Грузовик везёт фрукты.|kamyon|Kamyon meyve taşıyor.
+8.8|корабль|Корабль очень большой.|gemi|Gemi çok büyük.
+8.9|лодка|Мы пересекли озеро на лодке.|tekne, kayık|Gölü tekneyle geçtik.
+8.10|метро|Я езжу на работу на метро.|metro|İşe metroyla giderim.
+8.11|трамвай|Трамвай останавливается здесь.|tramvay|Tramvay burada duruyor.
+8.12|билет|Мне нужен билет до Самарканда.|bilet|Semerkant'a bir bilete ihtiyacım var.
+8.13|паспорт|Не забудь свой паспорт.|pasaport|Pasaportunu unutma.
+8.14|виза|Чтобы поехать туда, мне нужна виза.|vize|Oraya gitmek için vizeye ihtiyacım var.
+8.15|багаж|Мой багаж тяжёлый.|bagaj|Bagajım ağır.
+8.16|чемодан|Она собрала чемодан.|bavul|Bavulunu topladı.
+8.17|рейс, полёт|Полёт длится два часа.|uçuş|Uçuş iki saat sürüyor.
+8.18|поездка, путь|Путь был долгим.|yolculuk|Yolculuk uzundu.
+8.19|поездка|Мы съездили в горы.|gezi|Dağlara bir geziye gittik.
+8.20|экскурсия|Мы совершили экскурсию по старому городу.|tur|Eski şehirde bir tura katıldık.
+8.21|дорожное движение, пробки|Сегодня сильные пробки.|trafik|Bugün trafik çok yoğun.
+8.22|скорость|Здесь снизьте скорость.|hız|Burada hızınızı düşürün.
+8.23|двигатель|Двигатель очень громкий.|motor|Motor çok gürültülü.
+8.24|колесо|У машины спустило колесо.|tekerlek|Arabanın tekerleği patlak.
+8.25|шина|Мне нужна новая шина.|lastik|Yeni bir lastiğe ihtiyacım var.
+8.26|топливо|Машине нужно топливо.|yakıt|Arabanın yakıta ihtiyacı var.
+8.27|бензин|Здесь бензин дешёвый.|benzin|Burada benzin ucuz.
+8.28|права, лицензия|У него есть водительские права.|ehliyet, lisans|Ehliyeti var.
+8.29|авария|На дороге произошла авария.|kaza|Yolda bir kaza oldu.
+8.30|место (сиденье)|Это место свободно?|koltuk|Bu koltuk boş mu?
+8.31|платформа|Поезд отправляется со второй платформы.|peron|Tren ikinci perondan kalkıyor.
+8.32|прибытие|Время прибытия — шесть часов.|varış|Varış saati altı.
+8.33|отправление|Отправление в полдень.|kalkış|Kalkış öğlende.
+8.34|бронь|У меня забронировано на двоих.|rezervasyon|İki kişilik rezervasyonum var.
+# 9. Tabiat va ob-havo
+9.1|природа|Я люблю природу.|doğa|Doğayı seviyorum.
+9.2|мир|Он хочет увидеть мир.|dünya|Dünyayı görmek istiyor.
+9.3|земля|Земля круглая.|yeryüzü, dünya|Dünya yuvarlaktır.
+9.4|небо|Сегодня небо голубое.|gökyüzü|Bugün gökyüzü mavi.
+9.5|солнце|Солнце горячее.|güneş|Güneş sıcak.
+9.6|луна|Сегодня луна яркая.|ay|Bu gece ay parlak.
+9.7|звезда|Я вижу звезду на небе.|yıldız|Gökyüzünde bir yıldız görüyorum.
+9.8|облако|Над холмом тёмное облако.|bulut|Tepenin üzerinde kara bir bulut var.
+9.9|дождь|Дождь прекратился.|yağmur|Yağmur durdu.
+9.10|снег|На горах лежит снег.|kar|Dağlarda kar var.
+9.11|ветер|Сегодня сильный ветер.|rüzgâr|Bugün rüzgâr kuvvetli.
+9.12|буря, гроза|Надвигается буря.|fırtına|Bir fırtına geliyor.
+9.13|туман|Сегодня утром густой туман.|sis|Bu sabah sis yoğun.
+9.14|лёд|Озеро покрыто льдом.|buz|Göl buzla kaplı.
+9.15|огонь, пожар|Не играй с огнём.|ateş, yangın|Ateşle oynama.
+9.16|воздух|Горный воздух свежий.|hava|Dağ havası temiz.
+9.17|погода|Сегодня хорошая погода.|hava durumu|Bugün hava güzel.
+9.18|температура|Температура низкая.|sıcaklık|Sıcaklık düşük.
+9.19|время года|Весна — моё любимое время года.|mevsim|İlkbahar en sevdiğim mevsim.
+9.20|весна|Весной цветут цветы.|ilkbahar|İlkbaharda çiçekler açar.
+9.21|лето|Летом очень жарко.|yaz|Yazın hava çok sıcak.
+9.22|осень|Осенью падают листья.|sonbahar|Sonbaharda yapraklar düşer.
+9.23|зима|Зимой идёт снег.|kış|Kışın kar yağar.
+9.24|гора|Мы поднялись на гору.|dağ|Dağa tırmandık.
+9.25|холм|Дом стоит на холме.|tepe|Ev bir tepenin üzerinde.
+9.26|долина|Весной долина зелёная.|vadi|İlkbaharda vadi yemyeşildir.
+9.27|река|Река широкая.|nehir|Nehir geniş.
+9.28|озеро|Мы купались в озере.|göl|Gölde yüzdük.
+9.29|море|Сегодня море спокойное.|deniz|Bugün deniz sakin.
+9.30|океан|Океан очень глубокий.|okyanus|Okyanus çok derin.
+9.31|пляж|Дети играют на пляже.|plaj|Çocuklar plajda oynuyor.
+9.32|остров|Они живут на острове.|ada|Bir adada yaşıyorlar.
+9.33|пустыня|В пустыне очень жарко.|çöl|Çöl çok sıcak.
+9.34|лес|Мы гуляли по лесу.|orman|Ormanda yürüdük.
+9.35|дерево|Во дворе растёт старое дерево.|ağaç|Bahçede yaşlı bir ağaç var.
+9.36|цветок|Она подарила мне цветок.|çiçek|Bana bir çiçek verdi.
+9.37|трава|Трава мокрая.|çimen|Çimenler ıslak.
+9.38|лист|С дерева упал лист.|yaprak|Ağaçtan bir yaprak düştü.
+9.39|камень, скала|Он сел на большой камень.|kaya|Büyük bir kayanın üzerine oturdu.
+9.40|песок|Песок горячий.|kum|Kum sıcak.
+9.41|почва|Здесь плодородная почва.|toprak|Burada toprak verimli.
+9.42|поле|Фермер работает в поле.|tarla|Çiftçi tarlada çalışıyor.
+9.43|животное|Кошка — маленькое животное.|hayvan|Kedi küçük bir hayvandır.
+9.44|птица|На дереве поёт птица.|kuş|Ağaçta bir kuş ötüyor.
+9.45|кошка|Кошка спит на диване.|kedi|Kedi kanepede uyuyor.
+9.46|собака|Собака лает по ночам.|köpek|Köpek geceleri havlıyor.
+9.47|лошадь|Он ездит на лошади.|at|Ata biniyor.
+9.48|корова|Корова даёт молоко.|inek|İnek süt verir.
+9.49|овца|Овцы едят траву.|koyun|Koyunlar ot yer.
+9.50|коза|Коза на холме.|keçi|Keçi tepede.
+9.51|осёл|Осёл везёт сумки.|eşek|Eşek çantaları taşıyor.
+9.52|верблюд|Верблюд живёт в пустыне.|deve|Deve çölde yaşar.
+9.53|утка|Утка плавает в пруду.|ördek|Ördek gölette yüzüyor.
+9.54|кролик|Кролик ест морковь.|tavşan|Tavşan havuç yiyor.
+9.55|волк|Волк живёт в лесу.|kurt|Kurt ormanda yaşar.
+9.56|медведь|Медведь спит.|ayı|Ayı uyuyor.
+9.57|лев|Лев — царь зверей.|aslan|Aslan hayvanların kralıdır.
+9.58|тигр|Тигр очень быстрый.|kaplan|Kaplan çok hızlıdır.
+9.59|слон|Слон огромный.|fil|Fil çok iridir.
+9.60|обезьяна|Обезьяна ест банан.|maymun|Maymun muz yiyor.
+9.61|змея|Осторожно, там змея.|yılan|Dikkat et, orada bir yılan var.
+9.62|насекомое|На листе сидит насекомое.|böcek|Yaprağın üzerinde bir böcek var.
+9.63|пчела|Пчела делает мёд.|arı|Arı bal yapar.
+9.64|бабочка|Бабочка разноцветная.|kelebek|Kelebek rengârenk.
+9.65|паук|На стене паук.|örümcek|Duvarda bir örümcek var.
+# 10. Sifatlar
+10.1|хороший|Это хорошая книга.|iyi|Bu iyi bir kitap.
+10.2|плохой|Сегодня плохая погода.|kötü|Bugün hava kötü.
+10.3|новый|Я купил новый телефон.|yeni|Yeni bir telefon aldım.
+10.4|старый|Мой дедушка старый.|eski, yaşlı|Dedem yaşlı.
+10.5|молодой|Она молодая учительница.|genç|O genç bir öğretmen.
+10.6|большой|У них большой дом.|büyük|Büyük bir evleri var.
+10.7|маленький|Это маленькая комната.|küçük|Bu küçük bir oda.
+10.8|крупный, большой|Нам нужен большой стол.|geniş, büyük|Büyük bir masaya ihtiyacımız var.
+10.9|маленький; мало|В стакане мало воды.|küçük; az|Bardakta az su var.
+10.10|длинный|Река очень длинная.|uzun|Nehir çok uzun.
+10.11|короткий, низкий|Фильм короткий.|kısa|Film kısa.
+10.12|высокий (о росте)|Мой отец высокий.|uzun boylu|Babam uzun boylu.
+10.13|высокий|Гора очень высокая.|yüksek|Dağ çok yüksek.
+10.14|низкий|Цена низкая.|düşük, alçak|Fiyat düşük.
+10.15|широкий|Улица широкая.|geniş|Sokak geniş.
+10.16|узкий|Дорога узкая.|dar|Yol dar.
+10.17|толстый|Книга очень толстая.|kalın|Kitap çok kalın.
+10.18|тонкий, худой|Он высокий и худой.|ince, zayıf|Uzun boylu ve zayıf.
+10.19|тяжёлый|Эта коробка тяжёлая.|ağır|Bu kutu ağır.
+10.20|быстрый|Поезд быстрый.|hızlı|Tren hızlı.
+10.21|медленный|Автобус медленный.|yavaş|Otobüs yavaş.
+10.22|рано, ранний|Я встаю рано.|erken|Erken kalkarım.
+10.23|поздно, поздний|Мы опаздываем на урок.|geç|Derse geç kaldık.
+10.24|лёгкий (простой)|Тест был лёгким.|kolay|Sınav kolaydı.
+10.25|трудный|Вопрос трудный.|zor|Soru zor.
+10.26|твёрдый, тяжёлый|Эта работа тяжёлая.|sert, zor|Bu iş zor.
+10.27|мягкий|Подушка мягкая.|yumuşak|Yastık yumuşak.
+10.28|простой|Правило простое.|basit|Kural basit.
+10.29|сложный|Проблема сложная.|karmaşık|Sorun karmaşık.
+10.30|важный|Здоровье важно.|önemli|Sağlık önemlidir.
+10.31|необходимый|Вода необходима для жизни.|gerekli|Su yaşam için gereklidir.
+10.32|возможный|Можно закончить сегодня.|mümkün|Bugün bitirmek mümkün.
+10.33|невозможный|Это невозможно.|imkânsız|Bu imkânsız.
+10.34|бесплатный, свободный|Чай бесплатный.|ücretsiz, özgür|Çay ücretsiz.
+10.35|занятой|Сегодня я занят.|meşgul|Bugün meşgulüm.
+10.36|готовый|Ужин готов.|hazır|Akşam yemeği hazır.
+10.37|уверенный|Я уверен, что он придёт.|emin|Geleceğinden eminim.
+10.38|определённый, несомненный|Несомненно, он победит.|kesin|Kazanacağı kesin.
+10.39|ясный|Сегодня небо ясное.|açık, berrak|Bugün gökyüzü açık.
+10.40|верный, правдивый|Эта история правдивая.|doğru, gerçek|O hikâye gerçek.
+10.41|ложный|Ответ неверный.|yanlış|Cevap yanlış.
+10.42|неправильный|Ты неправ.|yanlış|Yanılıyorsun.
+10.43|настоящий|Это золото настоящее?|gerçek|Bu altın gerçek mi?
+10.44|поддельный|Часы поддельные.|sahte|Saat sahte.
+10.45|одинаковый|У нас одинаковые телефоны.|aynı|Aynı telefona sahibiz.
+10.46|разный|Они очень разные.|farklı|Çok farklılar.
+10.47|похожий|Эти два дома похожи.|benzer|İki ev birbirine benziyor.
+10.48|особенный|Сегодня особенный день.|özel|Bugün özel bir gün.
+10.49|распространённый|Это распространённое имя.|yaygın|Bu yaygın bir isim.
+10.50|редкий|Этот цветок редкий.|nadir|Bu çiçek nadir.
+10.51|нормальный|Температура нормальная.|normal|Sıcaklık normal.
+10.52|странный|Я услышал странный шум.|garip|Garip bir ses duydum.
+10.53|смешной|Фильм смешной.|komik|Film komik.
+10.54|серьёзный|Он выглядит серьёзным.|ciddi|Ciddi görünüyor.
+10.55|интересный|Это интересная книга.|ilginç|Bu ilginç bir kitap.
+10.56|скучный|Урок был скучным.|sıkıcı|Ders sıkıcıydı.
+10.57|захватывающий|Игра была захватывающей.|heyecanlı|Maç heyecanlıydı.
+10.58|красивый|Сад красивый.|güzel|Bahçe güzel.
+10.59|симпатичный|Она симпатичная девушка.|hoş, sevimli|O sevimli bir kız.
+10.60|уродливый|Здание уродливое.|çirkin|Bina çirkin.
+10.61|красивый (о мужчине)|Он красивый мужчина.|yakışıklı|O yakışıklı bir adam.
+10.62|грязный|Моя обувь грязная.|kirli|Ayakkabılarım kirli.
+10.63|богатый|Этот мужчина очень богат.|zengin|Adam çok zengin.
+10.64|бедный|Они бедная семья.|fakir|Onlar fakir bir aile.
+10.65|дешёвый|Рубашка дешёвая.|ucuz|Gömlek ucuz.
+10.66|дорогой|Эта машина дорогая.|pahalı|Bu araba pahalı.
+10.67|полный|Автобус полный.|dolu|Otobüs dolu.
+10.68|закрытый|Магазин закрыт.|kapalı|Dükkân kapalı.
+10.69|сухой|Полотенце сухое.|kuru|Havlu kuru.
+10.70|мокрый|Трава мокрая.|ıslak|Çimen ıslak.
+10.71|тёплый|Вода тёплая.|ılık, sıcak|Su ılık.
+10.72|прохладный|Вечер прохладный.|serin|Akşam serin.
+10.73|светлый, яркий|Комната светлая.|aydınlık, parlak|Oda aydınlık.
+10.74|тёмный|На улице темно.|karanlık|Dışarısı karanlık.
+10.75|тихий|Улица тихая.|sessiz, sakin|Sokak sessiz.
+10.76|громкий|Музыка слишком громкая.|gürültülü, yüksek sesli|Müzik çok yüksek.
+10.77|безопасный|Район безопасный.|güvenli|Bölge güvenli.
+10.78|опасный|Дорога опасная.|tehlikeli|Yol tehlikeli.
+10.79|осторожный|Будь осторожен!|dikkatli|Dikkatli ol!
+10.80|удачливый|Он везучий человек.|şanslı|O şanslı bir adam.
+10.81|счастливый|Сегодня я счастлив.|mutlu|Bugün mutluyum.
+10.82|грустный|Фильм меня расстроил.|üzgün|Film beni üzdü.
+10.83|сердитый|Мой отец сердится.|kızgın|Babam kızgın.
+10.84|испуганный|Не бойся.|korkmuş|Korkma.
+10.85|удивлённый|Я был удивлён новостью.|şaşırmış|Habere şaşırdım.
+10.86|гордый|Я горжусь своим сыном.|gururlu|Oğlumla gurur duyuyorum.
+10.87|застенчивый|Мальчик очень застенчивый.|utangaç|Çocuk çok utangaç.
+10.88|добрый|Она добрая женщина.|nazik, iyi kalpli|O iyi kalpli bir kadın.
+10.89|вежливый|Официант вежливый.|kibar|Garson kibar.
+10.90|грубый|Кричать грубо.|kaba|Bağırmak kabalıktır.
+10.91|дружелюбный|Соседи дружелюбные.|cana yakın|Komşular cana yakın.
+10.92|щедрый|Он щедрый человек.|cömert|O cömert bir adam.
+10.93|честный|Она честная девушка.|dürüst|O dürüst bir kız.
+10.94|ленивый|Моя кошка ленивая.|tembel|Kedim tembel.
+10.95|умный, сообразительный|Мальчик сообразительный.|zeki|Çocuk zeki.
+10.96|умный|Она умная студентка.|akıllı|O akıllı bir öğrenci.
+10.97|глупый|Это была глупая ошибка.|aptalca|Bu aptalca bir hataydı.
+10.98|храбрый|Солдат был храбрым.|cesur|Asker cesurdu.
+10.99|творческий|Она творческий человек.|yaratıcı|O yaratıcı biri.
+10.100|знаменитый|Он знаменитый певец.|ünlü|O ünlü bir şarkıcı.
+10.101|популярный|Эта песня популярна.|popüler|Bu şarkı popüler.
+10.102|современный|Они живут в современном доме.|modern|Modern bir evde yaşıyorlar.
+10.103|традиционный|Мы приготовили традиционную еду.|geleneksel|Geleneksel yemek pişirdik.
+10.104|местный|Я покупаю местные фрукты.|yerel|Yerel meyve alırım.
+10.105|международный|Это международный аэропорт.|uluslararası|Bu uluslararası bir havalimanı.
+10.106|национальный|Навруз — национальный праздник.|ulusal, milli|Nevruz milli bir bayramdır.
+10.107|общественный|Парк — общественное место.|kamusal, halka açık|Park halka açık bir yerdir.
+10.108|частный|Это частная комната.|özel|Burası özel bir oda.
+10.109|личный|Это мой личный телефон.|kişisel|Bu benim kişisel telefonum.
+10.110|официальный|Это официальное письмо.|resmî|Bu resmî bir mektup.
+10.111|главный|Главная дорога закрыта.|ana|Ana yol kapalı.
+10.112|целый|Он съел целый торт.|bütün|Bütün pastayı yedi.
+10.113|единственный; только|У меня только один брат.|tek; sadece|Sadece bir erkek kardeşim var.
+10.114|одинокий, холостой|Он не женат.|bekâr, tek|O bekâr.
+10.115|двойной|Я хочу двухместный номер.|çift|Çift kişilik bir oda istiyorum.
+10.116|общий, итоговый|Общая цена — десять долларов.|toplam|Toplam fiyat on dolar.
+10.117|дополнительный|Мне нужен дополнительный стул.|ekstra, ilave|Ekstra bir sandalyeye ihtiyacım var.
+10.118|полезный|Эта книга полезная.|faydalı|Bu kitap faydalı.
+10.119|бесполезный|Старый телефон бесполезен.|işe yaramaz|Eski telefon işe yaramaz.
+10.120|достаточный|У нас достаточно еды.|yeterli|Yeterince yiyeceğimiz var.
+10.121|доступный, свободный|Этот номер свободен?|müsait, mevcut|Bu oda müsait mi?
+10.122|обычный|Это был обычный день.|sıradan|Sıradan bir gündü.
+10.123|идеальный|Погода идеальная.|mükemmel|Hava mükemmel.
+10.124|ужасный|Еда была ужасной.|berbat, korkunç|Yemek berbattı.

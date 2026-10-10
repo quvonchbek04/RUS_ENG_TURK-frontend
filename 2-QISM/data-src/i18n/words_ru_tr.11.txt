@@ -1,0 +1,268 @@
+# 24. Otlar (qo'shimcha) — 1-qism
+24.1|способность|У неё способность быстро учиться.|yetenek|Hızlı öğrenme yeteneği var.
+24.2|отсутствие|Его отсутствие заметили.|yokluk, devamsızlık|Yokluğu fark edildi.
+24.3|действие|Мы должны действовать.|eylem|Harekete geçmeliyiz.
+24.4|деятельность, занятие|Плавание — хорошее занятие.|etkinlik, faaliyet|Yüzme iyi bir etkinliktir.
+24.5|преимущество|Знание английского — это преимущество.|avantaj|İngilizce konuşmak bir avantajdır.
+24.6|недостаток|Недостаток — это цена.|dezavantaj|Dezavantajı fiyatı.
+24.7|возраст|Сколько тебе лет?|yaş|Kaç yaşındasın?
+24.8|агентство|Она работает в туристическом агентстве.|ajans|Bir seyahat acentesinde çalışıyor.
+24.9|цель|Моя цель — выучить английский.|amaç|Amacım İngilizce öğrenmek.
+24.10|будильник, сигнал тревоги|Будильник зазвонил в шесть.|alarm|Alarm altıda çaldı.
+24.11|угол (ракурс)|Посмотри на это под другим углом.|açı|Ona başka bir açıdan bak.
+24.12|годовщина|Сегодня наша годовщина.|yıldönümü|Bugün yıldönümümüz.
+24.13|внешность|Его внешность изменилась.|görünüş|Görünüşü değişti.
+24.14|аплодисменты|Толпа громко аплодировала.|alkış|Kalabalık yüksek sesle alkışladı.
+24.15|подход|Это новый подход.|yaklaşım|Bu yeni bir yaklaşım.
+24.16|архитектура|Я люблю старую архитектуру.|mimari|Eski mimariyi severim.
+24.17|армия|Он пошёл в армию.|ordu|Orduya katıldı.
+24.18|статья|Я прочитал статью о здоровье.|makale|Sağlık hakkında bir makale okudum.
+24.19|атмосфера|В кафе приятная атмосфера.|atmosfer, ortam|Kafenin güzel bir ortamı var.
+24.20|зрители|Зрители аплодировали.|seyirci|Seyirciler alkışladı.
+24.21|автор|Автор написал десять книг.|yazar|Yazar on kitap yazdı.
+24.22|награда|Она получила награду.|ödül|Bir ödül kazandı.
+24.23|фон|Посмотри на фон.|arka plan|Arka plana bak.
+24.24|равновесие|Сохраняй равновесие.|denge|Dengeni koru.
+24.25|барьер|Язык — это барьер.|engel|Dil bir engeldir.
+24.26|основа|Это основа плана.|temel|Bu planın temeli.
+24.27|битва|Битва длилась два дня.|savaş, muharebe|Muharebe iki gün sürdü.
+24.28|красота|Я люблю красоту природы.|güzellik|Doğanın güzelliğini seviyorum.
+24.29|начало|Начало фильма медленное.|başlangıç|Filmin başlangıcı yavaş.
+24.30|польза|Упражнения приносят много пользы.|fayda|Egzersizin birçok faydası var.
+24.31|рождение|Рождение ребёнка было радостью.|doğum|Bebeğin doğumu bir sevinçti.
+24.32|пробел, пустое место|Оставьте это место пустым.|boşluk|Bu alanı boş bırakın.
+24.33|квартал, блок|Он живёт в соседнем квартале.|blok|Yandaki blokta oturuyor.
+24.34|граница|Это граница фермы.|sınır|Bu çiftliğin sınırı.
+24.35|ветка; филиал|Птица сидит на ветке.|dal; şube|Bir kuş dalda oturuyor.
+24.36|дыхание|Сделай глубокий вдох.|nefes|Derin bir nefes al.
+24.37|ветерок|Дует прохладный ветерок.|esinti|Serin bir esinti var.
+24.38|кирпич|Дом построен из кирпича.|tuğla|Ev tuğladan yapılmış.
+24.39|бремя|Долг — это бремя.|yük|Borç bir yüktür.
+24.40|кабель|Кабель слишком короткий.|kablo|Kablo çok kısa.
+24.41|пещера|В пещере живут летучие мыши.|mağara|Mağarada yarasalar yaşıyor.
+24.42|церемония|Мы были на свадебной церемонии.|tören|Düğün törenine gittik.
+24.43|цепь, цепочка|Он носит золотую цепочку.|zincir|Altın bir zincir takıyor.
+24.44|вызов, трудность|Это большой вызов.|zorluk, meydan okuma|Bu büyük bir zorluk.
+24.45|чемпион|Он чемпион.|şampiyon|O şampiyon.
+24.46|диаграмма|Посмотри на диаграмму.|grafik, tablo|Grafiğe bak.
+24.47|заявление, претензия|Он сделал ложное заявление.|iddia|Yanlış bir iddiada bulundu.
+24.48|климат|Здесь сухой климат.|iklim|Buranın iklimi kuru.
+24.49|код|Введите код.|kod|Kodu girin.
+24.50|комфорт|Отель предлагает комфорт.|konfor|Otel konfor sunuyor.
+24.51|команда (приказ)|Он отдал приказ.|komut, emir|Bir emir verdi.
+24.52|сообщество|Наше сообщество небольшое.|topluluk|Topluluğumuz küçük.
+24.53|сравнение|Сравнение было полезным.|karşılaştırma|Karşılaştırma faydalıydı.
+24.54|беспокойство|У меня есть опасение.|endişe|Bir endişem var.
+24.55|состояние; условие|Машина в хорошем состоянии.|durum; koşul|Araba iyi durumda.
+24.56|конфликт|У них был конфликт.|çatışma|Aralarında bir çatışma oldu.
+24.57|последствие|У каждого действия есть последствие.|sonuç|Her eylemin bir sonucu vardır.
+24.58|содержание|Мне нравится содержание этой книги.|içerik|Bu kitabın içeriğini seviyorum.
+24.59|контекст|Понимай слово в контексте.|bağlam|Kelimeyi bağlam içinde anla.
+24.60|контраст|Здесь большой контраст.|zıtlık, karşıtlık|Büyük bir zıtlık var.
+24.61|мужество|Он проявил большое мужество.|cesaret|Büyük cesaret gösterdi.
+24.62|трещина|В стене трещина.|çatlak|Duvarda bir çatlak var.
+24.63|кредит|Я купил это в кредит.|kredi|Onu krediyle aldım.
+24.64|кризис|Страна столкнулась с кризисом.|kriz|Ülke bir krizle karşılaştı.
+24.65|урожай (культура)|Фермеры собрали урожай.|ürün, mahsul|Çiftçiler ürünü hasat etti.
+24.66|изгиб, поворот|На дороге поворот.|viraj, eğri|Yolda bir viraj var.
+24.67|обычай|Это местный обычай.|gelenek, âdet|Bu yerel bir âdet.
+24.68|ущерб|Буря нанесла ущерб.|hasar|Fırtına hasara yol açtı.
+24.69|темнота|Он сидел в темноте.|karanlık|Karanlıkta oturdu.
+24.70|смерть|Смерть короля была печальной.|ölüm|Kralın ölümü üzücüydü.
+24.71|дебаты|У них были долгие дебаты.|tartışma, münazara|Uzun bir tartışma yaptılar.
+24.72|спрос|Высокий спрос на воду.|talep|Suya yüksek talep var.
+24.73|отдел|Она работает в отделе продаж.|departman, bölüm|Satış departmanında çalışıyor.
+24.74|деталь|Расскажи мне каждую деталь.|ayrıntı|Bana her ayrıntıyı anlat.
+24.75|устройство|Это устройство новое.|cihaz|Bu cihaz yeni.
+24.76|разница|В чём разница?|fark|Fark ne?
+24.77|трудность|Мне трудно уснуть.|zorluk|Uyumakta zorlanıyorum.
+24.78|открытие|Это было важное открытие.|keşif|Önemli bir keşifti.
+24.79|черновик|Я написал черновик.|taslak|Bir taslak yazdım.
+24.80|драма|Мы посмотрели драму.|dram|Bir dram izledik.
+24.81|усилие|Приложи усилие.|çaba|Çaba göster.
+24.82|империя|Это была большая империя.|imparatorluk|Büyük bir imparatorluktu.
+24.83|конец|Это конец истории.|son|Bu hikâyenin sonu.
+24.84|вход|Вход слева.|giriş|Giriş solda.
+24.85|окружающая среда|Мы должны защищать окружающую среду.|çevre|Çevreyi korumalıyız.
+24.86|оборудование|В спортзале новое оборудование.|ekipman|Spor salonunda yeni ekipman var.
+24.87|эпоха|Это была новая эпоха.|çağ, devir|Yeni bir çağdı.
+24.88|событие|Это было большое событие.|olay, etkinlik|Büyük bir olaydı.
+24.89|доказательство, улика|Нет никаких доказательств.|kanıt|Hiçbir kanıt yok.
+24.90|исключение|Есть одно исключение.|istisna|Bir istisna var.
+24.91|выставка|Мы посетили художественную выставку.|sergi|Bir sanat sergisini gezdik.
+24.92|расход|Путешествие — это расход.|masraf|Seyahat bir masraftır.
+24.93|эксперимент|Они провели эксперимент.|deney|Bir deney yaptılar.
+24.94|степень, мера|В какой-то степени это правда.|ölçü, derece|Bir dereceye kadar doğru.
+24.95|ткань|Ткань мягкая.|kumaş|Kumaş yumuşak.
+24.96|слава|Он обрёл славу.|şöhret|Şöhrete kavuştu.
+24.97|вина|Это не моя вина.|kusur, suç|Bu benim suçum değil.
+24.98|особенность, функция|У телефона новая функция.|özellik|Telefonun yeni bir özelliği var.
+24.99|забор|Вокруг сада забор.|çit|Bahçenin etrafında bir çit var.
+24.100|цифра; фигура|Запиши цифру.|rakam; şekil|Rakamı yaz.
+24.101|пламя|Пламя маленькое.|alev|Alev küçük.
+24.102|вкус, аромат|Мне нравится вкус этого чая.|tat, aroma|Bu çayın tadını seviyorum.
+24.103|сила|Прилагай меньше силы.|güç, kuvvet|Daha az güç kullan.
+24.104|формула|Я знаю формулу.|formül|Formülü biliyorum.
+24.105|фундамент|Фундамент дома прочный.|temel|Evin temeli sağlam.
+24.106|рамка|Я купил рамку для фото.|çerçeve|Bir fotoğraf çerçevesi aldım.
+24.107|граница (государственная)|Они пересекли границу.|sınır|Sınırı geçtiler.
+24.108|щель, промежуток|В заборе есть щель.|boşluk, aralık|Çitte bir boşluk var.
+24.109|ворота|Закрой ворота.|kapı (bahçe kapısı)|Bahçe kapısını kapat.
+24.110|поколение|Старшее поколение знает больше.|nesil|Yaşlı nesil daha çok şey bilir.
+24.111|жест|Он сделал дружеский жест.|jest|Dostça bir jest yaptı.
+24.112|слава|Они сражались за славу.|şan, zafer|Şan için savaştılar.
+24.113|зерно|Фермеры выращивают зерно.|tahıl|Çiftçiler tahıl yetiştiriyor.
+24.114|урожай|В этом году урожай был хорошим.|hasat|Bu yıl hasat iyiydi.
+24.115|наследие|Мы охраняем наше культурное наследие.|miras|Kültürel mirasımızı koruyoruz.
+24.116|честь|Для меня честь познакомиться с вами.|onur|Sizinle tanışmak bir onur.
+24.117|горизонт|Солнце опустилось за горизонт.|ufuk|Güneş ufkun altına battı.
+24.118|голод|Голод — большая проблема.|açlık|Açlık büyük bir sorundur.
+24.119|личность, удостоверение|Покажите удостоверение личности.|kimlik|Kimlik kartınızı gösterin.
+24.120|изображение|Изображение чёткое.|görüntü|Görüntü net.
+24.121|влияние, воздействие|Новость произвела большое впечатление.|etki|Haberin büyük bir etkisi oldu.
+24.122|вдохновение|Она моё вдохновение.|ilham|O benim ilham kaynağım.
+24.123|пример, случай|Например, яблоки — это фрукты.|örnek|Örneğin elmalar meyvedir.
+24.124|инструмент|Он играет на музыкальном инструменте.|alet, enstrüman|Bir müzik aleti çalıyor.
+24.125|намерение|У меня нет плохих намерений.|niyet|Kötü bir niyetim yok.
+24.126|предмет, пункт|Каждый предмет стоит пять долларов.|ürün, eşya|Her ürün beş dolar.
+24.127|дневник, журнал|Она пишет в дневнике.|günlük, dergi|Günlüğüne yazıyor.
+24.128|перекрёсток|На перекрёстке поверни налево.|kavşak|Kavşaktan sola dön.
+24.129|королевство|Это было богатое королевство.|krallık|Zengin bir krallıktı.
+24.130|этикетка|Прочитай этикетку.|etiket|Etiketi oku.
+24.131|труд|Это был тяжёлый труд.|emek|Ağır bir emekti.
+24.132|лестница (приставная)|Воспользуйся лестницей.|merdiven (portatif)|Merdiveni kullan.
+24.133|пейзаж|Пейзаж красивый.|manzara|Manzara çok güzel.
+24.134|слой|Добавь ещё один слой.|katman|Bir katman daha ekle.
+24.135|лекция|Мы посетили лекцию.|ders, konferans|Bir derse katıldık.
+24.136|длина|Какова длина стола?|uzunluk|Masanın uzunluğu ne kadar?
+24.137|уровень|Какой у тебя уровень английского?|seviye|İngilizce seviyen ne?
+24.138|предел, ограничение|Есть ограничение скорости.|sınır|Hız sınırı var.
+24.139|список|Составь список.|liste|Bir liste yap.
+24.140|груз|У грузовика тяжёлый груз.|yük|Kamyonun ağır bir yükü var.
+24.141|лотерея|Он выиграл в лотерею.|piyango|Piyangoyu kazandı.
+24.142|машина, аппарат|Аппарат сломан.|makine|Makine bozuk.
+24.143|большинство|Большинство проголосовало «за».|çoğunluk|Çoğunluk evet oyu verdi.
+24.144|меньшинство|Это мнение меньшинства.|azınlık|Bu bir azınlık görüşü.
+24.145|материал|Материал мягкий.|malzeme|Malzeme yumuşak.
+24.146|беспорядок|В комнате беспорядок.|dağınıklık|Oda darmadağın.
+24.147|метод|Этот метод простой.|yöntem|Bu yöntem kolay.
+24.148|металл|Ложка сделана из металла.|metal|Kaşık metalden yapılmış.
+24.149|военные, армия|Он пошёл служить в армию.|askeriye|Askeriyeye katıldı.
+24.150|миссия|Это была трудная миссия.|görev, misyon|Zor bir görevdi.
+24.151|модель|Это новая модель.|model|Bu yeni bir model.
+24.152|момент|Подожди минутку.|an|Bir an bekle.
+24.153|движение|Машина в движении.|hareket|Araba hareket hâlinde.
+24.154|нация|Нация гордится.|millet, ulus|Millet gururlu.
+24.155|иголка|Мне нужны иголка и нитка.|iğne|İğne ve iplik lazım.
+24.156|нерв|У него крепкие нервы.|sinir|Sinirleri sağlam.
+24.157|предмет, объект|На столе какой-то предмет.|nesne|Masada bir nesne var.
+24.158|случай, повод|Это особый случай.|vesile, özel gün|Bu özel bir gün.
+24.159|шансы|Шансы хорошие.|ihtimal, şans|İhtimaller iyi.
+24.160|операция|Операция прошла успешно.|operasyon, ameliyat|Ameliyat başarılı geçti.
+24.161|вариант|У тебя два варианта.|seçenek|İki seçeneğin var.
+24.162|происхождение|Каково происхождение этого слова?|köken|Bu kelimenin kökeni ne?
+24.163|результат, исход|Результат был хорошим.|sonuç|Sonuç iyiydi.
+24.164|темп|Он идёт медленным шагом.|tempo, hız|Yavaş bir tempoyla yürüyor.
+24.165|дворец|Король живёт во дворце.|saray|Kral bir sarayda yaşıyor.
+24.166|страсть|У него страсть к музыке.|tutku|Müziğe tutkusu var.
+24.167|тропинка, путь|Иди по тропинке.|patika, yol|Patikayı takip et.
+24.168|узор|На ковре красивый узор.|desen|Halının güzel bir deseni var.
+24.169|период|Это был трудный период.|dönem|Zor bir dönemdi.
+24.170|фаза, этап|Это первый этап.|aşama|Bu ilk aşama.
+24.171|фраза|Выучи эту фразу.|ifade, deyim|Bu ifadeyi öğren.
+24.172|кусок|Дай мне кусок хлеба.|parça|Bana bir parça ekmek ver.
+24.173|сюжет|Сюжет фильма интересный.|olay örgüsü|Filmin olay örgüsü ilginç.
+24.174|стихотворение|Она написала стихотворение.|şiir|Bir şiir yazdı.
+24.175|поэт|Поэт читает своё стихотворение.|şair|Şair şiirini okuyor.
+24.176|политика (правила)|Это политика компании.|politika|Bu şirket politikası.
+24.177|загрязнение|Загрязнение воздуха — это проблема.|kirlilik|Hava kirliliği bir sorundur.
+24.178|бассейн|Мы плаваем в бассейне.|havuz|Havuzda yüzüyoruz.
+24.179|население|Население растёт.|nüfus|Nüfus artıyor.
+24.180|должность, положение|У него хорошая должность.|pozisyon, konum|İyi bir pozisyonu var.
+24.181|сила, власть|Знание — сила.|güç, iktidar|Bilgi güçtür.
+24.182|гордость|Она очень гордится своей работой.|gurur|İşiyle çok gurur duyuyor.
+24.183|принцип|Это базовый принцип.|ilke|Bu temel bir ilke.
+24.184|приоритет|Безопасность — приоритет.|öncelik|Güvenlik bir önceliktir.
+24.185|процедура|Следуйте процедуре.|prosedür|Prosedüre uyun.
+24.186|процесс|Процесс требует времени.|süreç|Süreç zaman alıyor.
+24.187|собственность|Это частная собственность.|mülk|Burası özel mülk.
+24.188|доказательство|Мне нужно доказательство.|kanıt|Kanıta ihtiyacım var.
+24.189|ученик, школьник|Ученик поднял руку.|öğrenci|Öğrenci elini kaldırdı.
+24.190|ссора|Они поссорились.|kavga, tartışma|Kavga ettiler.
+24.191|диапазон, ассортимент|Разброс цен широкий.|aralık, yelpaze|Fiyat aralığı geniş.
+24.192|ставка, курс|Ставка высокая.|oran|Oran yüksek.
+24.193|соотношение|Соотношение два к одному.|oran|Oran ikiye bir.
+24.194|реальность|Смотри правде в глаза.|gerçeklik|Gerçekle yüzleş.
+24.195|приём, ресепшен|Стойка регистрации открыта.|resepsiyon|Resepsiyon açık.
+24.196|рекорд; запись|Он побил мировой рекорд.|rekor; kayıt|Dünya rekorunu kırdı.
+24.197|регион, область|Этот регион засушливый.|bölge|Bu bölge kurak.
+24.198|отношения|У них хорошие отношения.|ilişki|İyi bir ilişkileri var.
+24.199|родственник|Он мой родственник.|akraba|O benim akrabam.
+24.200|средство (лечебное)|Мёд — хорошее средство.|çare, ilaç|Bal iyi bir çaredir.
+24.201|репутация|У него хорошая репутация.|itibar|İyi bir itibarı var.
+24.202|исследование|Она исследует растения.|araştırma|Bitkiler üzerine araştırma yapıyor.
+24.203|ресурс|Вода — природный ресурс.|kaynak|Su doğal bir kaynaktır.
+24.204|уважение|Проявляй уважение.|saygı|Saygı göster.
+24.205|ответственность|Это моя ответственность.|sorumluluk|Bu benim sorumluluğum.
+24.206|ритм|Мне нравится ритм этой песни.|ritim|Bu şarkının ritmini seviyorum.
+24.207|роль|Он играет важную роль.|rol|Önemli bir rol oynuyor.
+24.208|верёвка|Привяжи это верёвкой.|ip, halat|Bir iple bağla.
+24.209|маршрут|Каким маршрутом ты едешь?|güzergâh|Hangi güzergâhı kullanıyorsun?
+24.210|распорядок|Это мой распорядок дня.|rutin|Bu benim günlük rutinim.
+24.211|сцена|Это моя любимая сцена.|sahne|Bu en sevdiğim sahne.
+24.212|схема|Это хорошая схема.|plan, şema|Bu iyi bir plan.
+24.213|раздел|Прочитай первый раздел.|bölüm|İlk bölümü oku.
+24.214|смысл, чувство|В этом есть смысл.|anlam, his|Bu mantıklı.
+24.215|тень|Я увидел тень.|gölge|Bir gölge gördüm.
+24.216|стыд; жаль|Как жаль.|utanç; yazık|Ne yazık.
+24.217|укрытие, приют|Они нашли укрытие.|sığınak|Bir sığınak buldular.
+24.218|смена|Он работает в ночную смену.|vardiya|Gece vardiyasında çalışıyor.
+24.219|шок|Это был шок.|şok|Bu bir şoktu.
+24.220|подпись|Мне нужна ваша подпись.|imza|İmzanıza ihtiyacım var.
+24.221|тишина|Наступила тишина.|sessizlik|Sessizlik oldu.
+24.222|ситуация|Ситуация сложная.|durum|Durum zor.
+24.223|ломтик|Отрежь ломтик хлеба.|dilim|Bir dilim ekmek kes.
+24.224|склон|Склон крутой.|yokuş, eğim|Yokuş dik.
+24.225|дым|В комнате дым.|duman|Odada duman var.
+24.226|источник|Каков источник новости?|kaynak|Haberin kaynağı ne?
+24.227|пространство, место; космос|Здесь нет места.|alan, boşluk; uzay|Burada yer yok.
+24.228|дух|У него сильный дух.|ruh|Güçlü bir ruhu var.
+24.229|сцена; этап|Певец на сцене.|sahne; aşama|Şarkıcı sahnede.
+24.230|стандарт|Стандарт высокий.|standart|Standart yüksek.
+24.231|государство; состояние|Государство помогает людям.|devlet; durum|Devlet insanlara yardım ediyor.
+24.232|шаг|Сделай шаг вперёд.|adım|Bir adım öne çık.
+24.233|запас|У нас не осталось запасов.|stok|Hiç stokumuz kalmadı.
+24.234|стратегия|Нам нужна новая стратегия.|strateji|Yeni bir stratejiye ihtiyacımız var.
+24.235|структура|Конструкция прочная.|yapı|Yapı sağlam.
+24.236|поверхность|Поверхность гладкая.|yüzey|Yüzey pürüzsüz.
+24.237|опрос|Мы провели опрос.|anket|Bir anket yaptık.
+24.238|символ|Это символ мира.|sembol|Bu bir barış sembolü.
+24.239|система|Система работает медленно.|sistem|Sistem yavaş.
+24.240|тенденция|Есть тенденция к росту.|eğilim|Artış eğilimi var.
+24.241|напряжение|В комнате напряжение.|gerginlik|Odada gerginlik var.
+24.242|термин|Это новый термин.|terim|Bu yeni bir terim.
+24.243|тема|Тема — любовь.|tema, konu|Konu aşk.
+24.244|теория|Это всего лишь теория.|teori|Bu sadece bir teori.
+24.245|нитка|Мне нужны иголка и нитка.|iplik|İğne ve iplik lazım.
+24.246|угроза|Это серьёзная угроза.|tehdit|Bu ciddi bir tehdit.
+24.247|инструмент|Молоток — это инструмент.|alet|Çekiç bir alettir.
+24.248|ловушка|Мышь в ловушке.|tuzak|Fare tuzakta.
+24.249|сокровище|Они нашли сокровище.|hazine|Bir hazine buldular.
+24.250|тенденция, тренд|Это новый тренд.|trend, eğilim|Bu yeni bir trend.
+24.251|испытание|Это испытательный срок.|deneme|Bu bir deneme süresi.
+24.252|трубка|Налей воду в трубку.|tüp|Suyu bir tüpe koy.
+24.253|единица, блок|Это небольшое подразделение.|birim|Bu küçük bir birim.
+24.254|ценность, стоимость|Стоимость высокая.|değer|Değeri yüksek.
+24.255|разнообразие|Еда разнообразная.|çeşitlilik|Yemekte çeşitlilik var.
+24.256|версия|Это новая версия.|sürüm|Bu yeni sürüm.
+24.257|победа|Это была великая победа.|zafer|Büyük bir zaferdi.
+24.258|вид|Вид красивый.|manzara|Manzara çok güzel.
+24.259|насилие|Насилие — это неправильно.|şiddet|Şiddet yanlıştır.
+24.260|громкость; объём|Убавь громкость.|ses; hacim|Sesi kıs.
+24.261|богатство|Здоровье важнее богатства.|servet|Sağlık servetten daha önemlidir.
+24.262|оружие|Он носит оружие.|silah|Silah taşıyor.
+24.263|благополучие|Они заботятся о благополучии детей.|refah|Çocukların refahını önemsiyorlar.
+24.264|мудрость|Мудрость приходит с возрастом.|bilgelik|Bilgelik yaşla gelir.
+24.265|свидетель|Он был свидетелем.|tanık|O bir tanıktı.
+24.266|молодёжь, юность|Молодёжь — наше будущее.|gençlik|Gençler bizim geleceğimizdir.
+24.267|зона|Это тихая зона.|bölge|Burası sessiz bir bölge.

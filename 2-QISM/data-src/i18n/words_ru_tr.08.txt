@@ -1,0 +1,202 @@
+# 18. Bog'lovchi va kichik so'zlar
+# 18.1 va 18.2 — ingliz artikllari: rus va turk tillarida artikl yo'q, shuning uchun tashlab ketiladi
+18.1|-|-|-|-
+18.2|-|-|-|-
+18.3|и|Я люблю чай и кофе.|ve|Çayı ve kahveyi severim.
+18.4|или|Ты хочешь чай или кофе?|veya, ya da|Çay mı yoksa kahve mi istersin?
+18.5|но|Я устал, но счастлив.|ama|Yorgunum ama mutluyum.
+18.6|потому что|Я остался дома, потому что шёл дождь.|çünkü|Evde kaldım çünkü yağmur yağdı.
+18.7|поэтому, так что|Было холодно, поэтому я надел пальто.|bu yüzden|Hava soğuktu, bu yüzden palto giydim.
+18.8|если|Если пойдёт дождь, мы останемся дома.|eğer|Eğer yağmur yağarsa evde kalırız.
+18.9|когда|Позвони мне, когда приедешь.|-dığında, ne zaman|Vardığında beni ara.
+18.10|хотя|Хотя было поздно, мы продолжали работать.|-e rağmen|Geç olmasına rağmen çalışmaya devam ettik.
+18.11|однако|Однако я не согласен.|ancak|Ancak katılmıyorum.
+18.12|поэтому, следовательно|Он был болен, поэтому остался дома.|bu nedenle|Hastaydı, bu nedenle evde kaldı.
+18.13|также|Она тоже учительница.|de, da|O da öğretmen.
+18.14|тоже; слишком|Я тоже хочу прийти.|de; çok|Ben de gelmek istiyorum.
+18.15|либо|Ты можешь взять либо чай, либо молоко.|ya … ya da|Ya çay ya da süt alabilirsin.
+18.16|ни|Никто из нас не знает ответа.|hiçbiri, ne … ne|İkimiz de cevabı bilmiyoruz.
+18.17|тоже, также|Я возьму и книгу тоже.|de, ayrıca|Kitabı da alacağım.
+18.18|вместо|Выпей лучше чаю.|yerine|Onun yerine çay iç.
+18.19|иначе|Поторопись, иначе мы опоздаем.|yoksa|Acele et, yoksa geç kalacağız.
+18.20|если не|Я не пойду, если ты не придёшь.|-medikçe|Sen gelmedikçe gitmem.
+18.21|ли|Я не знаю, дома ли он.|-ip -mediğini|Evde olup olmadığını bilmiyorum.
+18.22|чем|Она выше меня.|-den (daha)|O benden daha uzun.
+18.23|что (союз)|Я знаю, что он прав.|ki, -dığını|Onun haklı olduğunu biliyorum.
+18.24|это, этот|Это мой дом.|bu|Bu benim evim.
+18.25|эти|Эти яблоки свежие.|bunlar, bu|Bu elmalar taze.
+18.26|те|Те туфли дорогие.|şunlar, o|O ayakkabılar pahalı.
+18.27|который, какой|Какой автобус идёт в центр?|hangi|Hangi otobüs merkeze gidiyor?
+18.28|что|Как тебя зовут?|ne|Adın ne?
+18.29|кто|Кто этот мужчина?|kim|O adam kim?
+18.30|кого, кому|Кому ты звонил?|kimi|Kimi aradın?
+18.31|чей|Чья это сумка?|kimin|Bu çanta kimin?
+18.32|где|Где ты живёшь?|nerede|Nerede yaşıyorsun?
+18.33|почему|Почему ты опоздал?|neden|Neden geç kaldın?
+18.34|как|Как дела?|nasıl|Nasılsın?
+18.35|здесь, сюда|Иди сюда, пожалуйста.|burada, buraya|Buraya gel, lütfen.
+18.36|там|Книга вон там.|orada|Kitap şurada.
+18.37|везде|Я везде искал свои ключи.|her yerde|Anahtarlarımı her yerde aradım.
+18.38|нигде|Негде сесть.|hiçbir yerde|Oturacak hiçbir yer yok.
+18.39|где-то|Я где-то оставил свой телефон.|bir yerde|Telefonumu bir yerde bıraktım.
+18.40|где угодно, куда угодно|Ты можешь пойти куда захочешь?|herhangi bir yere|İstediğin herhangi bir yere gidebilir misin?
+18.41|что-то|Я хочу кое-что сказать.|bir şey|Bir şey söylemek istiyorum.
+18.42|что-нибудь|Тебе что-нибудь нужно?|bir şey (soru)|Bir şeye ihtiyacın var mı?
+18.43|ничего|В коробке ничего нет.|hiçbir şey|Kutuda hiçbir şey yok.
+18.44|всё|Всё готово.|her şey|Her şey hazır.
+18.45|кто-то|Кто-то стоит у двери.|biri|Kapıda biri var.
+18.46|кто-нибудь|Здесь кто-нибудь есть?|kimse (soru)|Burada kimse var mı?
+18.47|никто|Никто не ответил на звонок.|hiç kimse|Telefona hiç kimse cevap vermedi.
+18.48|все (люди)|Все счастливы.|herkes|Herkes mutlu.
+18.49|сам, себя|Я сделал это сам.|kendim|Bunu kendim yaptım.
+18.50|сам, себя (ты, вы)|Устраивайтесь поудобнее.|kendin, kendiniz|Kendinizi evinizde hissedin.
+18.51|сам, себя (он)|Он порезался.|kendisi (erkek)|Kendini kesti.
+18.52|сама, себя (она)|Она сама выучила английский.|kendisi (kadın)|İngilizceyi kendi kendine öğrendi.
+18.53|само, себя (оно)|Кошка умылась.|kendisi (nesne/hayvan)|Kedi kendini yıkadı.
+18.54|сами, себя (мы)|Мы хорошо провели время.|kendimiz|Çok eğlendik.
+18.55|сами, себя (они)|Они сделали это сами.|kendileri|Bunu kendileri yaptılar.
+18.56|я|Я студент.|ben|Ben öğrenciyim.
+18.57|ты, вы|Ты мой друг.|sen, siz|Sen benim arkadaşımsın.
+18.58|он|Он учитель.|o (erkek)|O bir öğretmen.
+18.59|она|Она дома.|o (kadın)|O evde.
+18.60|оно, это|Сегодня прекрасный день.|o (nesne)|Bugün güzel bir gün.
+18.61|мы|Мы живём в Ташкенте.|biz|Taşkent'te yaşıyoruz.
+18.62|они|Они мои соседи.|onlar|Onlar benim komşularım.
+18.63|меня, мне|Пожалуйста, позвони мне вечером.|beni, bana|Lütfen bu akşam beni ara.
+18.64|его, ему|Я видел его вчера.|onu (erkek)|Dün onu gördüm.
+18.65|её, ей|Я звонил ей вчера вечером.|onu (kadın)|Dün akşam onu aradım.
+18.66|нас, нам|Они пригласили нас на ужин.|bizi, bize|Bizi akşam yemeğine davet ettiler.
+18.67|их, им|Я хорошо их знаю.|onları|Onları iyi tanırım.
+18.68|мой|Это моя книга.|benim|Bu benim kitabım.
+18.69|твой, ваш|Это твоя ручка?|senin, sizin|Bu senin kalemin mi?
+18.70|его (притяж.)|Его машина новая.|onun (erkek)|Onun arabası yeni.
+18.71|его, её (о предмете)|Собака виляла хвостом.|onun (nesne/hayvan)|Köpek kuyruğunu salladı.
+18.72|наш|Наш дом маленький.|bizim|Bizim evimiz küçük.
+18.73|их (притяж.)|Их сад красивый.|onların|Onların bahçesi güzel.
+18.74|мой (без сущ.)|Эта книга моя.|benimki|Bu kitap benim.
+18.75|твой (без сущ.)|Эта ручка твоя?|seninki|Bu kalem senin mi?
+18.76|их (без сущ.)|Дом слева — их.|onlarınki|Soldaki ev onların.
+18.77|в|Книга в сумке.|içinde, -de|Kitap çantanın içinde.
+18.78|на|Чашка на столе.|üstünde|Fincan masanın üstünde.
+18.79|в, у (точное место)|Я дома.|-de, -da|Evdeyim.
+18.80|у, около; посредством|Дом стоит у реки.|yanında; ile|Ev nehrin kenarında.
+18.81|с|Я иду с другом.|ile|Arkadaşımla gidiyorum.
+18.82|без|Чай без сахара, пожалуйста.|-siz, olmadan|Şekersiz çay, lütfen.
+18.83|для|Этот подарок для тебя.|için|Bu hediye senin için.
+18.84|из, от|Я из Узбекистана.|-den, -dan|Ben Özbekistanlıyım.
+18.85|в, к|Я иду в школу.|-e, -a|Okula gidiyorum.
+18.86|(родительный падеж)|Это карта города.|-in (tamlama)|Bu şehrin haritası.
+18.87|о, про|Расскажи мне о своей семье.|hakkında|Bana ailen hakkında anlat.
+18.88|над|Самолёт пролетел над городом.|üzerinden|Uçak şehrin üzerinden uçtu.
+18.89|под|Кошка под столом.|altında|Kedi masanın altında.
+18.90|между|Он сидит между двумя друзьями.|arasında|İki arkadaşın arasında oturuyor.
+18.91|среди|Она среди друзей.|arasında (topluluk)|Arkadaşlarının arasında.
+18.92|через, сквозь|Мы прошли через парк.|içinden|Parkın içinden yürüdük.
+18.93|через, поперёк|Он переплыл реку.|karşıya|Nehri karşıya yüzdü.
+18.94|вокруг|Мы прогулялись вокруг озера.|etrafında|Gölün etrafında yürüdük.
+18.95|вдоль|Мы шли вдоль реки.|boyunca|Nehir boyunca yürüdük.
+18.96|позади, за|Сад за домом.|arkasında|Bahçe evin arkasında.
+18.97|рядом с|Она села рядом со мной.|yanında|Yanıma oturdu.
+18.98|рядом с, возле|Банк рядом со школой.|yanında, bitişiğinde|Banka okulun yanında.
+18.99|около, близко|Магазин рядом с моим домом.|yakınında|Dükkân evimin yakınında.
+18.100|далеко|Деревня далеко отсюда.|uzak|Köy buradan uzak.
+18.101|внутри|Ключ внутри коробки.|içinde|Anahtar kutunun içinde.
+18.102|снаружи, на улице|Дети играют на улице.|dışarıda|Çocuklar dışarıda oynuyor.
+18.103|над, выше|Лампа над столом.|üstünde, yukarısında|Lamba masanın üstünde.
+18.104|ниже|Температура ниже нуля.|altında|Sıcaklık sıfırın altında.
+18.105|вверх|Посмотри на небо.|yukarı|Gökyüzüne bak.
+18.106|вниз|Садитесь, пожалуйста.|aşağı|Oturun, lütfen.
+18.107|в (внутрь)|Он вошёл в комнату.|içine|Odaya girdi.
+18.108|наружу, из|Она вышла из дома.|dışarı|Evden dışarı çıktı.
+18.109|выключено, прочь|Выключи свет.|kapalı; -den uzak|Işığı kapat.
+18.110|прочь, далеко|Птица улетела.|uzağa|Kuş uçup gitti.
+18.111|к, по направлению к|Он пошёл к двери.|-e doğru|Kapıya doğru yürüdü.
+18.112|против; к (опираясь)|Он прислонился к стене.|-e karşı; -e yaslanarak|Duvara yaslandı.
+18.113|несмотря на|Несмотря на дождь, мы вышли на улицу.|-e rağmen|Yağmura rağmen dışarı çıktık.
+18.114|кроме|Пришли все, кроме Али.|hariç|Ali hariç herkes geldi.
+18.115|согласно|Судя по карте, мы рядом.|-e göre|Haritaya göre yakınız.
+18.116|очень|Суп очень горячий.|çok|Çorba çok sıcak.
+18.117|довольно|Сегодня довольно холодно.|oldukça|Bugün hava oldukça soğuk.
+18.118|довольно, скорее|Тест был довольно трудным.|epey, oldukça|Sınav epey zordu.
+18.119|почти|Я почти готов.|neredeyse|Neredeyse hazırım.
+18.120|чуть не, почти|Мы чуть не опоздали на автобус.|az kalsın, neredeyse|Az kalsın otobüsü kaçırıyorduk.
+18.121|действительно|Мне очень нравится эта песня.|gerçekten|Bu şarkıyı gerçekten seviyorum.
+18.122|только что; просто|Я только что приехал.|az önce; sadece|Az önce geldim.
+18.123|даже|Даже ребёнок может это сделать.|bile|Bunu bir çocuk bile yapabilir.
+18.124|может быть|Может быть, он придёт.|belki|Belki gelir.
+18.125|возможно|Возможно, ты прав.|belki de|Belki de haklısın.
+18.126|вероятно|Вероятно, пойдёт дождь.|muhtemelen|Muhtemelen yağmur yağacak.
+18.127|конечно, непременно|Я обязательно тебе помогу.|kesinlikle|Sana kesinlikle yardım edeceğim.
+18.128|конечно|Конечно, ты можешь прийти.|tabii ki|Tabii ki gelebilirsin.
+18.129|точно, именно|Совершенно верно.|tam olarak|Tam olarak doğru.
+18.130|особенно|Я люблю фрукты, особенно яблоки.|özellikle|Meyveyi severim, özellikle elmayı.
+18.131|полностью|Я совсем забыл.|tamamen|Tamamen unuttum.
+18.132|абсолютно|Ты абсолютно прав.|kesinlikle, tamamen|Kesinlikle haklısın.
+18.133|быстро|Он быстро бегает.|hızlıca|Hızlı koşuyor.
+18.134|медленно|Пожалуйста, говорите медленно.|yavaşça|Lütfen yavaş konuşun.
+18.135|осторожно|Езжай осторожно.|dikkatlice|Dikkatli sür.
+18.136|легко|Она легко учит языки.|kolayca|Dilleri kolayca öğreniyor.
+18.137|едва|Я едва тебя слышу.|zar zor|Seni zar zor duyuyorum.
+18.138|хорошо|Она хорошо говорит по-английски.|iyi|İngilizceyi iyi konuşuyor.
+18.139|плохо|Он плохо играет.|kötü|Kötü oynuyor.
+18.140|вместе|Мы учимся вместе.|birlikte|Birlikte ders çalışıyoruz.
+18.141|да|Да, я понимаю.|evet|Evet, anlıyorum.
+18.142|нет|Нет, спасибо.|hayır|Hayır, teşekkürler.
+18.143|пожалуйста|Садитесь, пожалуйста.|lütfen|Lütfen oturun.
+18.144|спасибо|Спасибо за помощь.|teşekkür ederim|Yardımın için teşekkür ederim.
+18.145|извините|Извините за опоздание.|özür dilerim|Geç kaldığım için özür dilerim.
+18.146|привет, здравствуйте|Привет, как дела?|merhaba|Merhaba, nasılsın?
+18.147|до свидания|До свидания, до скорой встречи.|hoşça kal|Hoşça kal, yakında görüşürüz.
+18.148|хорошо, ладно|Ладно, пошли.|tamam|Tamam, gidelim.
+# 19. Hobbi va bo'sh vaqt
+19.1|хобби|Моё хобби — чтение.|hobi|Hobim okumak.
+19.2|игра|Мы сыграли в игру.|oyun|Bir oyun oynadık.
+19.3|футбол|Он играет в футбол.|futbol|Futbol oynuyor.
+19.4|баскетбол|Они играют в баскетбол каждую пятницу.|basketbol|Her cuma basketbol oynarlar.
+19.5|теннис|Она хорошо играет в теннис.|tenis|İyi tenis oynuyor.
+19.6|волейбол|Мы играем в волейбол на пляже.|voleybol|Plajda voleybol oynarız.
+19.7|шахматы|Мой дедушка играет в шахматы.|satranç|Dedem satranç oynar.
+19.8|борьба|Борьба — национальный вид спорта.|güreş|Güreş milli bir spordur.
+19.9|бокс|Он любит бокс.|boks|Boksu sever.
+19.10|бег|Бег полезен для здоровья.|koşu|Koşu sağlığa iyi gelir.
+19.11|плавание|Плавание — мой любимый вид спорта.|yüzme|Yüzme en sevdiğim spor.
+19.12|езда на велосипеде|Кататься на велосипеде весело.|bisiklet sürme|Bisiklet sürmek eğlencelidir.
+19.13|пеший поход|Мы ходим в походы в горы.|doğa yürüyüşü|Dağlarda doğa yürüyüşüne gideriz.
+19.14|кемпинг|Прошлым летом мы ходили в поход с палатками.|kamp|Geçen yaz kampa gittik.
+19.15|рыбалка|Рыбалка успокаивает.|balıkçılık, balık tutma|Balık tutmak rahatlatıcıdır.
+19.16|спортзал|Я хожу в спортзал.|spor salonu|Spor salonuna giderim.
+19.17|тренер|Тренер тренирует команду.|antrenör|Antrenör takımı çalıştırıyor.
+19.18|игрок|Он хороший игрок.|oyuncu|İyi bir oyuncu.
+19.19|болельщик|Я футбольный болельщик.|taraftar|Ben bir futbol taraftarıyım.
+19.20|победитель|Победитель получает приз.|kazanan|Kazanan ödül alır.
+19.21|приз|Она выиграла приз.|ödül|Bir ödül kazandı.
+19.22|медаль|Он выиграл золотую медаль.|madalya|Altın madalya kazandı.
+19.23|счёт|Какой счёт?|skor|Skor ne?
+19.24|гонка, забег|Забег начинается в девять.|yarış|Yarış dokuzda başlıyor.
+19.25|соревнование|Соревнование завтра.|yarışma|Yarışma yarın.
+19.26|мяч|Брось мне мяч.|top|Topu bana at.
+19.27|карты|Они играют в карты.|iskambil kâğıtları|Kâğıt oynuyorlar.
+19.28|головоломка, пазл|Ребёнок собирает пазл.|yapboz, bulmaca|Çocuk bir yapboz çözüyor.
+19.29|игрушка|Малышу нравится игрушка.|oyuncak|Bebek oyuncağı seviyor.
+19.30|картина|Картина красивая.|tablo, resim|Tablo çok güzel.
+19.31|рисование, рисунок|Он хорошо рисует.|çizim|Çizimde iyidir.
+19.32|гитара|Он играет на гитаре.|gitar|Gitar çalıyor.
+19.33|пианино|Она играет на пианино.|piyano|Piyano çalıyor.
+19.34|скрипка|Скрипка звучит нежно.|keman|Keman tatlı bir ses çıkarıyor.
+19.35|барабан|Он играет на барабане.|davul|Davul çalıyor.
+19.36|концерт|Мы ходили на концерт.|konser|Bir konsere gittik.
+19.37|вечеринка|Сегодня вечером у нас вечеринка.|parti|Bu akşam bir partimiz var.
+19.38|фестиваль|Фестиваль начинается завтра.|festival|Festival yarın başlıyor.
+19.39|свадьба|Мы ходили на свадьбу.|düğün|Bir düğüne gittik.
+19.40|подарок|Это подарок для тебя.|hediye|Bu senin için bir hediye.
+19.41|пикник|Мы устроили пикник в парке.|piknik|Parkta piknik yaptık.
+19.42|приключение|Это было отличное приключение.|macera|Harika bir maceraydı.
+19.43|лагерь|Дети в лагере.|kamp|Çocuklar kampta.
+19.44|фотография (хобби)|Фотография — моё хобби.|fotoğrafçılık|Fotoğrafçılık benim hobim.
+19.45|коллекция|У него коллекция марок.|koleksiyon|Pul koleksiyonu var.
+19.46|чтение|Чтение — моё хобби.|okuma|Okumak benim hobim.
+19.47|кулинария|Готовить весело.|yemek yapma|Yemek yapmak eğlencelidir.
+19.48|садоводство|Работа в саду успокаивает.|bahçecilik|Bahçecilik rahatlatıcıdır.
+19.49|покупки, шопинг|Я люблю ходить по магазинам.|alışveriş|Alışverişi severim.
+19.50|танцы|Танцевать весело.|dans|Dans etmek eğlencelidir.
+19.51|пение|Пение делает меня счастливым.|şarkı söyleme|Şarkı söylemek beni mutlu ediyor.

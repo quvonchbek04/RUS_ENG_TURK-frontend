@@ -1,0 +1,3166 @@
+{
+ "m0": {
+  "dialog2": {
+   "title": "Meeting a new classmate",
+   "lines": [
+    [
+     "A",
+     "Hello! My name is Ali. What is your name?",
+     "Salom! Mening ismim Ali. Sizning ismingiz nima?"
+    ],
+    [
+     "B",
+     "Hi, Ali. I am Dilya. Nice to meet you.",
+     "Salom, Ali. Men Dilyaman. Tanishganimdan xursandman."
+    ],
+    [
+     "A",
+     "How do you spell your name?",
+     "Ismingizni qanday yozasiz (harflab ayting)?"
+    ],
+    [
+     "B",
+     "D-I-L-Y-A.",
+     "D-I-L-Y-A."
+    ],
+    [
+     "A",
+     "Thank you. Are you a new student?",
+     "Rahmat. Siz yangi talabamisiz?"
+    ],
+    [
+     "B",
+     "Yes, I am. This is my first day.",
+     "Ha. Bugun mening birinchi kunim."
+    ],
+    [
+     "A",
+     "Welcome! Let me show you the classroom.",
+     "Xush kelibsiz! Sinfni ko'rsatib qo'yay."
+    ],
+    [
+     "B",
+     "Thank you very much!",
+     "Katta rahmat!"
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Harflarni talaffuz qilish bo'yicha maslahat",
+    "text": "Ingliz alifbosida 26 harf bor, lekin tovushlar 44 ga yaqin. Shuning uchun harf nomi va tovushini alohida o'rganing: masalan, 'a' harfi 'cat' so'zida [æ], 'name' so'zida [eɪ] deb o'qiladi. Ismni harflab aytish (spelling) tanishuvda juda kerak.",
+    "examples": [
+     [
+      "A - B - C - D",
+      "ey - bi - si - di"
+     ],
+     [
+      "My name is Bob: B-O-B.",
+      "Mening ismim Bob: B-O-B."
+     ]
+    ]
+   },
+   {
+    "title": "Katta va kichik harflar",
+    "text": "Ingliz tilida gap boshi, shaxs ismlari, mamlakat va tillar nomi, hafta kunlari va oylar bosh harf bilan yoziladi. 'I' (men) olmoshi doim katta harf bilan yoziladi.",
+    "examples": [
+     [
+      "I am from Uzbekistan.",
+      "Men O'zbekistondanman."
+     ],
+     [
+      "On Monday I speak English.",
+      "Dushanba kuni men inglizcha gapiraman."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "My first English lesson",
+   "text": "Today is my first English lesson. The teacher is kind. She writes the alphabet on the board. We read the letters together: A, B, C, D. Then we spell our names. I am a little shy, but I am happy.",
+   "uz": "Bugun mening birinchi ingliz tili darsim. O'qituvchi mehribon. U doskaga alifboni yozadi. Biz harflarni birga o'qiymiz: A, B, C, D. Keyin ismlarimizni harflaymiz. Men biroz uyatchanman, lekin xursandman.",
+   "questions": [
+    [
+     "Whose first lesson is it?",
+     "It is my first English lesson."
+    ],
+    [
+     "What does the teacher write on the board?",
+     "She writes the alphabet."
+    ],
+    [
+     "How does the student feel?",
+     "He/She is a little shy, but happy."
+    ]
+   ]
+  }
+ },
+ "m1": {
+  "dialog2": {
+   "title": "At the language centre",
+   "lines": [
+    [
+     "Admin",
+     "Good morning. How can I help you?",
+     "Xayrli tong. Sizga qanday yordam bera olaman?"
+    ],
+    [
+     "Sara",
+     "I would like to join an English course.",
+     "Men ingliz tili kursiga yozilmoqchiman."
+    ],
+    [
+     "Admin",
+     "Sure. What is your full name?",
+     "Albatta. To'liq ismingiz nima?"
+    ],
+    [
+     "Sara",
+     "My name is Sara Karimova. S-A-R-A.",
+     "Mening ismim Sara Karimova. S-A-R-A."
+    ],
+    [
+     "Admin",
+     "And what is your phone number?",
+     "Telefon raqamingiz-chi?"
+    ],
+    [
+     "Sara",
+     "It is 90 123 45 67.",
+     "90 123 45 67."
+    ],
+    [
+     "Admin",
+     "Thank you. The course starts on Monday.",
+     "Rahmat. Kurs dushanba kuni boshlanadi."
+    ],
+    [
+     "Sara",
+     "Great. See you on Monday!",
+     "Ajoyib. Dushanbagacha!"
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "To be fe'li: am / is / are",
+    "text": "'To be' fe'li shaxsga qarab o'zgaradi: I am, he/she/it is, you/we/they are. Qisqa shakllar og'zaki nutqda ko'p ishlatiladi: I'm, he's, they're.",
+    "examples": [
+     [
+      "I am a student. = I'm a student.",
+      "Men talabaman."
+     ],
+     [
+      "She is from Samarkand.",
+      "U Samarqanddan."
+     ]
+    ]
+   },
+   {
+    "title": "Tanishuv so'roqlari",
+    "text": "What is your name? (Ismingiz nima?), Where are you from? (Qayerdansiz?), How old are you? (Necha yoshdasiz?) — bular tanishuvning asosiy uchta savoli. Javobda to'liq gap ishlating.",
+    "examples": [
+     [
+      "Where are you from? — I am from Tashkent.",
+      "Qayerdansiz? — Men Toshkentdanman."
+     ],
+     [
+      "How old are you? — I am twenty.",
+      "Necha yoshdasiz? — Yigirma yoshdaman."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "Meet Sara",
+   "text": "Sara is twenty years old. She is from Samarkand. She is a student at the university. Now she is at a language centre because she wants to speak English well. Her phone number is 90 123 45 67.",
+   "uz": "Sara yigirma yoshda. U Samarqanddan. U universitetda talaba. Hozir u til markazida, chunki u inglizchani yaxshi gapirishni xohlaydi. Uning telefon raqami 90 123 45 67.",
+   "questions": [
+    [
+     "How old is Sara?",
+     "She is twenty."
+    ],
+    [
+     "Where is she from?",
+     "She is from Samarkand."
+    ],
+    [
+     "Why is she at the language centre?",
+     "Because she wants to speak English well."
+    ]
+   ]
+  }
+ },
+ "m2": {
+  "dialog2": {
+   "title": "Shopping for fruit",
+   "lines": [
+    [
+     "Seller",
+     "Good afternoon! What do you need?",
+     "Xayrli kun! Sizga nima kerak?"
+    ],
+    [
+     "Buyer",
+     "I need some apples and bananas.",
+     "Menga bir oz olma va banan kerak."
+    ],
+    [
+     "Seller",
+     "How many apples do you want?",
+     "Nechta olma xohlaysiz?"
+    ],
+    [
+     "Buyer",
+     "Two kilos, please. How much are they?",
+     "Ikki kilo, iltimos. Ular qancha turadi?"
+    ],
+    [
+     "Seller",
+     "They are ten thousand soums per kilo.",
+     "Kilosi o'n ming so'm."
+    ],
+    [
+     "Buyer",
+     "OK. I buy two kilos of apples.",
+     "Mayli. Ikki kilo olma olaman."
+    ],
+    [
+     "Seller",
+     "Here you are. Anything else?",
+     "Marhamat. Yana nima kerak?"
+    ],
+    [
+     "Buyer",
+     "No, thank you. That is all.",
+     "Yo'q, rahmat. Hammasi shu."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Present Simple: -s qo'shimchasi",
+    "text": "He/she/it bilan fe'lga -s (yoki -es) qo'shiladi: she works, he watches. Inkorda do not / does not ishlatiladi va fe'l asl holida qoladi: she does not work.",
+    "examples": [
+     [
+      "My mother cooks every day.",
+      "Onam har kuni ovqat pishiradi."
+     ],
+     [
+      "He does not drink tea.",
+      "U choy ichmaydi."
+     ]
+    ]
+   },
+   {
+    "title": "Savol tuzish: Do / Does",
+    "text": "Savolda gap boshiga Do (I, you, we, they) yoki Does (he, she, it) qo'yiladi. Does dan keyin fe'lga -s qo'shilmaydi.",
+    "examples": [
+     [
+      "Do you like fruit?",
+      "Siz mevani yoqtirasizmi?"
+     ],
+     [
+      "Does she buy bread here?",
+      "U bu yerdan non sotib oladimi?"
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "A day at the market",
+   "text": "Every Saturday my mother goes to the market. She buys vegetables, fruit and bread. The seller knows her and always says hello. My mother likes fresh apples, but she does not like expensive things. I often help her carry the bags.",
+   "uz": "Har shanba kuni onam bozorga boradi. U sabzavot, meva va non sotib oladi. Sotuvchi uni taniydi va doim salom beradi. Onam yangi olmani yaxshi ko'radi, lekin qimmat narsalarni yoqtirmaydi. Men ko'pincha unga sumkalarni ko'tarishda yordam beraman.",
+   "questions": [
+    [
+     "When does the mother go to the market?",
+     "Every Saturday."
+    ],
+    [
+     "What does she buy?",
+     "Vegetables, fruit and bread."
+    ],
+    [
+     "Who helps her carry the bags?",
+     "The child (I) often helps her."
+    ]
+   ]
+  }
+ },
+ "m3": {
+  "dialog2": {
+   "title": "Buying stationery",
+   "lines": [
+    [
+     "A",
+     "Excuse me, do you have a notebook?",
+     "Kechirasiz, daftaringiz bormi?"
+    ],
+    [
+     "B",
+     "Yes, we have notebooks and pens.",
+     "Ha, bizda daftar va ruchkalar bor."
+    ],
+    [
+     "A",
+     "I need a pen and an eraser.",
+     "Menga ruchka va o'chirg'ich kerak."
+    ],
+    [
+     "B",
+     "Here is a blue pen and an eraser.",
+     "Mana ko'k ruchka va o'chirg'ich."
+    ],
+    [
+     "A",
+     "And two notebooks, please.",
+     "Va ikkita daftar, iltimos."
+    ],
+    [
+     "B",
+     "The notebooks are on the shelf.",
+     "Daftarlar javonda."
+    ],
+    [
+     "A",
+     "Thank you. I take an orange pen too.",
+     "Rahmat. Apelsin rangli ruchka ham olaman."
+    ],
+    [
+     "B",
+     "Of course. Anything else?",
+     "Albatta. Yana biror narsa?"
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "a yoki an?",
+    "text": "Undosh tovush bilan boshlanuvchi so'z oldidan 'a', unli tovush bilan boshlansa 'an' ishlatiladi. Muhimi yozuv emas, tovush: 'an hour' (h o'qilmaydi), 'a university' (y tovushi).",
+    "examples": [
+     [
+      "a book, a pen",
+      "kitob, ruchka"
+     ],
+     [
+      "an apple, an hour",
+      "olma, soat"
+     ]
+    ]
+   },
+   {
+    "title": "Ko'plikning qoidasiz shakllari",
+    "text": "Ba'zi otlar -s olmaydi: man → men, woman → women, child → children, foot → feet, tooth → teeth, person → people. Ularni yodlab oling.",
+    "examples": [
+     [
+      "two children and three women",
+      "ikki bola va uch ayol"
+     ],
+     [
+      "My feet are cold.",
+      "Oyoqlarim sovuq."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "The new classroom",
+   "text": "Our classroom is new. There are twenty chairs, ten tables and a big board. There is an old clock on the wall. Every student has a notebook and a pen. The teacher has an orange bag and a lot of books.",
+   "uz": "Bizning sinfimiz yangi. Yigirmata stul, o'nta stol va katta doska bor. Devorda eski soat bor. Har bir o'quvchida daftar va ruchka bor. O'qituvchining apelsin rangli sumkasi va ko'p kitoblari bor.",
+   "questions": [
+    [
+     "How many chairs are there?",
+     "There are twenty chairs."
+    ],
+    [
+     "What is on the wall?",
+     "An old clock."
+    ],
+    [
+     "What does the teacher have?",
+     "An orange bag and a lot of books."
+    ]
+   ]
+  }
+ },
+ "m17": {
+  "dialog2": {
+   "title": "Talking about a house",
+   "lines": [
+    [
+     "A",
+     "Where do you live?",
+     "Qayerda yashaysiz?"
+    ],
+    [
+     "B",
+     "I live in a big house with my family.",
+     "Men oilam bilan katta uyda yashayman."
+    ],
+    [
+     "A",
+     "How many rooms are there?",
+     "Nechta xona bor?"
+    ],
+    [
+     "B",
+     "There are five rooms and a garden.",
+     "Beshta xona va bog' bor."
+    ],
+    [
+     "A",
+     "Is your bedroom big?",
+     "Yotoqxonangiz kattami?"
+    ],
+    [
+     "B",
+     "No, it is small, but it is comfortable.",
+     "Yo'q, kichik, lekin qulay."
+    ],
+    [
+     "A",
+     "Who lives with you?",
+     "Siz bilan kim yashaydi?"
+    ],
+    [
+     "B",
+     "My parents, my brother and my grandmother.",
+     "Ota-onam, akam va buvim."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "There is / There are",
+    "text": "Biror narsaning borligini aytish uchun: there is (birlik), there are (ko'plik). Inkori: there is not (isn't), there are not (aren't). Savol: Is there...? Are there...?",
+    "examples": [
+     [
+      "There is a sofa in the room.",
+      "Xonada divan bor."
+     ],
+     [
+      "Are there any chairs?",
+      "Stullar bormi?"
+     ]
+    ]
+   },
+   {
+    "title": "Egalik: 's",
+    "text": "Ega ismiga 's qo'shilsa 'kimning' ma'nosi chiqadi: my brother's room (akamning xonasi). Ko'plikda s dan keyin faqat apostrof: my parents' house.",
+    "examples": [
+     [
+      "This is Ali's book.",
+      "Bu Alining kitobi."
+     ],
+     [
+      "my parents' car",
+      "ota-onamning mashinasi"
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "My grandmother",
+   "text": "My grandmother lives with us. She is seventy years old. She wakes up early and makes tea for everybody. In the evening she tells stories to the children. Her room is next to the kitchen. We love her very much.",
+   "uz": "Buvim biz bilan yashaydi. U yetmish yoshda. U erta turadi va hamma uchun choy damlaydi. Kechqurun u bolalarga ertak aytib beradi. Uning xonasi oshxonaning yonida. Biz uni juda yaxshi ko'ramiz.",
+   "questions": [
+    [
+     "How old is the grandmother?",
+     "She is seventy."
+    ],
+    [
+     "What does she do in the evening?",
+     "She tells stories to the children."
+    ],
+    [
+     "Where is her room?",
+     "Next to the kitchen."
+    ]
+   ]
+  }
+ },
+ "m18": {
+  "dialog2": {
+   "title": "Which colour do you like?",
+   "lines": [
+    [
+     "A",
+     "What colour is your new bag?",
+     "Yangi sumkangiz qanday rangda?"
+    ],
+    [
+     "B",
+     "It is dark green. I love green.",
+     "To'q yashil. Men yashilni yaxshi ko'raman."
+    ],
+    [
+     "A",
+     "Is it a big bag or a small one?",
+     "U katta sumkami yoki kichikmi?"
+    ],
+    [
+     "B",
+     "It is a medium round bag.",
+     "O'rtacha yumaloq sumka."
+    ],
+    [
+     "A",
+     "My favourite colour is blue, like the sky.",
+     "Mening sevimli rangim ko'k, osmondek."
+    ],
+    [
+     "B",
+     "Blue is nice. Do you like red too?",
+     "Ko'k chiroyli. Qizilni ham yoqtirasizmi?"
+    ],
+    [
+     "A",
+     "Not really. Red is too bright for me.",
+     "Unchalik emas. Qizil men uchun juda yorqin."
+    ],
+    [
+     "B",
+     "I understand. Everybody has a different taste.",
+     "Tushunaman. Har kimning didi har xil."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Sifat otdan oldin keladi",
+    "text": "Ingliz tilida sifat otdan oldin turadi va o'zgarmaydi: a red car, red cars. Sifat ko'plikka qo'shimcha olmaydi.",
+    "examples": [
+     [
+      "a small white cat",
+      "kichkina oq mushuk"
+     ],
+     [
+      "two big blue boxes",
+      "ikkita katta ko'k quti"
+     ]
+    ]
+   },
+   {
+    "title": "Ranglarni tasvirlash",
+    "text": "Rangni ochiq/to'q qilish uchun light va dark so'zlari rang oldiga qo'yiladi: light blue, dark green. Shakl: round (yumaloq), square (kvadrat), long (uzun).",
+    "examples": [
+     [
+      "a light blue shirt",
+      "och ko'k ko'ylak"
+     ],
+     [
+      "a round table",
+      "yumaloq stol"
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "Colours around us",
+   "text": "The sky is blue and the grass is green. The sun is yellow and the snow is white. In my room the walls are light yellow, and the carpet is brown. I like bright colours because they make me happy.",
+   "uz": "Osmon ko'k, maysa yashil. Quyosh sariq, qor oq. Mening xonamda devorlar och sariq, gilam esa jigarrang. Men yorqin ranglarni yoqtiraman, chunki ular meni xursand qiladi.",
+   "questions": [
+    [
+     "What colour is the sky?",
+     "Blue."
+    ],
+    [
+     "What colour are the walls in the room?",
+     "Light yellow."
+    ],
+    [
+     "Why does the writer like bright colours?",
+     "They make him/her happy."
+    ]
+   ]
+  }
+ },
+ "m19": {
+  "dialog2": {
+   "title": "Booking a table",
+   "lines": [
+    [
+     "Guest",
+     "Hello, I would like to book a table for four.",
+     "Salom, to'rt kishilik stol band qilmoqchiman."
+    ],
+    [
+     "Waiter",
+     "Certainly. For what time?",
+     "Albatta. Soat nechaga?"
+    ],
+    [
+     "Guest",
+     "For seven o'clock this evening.",
+     "Bugun kechqurun soat yettiga."
+    ],
+    [
+     "Waiter",
+     "Could I have your name, please?",
+     "Ismingizni aytsangiz?"
+    ],
+    [
+     "Guest",
+     "Yes, it is Rustam Aliyev.",
+     "Ha, Rustam Aliyev."
+    ],
+    [
+     "Waiter",
+     "Would you like a table by the window?",
+     "Deraza yonidagi stolni xohlaysizmi?"
+    ],
+    [
+     "Guest",
+     "Yes, that would be lovely.",
+     "Ha, juda yaxshi bo'lardi."
+    ],
+    [
+     "Waiter",
+     "Perfect. See you at seven.",
+     "Ajoyib. Soat yettida kutamiz."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Would like va Can/Could",
+    "text": "'I would like...' — 'Men ... xohlardim' degan xushmuomala shakl. 'Could I have...?' va 'Can I have...?' — iltimos qilish. Could — yanada xushmuomala.",
+    "examples": [
+     [
+      "I would like a cup of tea.",
+      "Men bir piyola choy xohlardim."
+     ],
+     [
+      "Could I have the menu, please?",
+      "Menyuni berolasizmi?"
+     ]
+    ]
+   },
+   {
+    "title": "Sanaladigan va sanalmaydigan otlar",
+    "text": "Sanaladigan: apple, egg (a/an, -s). Sanalmaydigan: water, rice, bread (ko'plik yo'q). Ular bilan some/much, sanaladiganlar bilan many ishlatiladi.",
+    "examples": [
+     [
+      "some water and a salad",
+      "bir oz suv va salat"
+     ],
+     [
+      "How much rice? How many eggs?",
+      "Qancha guruch? Nechta tuxum?"
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "Dinner at a restaurant",
+   "text": "On Friday we went to a nice restaurant. The waiter brought the menu. I ordered soup and grilled chicken, and my sister ordered a salad. For dessert we had ice cream. The food was delicious and the service was very polite.",
+   "uz": "Juma kuni biz chiroyli restoranga bordik. Ofitsiant menyuni olib keldi. Men sho'rva va grilda tovuq buyurtma qildim, singlim esa salat buyurtma qildi. Desertga muzqaymoq yedik. Ovqat mazali va xizmat juda xushmuomala edi.",
+   "questions": [
+    [
+     "What did the writer order?",
+     "Soup and grilled chicken."
+    ],
+    [
+     "What did the sister order?",
+     "A salad."
+    ],
+    [
+     "How was the service?",
+     "Very polite."
+    ]
+   ]
+  }
+ },
+ "m20": {
+  "dialog2": {
+   "title": "What is your daily routine?",
+   "lines": [
+    [
+     "A",
+     "What time do you get up?",
+     "Soat nechada turasiz?"
+    ],
+    [
+     "B",
+     "I get up at six thirty.",
+     "Men oltida o'ttizda turaman."
+    ],
+    [
+     "A",
+     "What do you do after breakfast?",
+     "Nonushtadan keyin nima qilasiz?"
+    ],
+    [
+     "B",
+     "I go to work at eight o'clock.",
+     "Soat sakkizda ishga boraman."
+    ],
+    [
+     "A",
+     "When do you have lunch?",
+     "Tushlikni qachon qilasiz?"
+    ],
+    [
+     "B",
+     "At one o'clock, usually with my colleagues.",
+     "Soat birda, odatda hamkasblarim bilan."
+    ],
+    [
+     "A",
+     "And when do you go to bed?",
+     "Qachon uxlaysiz?"
+    ],
+    [
+     "B",
+     "Around eleven. I am always tired in the evening.",
+     "Soat o'n bir atrofida. Kechqurun doim charchagan bo'laman."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Chastota ravishlari",
+    "text": "always (doim), usually (odatda), often (tez-tez), sometimes (ba'zan), never (hech qachon). Ular odatda asosiy fe'ldan oldin, 'to be' dan keyin keladi.",
+    "examples": [
+     [
+      "I usually drink tea in the morning.",
+      "Men odatda ertalab choy ichaman."
+     ],
+     [
+      "She is never late.",
+      "U hech qachon kechikmaydi."
+     ]
+    ]
+   },
+   {
+    "title": "Vaqt predloglari",
+    "text": "at + soat (at 7:00), on + kun (on Monday), in + kun qismi (in the morning), lekin at night. 'half past six' = 6:30, 'quarter to seven' = 6:45.",
+    "examples": [
+     [
+      "at half past six",
+      "oltida o'ttizda"
+     ],
+     [
+      "in the evening, at night",
+      "kechqurun, kechasi"
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "A busy day",
+   "text": "Karim has a busy day. He gets up at six, has breakfast and goes to the university at eight. His classes finish at three. Then he goes to the gym for an hour. In the evening he does his homework and reads a book. He goes to bed at eleven.",
+   "uz": "Karimning kuni band. U oltida turadi, nonushta qiladi va sakkizda universitetga ketadi. Darslari uchda tugaydi. Keyin bir soat sport zaliga boradi. Kechqurun uy vazifasini bajaradi va kitob o'qiydi. U o'n birda uxlaydi.",
+   "questions": [
+    [
+     "When does Karim get up?",
+     "At six."
+    ],
+    [
+     "What does he do after classes?",
+     "He goes to the gym."
+    ],
+    [
+     "When does he go to bed?",
+     "At eleven."
+    ]
+   ]
+  }
+ },
+ "m4": {
+  "dialog2": {
+   "title": "A weekend in the mountains",
+   "lines": [
+    [
+     "A",
+     "Did you go anywhere last weekend?",
+     "O'tgan dam olish kunlari biror joyga bordingizmi?"
+    ],
+    [
+     "B",
+     "Yes, we went to the mountains.",
+     "Ha, biz tog'ga bordik."
+    ],
+    [
+     "A",
+     "How did you travel?",
+     "Qanday bordingiz?"
+    ],
+    [
+     "B",
+     "We took a bus and then walked for three hours.",
+     "Avtobusga o'tirdik, keyin uch soat piyoda yurdik."
+    ],
+    [
+     "A",
+     "Did you take photos?",
+     "Rasmga oldingizmi?"
+    ],
+    [
+     "B",
+     "Of course. I took more than a hundred.",
+     "Albatta. Yuztadan ko'p rasmga oldim."
+    ],
+    [
+     "A",
+     "Was the weather good?",
+     "Ob-havo yaxshi edimi?"
+    ],
+    [
+     "B",
+     "It was sunny, but a little cold.",
+     "Quyoshli, lekin biroz sovuq edi."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Muntazam fe'llar: -ed",
+    "text": "Muntazam fe'llarga -ed qo'shiladi: work → worked, play → played. -e bilan tugasa faqat -d: live → lived. Undosh+y: study → studied.",
+    "examples": [
+     [
+      "We visited our aunt.",
+      "Biz xolamnikiga bordik."
+     ],
+     [
+      "She studied all night.",
+      "U tun bo'yi o'qidi."
+     ]
+    ]
+   },
+   {
+    "title": "Inkor va savol: did",
+    "text": "Past Simple da inkor va savolda did / did not ishlatiladi, asosiy fe'l asl holida qoladi: Did you go? I did not go. Bu qoidani 'went' kabi nomuntazam fe'llarga ham qo'llang.",
+    "examples": [
+     [
+      "I did not see him yesterday.",
+      "Men uni kecha ko'rmadim."
+     ],
+     [
+      "Did they come late?",
+      "Ular kech keldimi?"
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "A trip to Chimgan",
+   "text": "Last summer my friends and I visited Chimgan. We left early in the morning and arrived at ten. We walked along a river and ate lunch on the grass. In the afternoon it rained a little, so we returned to the bus. It was a tiring but wonderful day.",
+   "uz": "O'tgan yozda do'stlarim va men Chimyonga bordik. Ertalab erta chiqib, soat o'nda yetib keldik. Daryo bo'ylab yurdik va maysada tushlik qildik. Tushdan keyin ozgina yomg'ir yog'di, shuning uchun avtobusga qaytdik. Bu charchatadigan, lekin ajoyib kun edi.",
+   "questions": [
+    [
+     "When did they arrive?",
+     "At ten."
+    ],
+    [
+     "What did they do at lunchtime?",
+     "They ate lunch on the grass."
+    ],
+    [
+     "Why did they return to the bus?",
+     "Because it rained."
+    ]
+   ]
+  }
+ },
+ "m5": {
+  "dialog2": {
+   "title": "Plans for next year",
+   "lines": [
+    [
+     "A",
+     "What are you going to do next year?",
+     "Kelasi yil nima qilmoqchisiz?"
+    ],
+    [
+     "B",
+     "I am going to study English in London.",
+     "Men Londonda ingliz tilini o'rganmoqchiman."
+    ],
+    [
+     "A",
+     "Will it be expensive?",
+     "Qimmat bo'ladimi?"
+    ],
+    [
+     "B",
+     "I think it will be more expensive than here.",
+     "O'ylaymanki, bu yerdagidan qimmatroq bo'ladi."
+    ],
+    [
+     "A",
+     "Will you work there?",
+     "U yerda ishlaysizmi?"
+    ],
+    [
+     "B",
+     "Maybe. I will look for a part-time job.",
+     "Balki. Yarim kunlik ish qidiraman."
+    ],
+    [
+     "A",
+     "I am sure you will do well.",
+     "Ishonchim komilki, siz yaxshi uddalaysiz."
+    ],
+    [
+     "B",
+     "Thank you, that is very kind.",
+     "Rahmat, bu juda yaxshi gap."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "will va going to",
+    "text": "'Going to' — oldindan qilingan reja yoki ko'rinib turgan belgi: I am going to study. 'Will' — o'sha payt qabul qilingan qaror, bashorat, va'da: I will help you.",
+    "examples": [
+     [
+      "Look at the clouds! It is going to rain.",
+      "Bulutlarga qarang! Yomg'ir yog'adi."
+     ],
+     [
+      "I will call you tonight.",
+      "Men sizga bugun kechqurun qo'ng'iroq qilaman."
+     ]
+    ]
+   },
+   {
+    "title": "Qiyosiy va orttirma daraja",
+    "text": "Qisqa sifat: tall → taller → the tallest. Uzun sifat: more/most beautiful. Qoidasiz: good → better → the best, bad → worse → the worst.",
+    "examples": [
+     [
+      "This book is more interesting than that one.",
+      "Bu kitob anavidan qiziqarliroq."
+     ],
+     [
+      "He is the best player in the team.",
+      "U jamoadagi eng yaxshi o'yinchi."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "My plan for the future",
+   "text": "In five years I want to be a doctor. First I will finish school, then I will enter the medical university. It will be difficult, but I am going to work hard. My father says that a good doctor is the happiest person in the world.",
+   "uz": "Besh yildan keyin men shifokor bo'lishni xohlayman. Avval maktabni tugataman, keyin tibbiyot universitetiga kiraman. Bu qiyin bo'ladi, lekin men qattiq mehnat qilmoqchiman. Dadam yaxshi shifokor dunyodagi eng baxtli odam, deydi.",
+   "questions": [
+    [
+     "What does the writer want to be?",
+     "A doctor."
+    ],
+    [
+     "What will he/she do first?",
+     "Finish school."
+    ],
+    [
+     "What does the father say?",
+     "A good doctor is the happiest person in the world."
+    ]
+   ]
+  }
+ },
+ "m6": {
+  "dialog2": {
+   "title": "Where is it?",
+   "lines": [
+    [
+     "A",
+     "Excuse me, where is the post office?",
+     "Kechirasiz, pochta qayerda?"
+    ],
+    [
+     "B",
+     "It is between the bank and the pharmacy.",
+     "U bank va dorixona o'rtasida."
+    ],
+    [
+     "A",
+     "Is it far from here?",
+     "Bu yerdan uzoqmi?"
+    ],
+    [
+     "B",
+     "No, it is opposite the park.",
+     "Yo'q, parkning qarshisida."
+    ],
+    [
+     "A",
+     "Thank you. And the bus stop?",
+     "Rahmat. Avtobus bekati-chi?"
+    ],
+    [
+     "B",
+     "It is behind that building, next to the cafe.",
+     "U anavi bino orqasida, kafening yonida."
+    ],
+    [
+     "A",
+     "Great, I see it now.",
+     "Zo'r, endi ko'rdim."
+    ],
+    [
+     "B",
+     "You are welcome.",
+     "Arzimaydi."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Joy predloglari",
+    "text": "in front of (oldida), behind (orqasida), next to / beside (yonida), between (o'rtasida), opposite (qarshisida), under (ostida), above (tepasida).",
+    "examples": [
+     [
+      "The cat is under the table.",
+      "Mushuk stol ostida."
+     ],
+     [
+      "The school is opposite the library.",
+      "Maktab kutubxonaning qarshisida."
+     ]
+    ]
+   },
+   {
+    "title": "Harakat predloglari",
+    "text": "to (...ga), from (...dan), into (ichiga), out of (ichidan), across (kesib), through (orqali), along (bo'ylab).",
+    "examples": [
+     [
+      "We walked across the bridge.",
+      "Biz ko'prikdan o'tdik."
+     ],
+     [
+      "He went into the room.",
+      "U xonaga kirdi."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "My neighbourhood",
+   "text": "My neighbourhood is quiet and green. There is a small park in front of my house, and a bakery next to it. Behind the bakery there is a school. Every morning I walk through the park to the bus stop, which is opposite the pharmacy.",
+   "uz": "Mening mahallam sokin va ko'm-ko'k. Uyim oldida kichik park, uning yonida novvoyxona bor. Novvoyxona orqasida maktab bor. Har ertalab men park orqali dorixona qarshisidagi avtobus bekatiga yuraman.",
+   "questions": [
+    [
+     "What is in front of the house?",
+     "A small park."
+    ],
+    [
+     "What is behind the bakery?",
+     "A school."
+    ],
+    [
+     "Where is the bus stop?",
+     "Opposite the pharmacy."
+    ]
+   ]
+  }
+ },
+ "m21": {
+  "dialog2": {
+   "title": "Planning a picnic",
+   "lines": [
+    [
+     "A",
+     "What is the weather like today?",
+     "Bugun ob-havo qanday?"
+    ],
+    [
+     "B",
+     "It is sunny and warm.",
+     "Quyoshli va iliq."
+    ],
+    [
+     "A",
+     "Let us have a picnic then!",
+     "Unda pikniklik qilaylik!"
+    ],
+    [
+     "B",
+     "Good idea. But the forecast says it will rain tomorrow.",
+     "Yaxshi fikr. Lekin prognozda ertaga yomg'ir yog'adi deyilgan."
+    ],
+    [
+     "A",
+     "Then we must go today.",
+     "Unda bugun borishimiz kerak."
+    ],
+    [
+     "B",
+     "I will bring a blanket and some sandwiches.",
+     "Men ko'rpacha va sendvichlar olib kelaman."
+    ],
+    [
+     "A",
+     "I will take juice and fruit.",
+     "Men sharbat va meva olaman."
+    ],
+    [
+     "B",
+     "Perfect. Let us meet at noon.",
+     "Ajoyib. Peshinda uchrashamiz."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Ob-havo ifodalari",
+    "text": "Ob-havoda 'it' rasmiy ega bo'lib ishlaydi: It is raining, It is cold, It snows in winter. 'What is the weather like?' — ob-havo qanday?",
+    "examples": [
+     [
+      "It is windy today.",
+      "Bugun shamol bor."
+     ],
+     [
+      "It never snows in July.",
+      "Iyulda hech qachon qor yog'maydi."
+     ]
+    ]
+   },
+   {
+    "title": "Present Continuous",
+    "text": "Hozir davom etayotgan ish: am/is/are + fe'l-ing. Ob-havoda ham ishlatiladi: It is raining now.",
+    "examples": [
+     [
+      "The sun is shining.",
+      "Quyosh charaqlayapti."
+     ],
+     [
+      "Are the children playing outside?",
+      "Bolalar tashqarida o'ynayaptimi?"
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "Four seasons",
+   "text": "In my country there are four seasons. Spring is green and fresh. Summer is very hot, and we eat a lot of watermelon. Autumn is rainy and golden. Winter is cold, and sometimes it snows. My favourite season is autumn because the weather is mild.",
+   "uz": "Mening mamlakatimda to'rt fasl bor. Bahor yam-yashil va salqin. Yoz juda issiq, biz ko'p tarvuz yeymiz. Kuz yomg'irli va oltin rangda. Qish sovuq, ba'zan qor yog'adi. Sevimli faslim kuz, chunki havo mo''tadil.",
+   "questions": [
+    [
+     "How many seasons are there?",
+     "Four."
+    ],
+    [
+     "What do people eat in summer?",
+     "A lot of watermelon."
+    ],
+    [
+     "Why does the writer like autumn?",
+     "Because the weather is mild."
+    ]
+   ]
+  }
+ },
+ "m22": {
+  "dialog2": {
+   "title": "Taking a taxi",
+   "lines": [
+    [
+     "Driver",
+     "Where to, madam?",
+     "Qayerga, xonim?"
+    ],
+    [
+     "Guest",
+     "To the railway station, please.",
+     "Temir yo'l vokzaliga, iltimos."
+    ],
+    [
+     "Driver",
+     "It takes about twenty minutes.",
+     "Taxminan yigirma daqiqa ketadi."
+    ],
+    [
+     "Guest",
+     "Turn left at the traffic lights, please.",
+     "Svetoforda chapga buring, iltimos."
+    ],
+    [
+     "Driver",
+     "Sure. Then straight on?",
+     "Albatta. Keyin to'g'riga-mi?"
+    ],
+    [
+     "Guest",
+     "Yes, go straight and stop at the corner.",
+     "Ha, to'g'riga yuring va burchakda to'xtang."
+    ],
+    [
+     "Driver",
+     "Here we are. That is fifteen thousand.",
+     "Yetib keldik. O'n besh ming."
+    ],
+    [
+     "Guest",
+     "Here you are. Keep the change.",
+     "Marhamat. Qaytimi sizniki."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Buyruq mayli inkori",
+    "text": "Inkor buyruq: Do not (Don't) + fe'l. Taklif uchun: Let's + fe'l. Xushmuomalalik uchun please qo'shing.",
+    "examples": [
+     [
+      "Don't turn right here.",
+      "Bu yerda o'ngga burilmang."
+     ],
+     [
+      "Let's take a taxi.",
+      "Taksi olaylik."
+     ]
+    ]
+   },
+   {
+    "title": "Yo'nalish so'zlari",
+    "text": "turn left/right (chapga/o'ngga buring), go straight on (to'g'riga yuring), at the corner (burchakda), at the traffic lights (svetoforda), take the second street (ikkinchi ko'chaga buriling).",
+    "examples": [
+     [
+      "Take the second street on the right.",
+      "O'ng tomondagi ikkinchi ko'chaga buriling."
+     ],
+     [
+      "Go past the bank.",
+      "Bankdan o'tib keting."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "Lost in the city",
+   "text": "Last week I was lost in a big city. I asked a policeman for help. He said: go straight on, turn right at the second street, and you will see the museum on your left. I thanked him and followed his directions. In ten minutes I was at my hotel.",
+   "uz": "O'tgan hafta men katta shaharda adashib qoldim. Politsiyachidan yordam so'radim. U dedi: to'g'riga yuring, ikkinchi ko'chadan o'ngga buriling, chap tomoningizda muzey ko'rinadi. Men unga rahmat aytdim va ko'rsatmasiga amal qildim. O'n daqiqada mehmonxonamda edim.",
+   "questions": [
+    [
+     "Who did the writer ask for help?",
+     "A policeman."
+    ],
+    [
+     "Where did he say to turn?",
+     "Right at the second street."
+    ],
+    [
+     "How long did it take to reach the hotel?",
+     "Ten minutes."
+    ]
+   ]
+  }
+ },
+ "m23": {
+  "dialog2": {
+   "title": "Hobbies and sport",
+   "lines": [
+    [
+     "A",
+     "What do you do in your free time?",
+     "Bo'sh vaqtingizda nima qilasiz?"
+    ],
+    [
+     "B",
+     "I like playing football with my friends.",
+     "Men do'stlarim bilan futbol o'ynashni yaxshi ko'raman."
+    ],
+    [
+     "A",
+     "How often do you play?",
+     "Qanchalik tez-tez o'ynaysiz?"
+    ],
+    [
+     "B",
+     "Twice a week, on Tuesday and Saturday.",
+     "Haftasiga ikki marta, seshanba va shanba kuni."
+    ],
+    [
+     "A",
+     "I enjoy swimming, but I hate running.",
+     "Men suzishni yoqtiraman, lekin yugurishni yomon ko'raman."
+    ],
+    [
+     "B",
+     "Really? Running is good for health.",
+     "Rostdanmi? Yugurish sog'liq uchun foydali."
+    ],
+    [
+     "A",
+     "I know, but I prefer the pool.",
+     "Bilaman, lekin men basseynni afzal ko'raman."
+    ],
+    [
+     "B",
+     "Then let us go swimming together!",
+     "Unda birga suzishga boraylik!"
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Like / love / hate + -ing",
+    "text": "Yoqtirish va yoqtirmaslikni bildiruvchi fe'llardan keyin fe'l -ing shaklida keladi: like reading, love swimming, hate waking up early.",
+    "examples": [
+     [
+      "She loves dancing.",
+      "U raqsga tushishni yaxshi ko'radi."
+     ],
+     [
+      "I do not like cooking.",
+      "Men ovqat pishirishni yoqtirmayman."
+     ]
+    ]
+   },
+   {
+    "title": "How often? — takrorlanish",
+    "text": "once a week (haftada bir marta), twice a month (oyda ikki marta), three times a year (yilda uch marta). Savol: How often do you...?",
+    "examples": [
+     [
+      "I go to the gym three times a week.",
+      "Men haftasiga uch marta sport zaliga boraman."
+     ],
+     [
+      "How often does he play chess?",
+      "U qanchalik tez-tez shaxmat o'ynaydi?"
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "My favourite sport",
+   "text": "My favourite sport is basketball. I play it with my classmates after school. We have a small team, and we play in the yard twice a week. Sport makes me strong and helps me make new friends. I want to join a real club next year.",
+   "uz": "Mening sevimli sportim basketbol. Men uni maktabdan keyin sinfdoshlarim bilan o'ynayman. Bizning kichik jamoamiz bor va haftasiga ikki marta hovlida o'ynaymiz. Sport meni kuchli qiladi va yangi do'stlar orttirishga yordam beradi. Kelasi yil haqiqiy klubga a'zo bo'lmoqchiman.",
+   "questions": [
+    [
+     "What is the writer's favourite sport?",
+     "Basketball."
+    ],
+    [
+     "How often do they play?",
+     "Twice a week."
+    ],
+    [
+     "What does the writer want to do next year?",
+     "Join a real club."
+    ]
+   ]
+  }
+ },
+ "m24": {
+  "dialog2": {
+   "title": "Trying on clothes",
+   "lines": [
+    [
+     "Seller",
+     "Can I help you?",
+     "Sizga yordam bera olamanmi?"
+    ],
+    [
+     "Buyer",
+     "Yes, I am looking for a jacket.",
+     "Ha, men kurtka qidiryapman."
+    ],
+    [
+     "Seller",
+     "What size do you wear?",
+     "Qaysi o'lchamni kiyasiz?"
+    ],
+    [
+     "Buyer",
+     "Medium. Can I try this one on?",
+     "O'rtacha. Buni kiyib ko'rsam bo'ladimi?"
+    ],
+    [
+     "Seller",
+     "Of course. The fitting room is over there.",
+     "Albatta. Primerka xonasi anavi yerda."
+    ],
+    [
+     "Buyer",
+     "It is too small. Do you have a bigger one?",
+     "Kichik ekan. Kattaroq bor-mi?"
+    ],
+    [
+     "Seller",
+     "Yes, this one is larger and cheaper.",
+     "Ha, bu kattaroq va arzonroq."
+    ],
+    [
+     "Buyer",
+     "Great, I will take it.",
+     "Zo'r, buni olaman."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Too va enough",
+    "text": "too + sifat = ortiqcha (too small — juda kichik, yaramaydi). sifat + enough = yetarli (big enough — yetarlicha katta).",
+    "examples": [
+     [
+      "These shoes are too tight.",
+      "Bu poyabzal juda tor."
+     ],
+     [
+      "The coat is warm enough.",
+      "Palto yetarlicha issiq."
+     ]
+    ]
+   },
+   {
+    "title": "Kiyim fe'llari",
+    "text": "wear — kiyib yurmoq, put on — kiymoq, try on — kiyib ko'rmoq, take off — yechmoq. Bularni adashtirmang.",
+    "examples": [
+     [
+      "I put on my coat and went out.",
+      "Men paltoni kiyib, tashqariga chiqdim."
+     ],
+     [
+      "Take off your shoes, please.",
+      "Poyabzalingizni yechting, iltimos."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "Shopping online",
+   "text": "Today many people buy clothes online. It is easy and quick, and the prices are often lower. But there is a problem: you cannot try things on. My sister bought a dress that was too long, so she sent it back. Now she always checks the size chart carefully.",
+   "uz": "Bugun ko'p odamlar kiyimni internetdan sotib oladi. Bu oson va tez, narxlar ko'pincha past. Lekin muammo bor: kiyib ko'rib bo'lmaydi. Singlim juda uzun ko'ylak sotib oldi va uni qaytarib yubordi. Endi u doim o'lchamlar jadvalini sinchiklab tekshiradi.",
+   "questions": [
+    [
+     "Why do people buy clothes online?",
+     "It is easy, quick and cheaper."
+    ],
+    [
+     "What was the problem with the dress?",
+     "It was too long."
+    ],
+    [
+     "What does the sister do now?",
+     "She checks the size chart carefully."
+    ]
+   ]
+  }
+ },
+ "m7": {
+  "dialog2": {
+   "title": "Why were you late?",
+   "lines": [
+    [
+     "A",
+     "Why are you late again?",
+     "Nega yana kechikdingiz?"
+    ],
+    [
+     "B",
+     "Because the bus broke down.",
+     "Chunki avtobus buzilib qoldi."
+    ],
+    [
+     "A",
+     "So how did you get here?",
+     "Unda bu yerga qanday keldingiz?"
+    ],
+    [
+     "B",
+     "I walked, so I am tired.",
+     "Piyoda keldim, shuning uchun charchadim."
+    ],
+    [
+     "A",
+     "Although you are tired, you must finish the report.",
+     "Charchagan bo'lsangiz ham, hisobotni tugatishingiz kerak."
+    ],
+    [
+     "B",
+     "I will do it, but I need a coffee first.",
+     "Qilaman, lekin avval kofe kerak."
+    ],
+    [
+     "A",
+     "Fine. However, please call me next time.",
+     "Mayli. Biroq keyingi safar menga qo'ng'iroq qiling."
+    ],
+    [
+     "B",
+     "I promise.",
+     "Va'da beraman."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Bog'lovchilar: because, so, although",
+    "text": "because — chunki (sabab), so — shuning uchun (natija), although — garchi (qarama-qarshilik), however — biroq (yangi gap boshida).",
+    "examples": [
+     [
+      "I stayed at home because it was cold.",
+      "Sovuq bo'lgani uchun uyda qoldim."
+     ],
+     [
+      "It was cold, so I stayed at home.",
+      "Sovuq edi, shuning uchun uyda qoldim."
+     ]
+    ]
+   },
+   {
+    "title": "Vergul qoidasi",
+    "text": "so, but, however kabi bog'lovchilardan oldin (yoki keyin) vergul qo'yiladi. Because oldidan odatda vergul kerak emas.",
+    "examples": [
+     [
+      "He was ill, but he went to work.",
+      "U kasal edi, lekin ishga bordi."
+     ],
+     [
+      "Although it rained, we walked.",
+      "Yomg'ir yog'sa ham, biz yurdik."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "A bad morning",
+   "text": "Yesterday morning my alarm did not ring, so I woke up late. I ran to the bus stop, but the bus had already left. Although I took a taxi, I arrived ten minutes late. My boss was not angry because I explained everything honestly.",
+   "uz": "Kecha ertalab budilnikim jiringlamadi, shuning uchun kech uyg'ondim. Avtobus bekatiga yugurdim, lekin avtobus allaqachon ketgan edi. Taksi olgan bo'lsam ham, o'n daqiqa kech keldim. Boshlig'im jahli chiqmadi, chunki men hammasini rostgo'ylik bilan tushuntirdim.",
+   "questions": [
+    [
+     "Why did the writer wake up late?",
+     "The alarm did not ring."
+    ],
+    [
+     "How did the writer get to work?",
+     "By taxi."
+    ],
+    [
+     "Why was the boss not angry?",
+     "Because the writer explained honestly."
+    ]
+   ]
+  }
+ },
+ "m8": {
+  "dialog2": {
+   "title": "Writing a polite email",
+   "lines": [
+    [
+     "A",
+     "I need to write an email to my manager.",
+     "Menejerimga xat yozishim kerak."
+    ],
+    [
+     "B",
+     "Start with \"Dear Mr. Smith\".",
+     "'Dear Mr. Smith' bilan boshlang."
+    ],
+    [
+     "A",
+     "Should I write \"Hi\" instead?",
+     "'Hi' deb yozsam bo'ladimi?"
+    ],
+    [
+     "B",
+     "No, that is too informal for a manager.",
+     "Yo'q, bu menejer uchun juda norasmiy."
+    ],
+    [
+     "A",
+     "How do I finish the email?",
+     "Xatni qanday tugatay?"
+    ],
+    [
+     "B",
+     "Use \"Kind regards\" or \"Yours sincerely\".",
+     "'Kind regards' yoki 'Yours sincerely' yozing."
+    ],
+    [
+     "A",
+     "Thanks, that sounds professional.",
+     "Rahmat, bu kasbiy ko'rinadi."
+    ],
+    [
+     "B",
+     "Do not forget to check your spelling.",
+     "Imloni tekshirishni unutmang."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Rasmiy va norasmiy so'zlar",
+    "text": "Norasmiy: get, buy, ask for, a lot of. Rasmiy: obtain, purchase, request, numerous. Rasmiy yozuvda qisqartmalar (don't, I'm) ishlatilmaydi.",
+    "examples": [
+     [
+      "I would be grateful if you could help me.",
+      "Yordam bersangiz, minnatdor bo'lardim."
+     ],
+     [
+      "Can you help me?",
+      "Menga yordam bera olasizmi? (norasmiy)"
+     ]
+    ]
+   },
+   {
+    "title": "Mashhur idiomalar",
+    "text": "a piece of cake — juda oson; break the ice — muzni eritmoq; once in a blue moon — juda kamdan-kam. Idiomani so'zma-so'z tarjima qilmang.",
+    "examples": [
+     [
+      "The exam was a piece of cake.",
+      "Imtihon juda oson edi."
+     ],
+     [
+      "He visits us once in a blue moon.",
+      "U bizni juda kamdan-kam ziyorat qiladi."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "My first job application",
+   "text": "Last month I applied for my first job. I wrote a formal letter and attached my CV. I used polite phrases such as 'I am writing to apply' and 'I look forward to hearing from you'. A week later the company invited me for an interview.",
+   "uz": "O'tgan oy birinchi ishimga ariza berdim. Rasmiy xat yozib, rezyumemni biriktirdim. 'Murojaat qilish uchun yozyapman' va 'Javobingizni kutaman' kabi xushmuomala iboralardan foydalandim. Bir haftadan keyin kompaniya meni suhbatga taklif qildi.",
+   "questions": [
+    [
+     "What did the writer attach to the letter?",
+     "A CV."
+    ],
+    [
+     "What polite phrase did the writer use?",
+     "I look forward to hearing from you."
+    ],
+    [
+     "What happened a week later?",
+     "The company invited the writer for an interview."
+    ]
+   ]
+  }
+ },
+ "m9": {
+  "dialog2": {
+   "title": "Choosing a career",
+   "lines": [
+    [
+     "A",
+     "What do you want to be in the future?",
+     "Kelajakda kim bo'lmoqchisiz?"
+    ],
+    [
+     "B",
+     "In my opinion, teaching is a noble job.",
+     "Mening fikrimcha, o'qituvchilik olijanob kasb."
+    ],
+    [
+     "A",
+     "I agree, but the salary is low.",
+     "Roziman, lekin maosh past."
+    ],
+    [
+     "B",
+     "That is true, yet I prefer a job that helps people.",
+     "To'g'ri, lekin men odamlarga yordam beradigan ishni afzal ko'raman."
+    ],
+    [
+     "A",
+     "As for me, I would like to be an engineer.",
+     "Menga kelsak, men muhandis bo'lishni xohlayman."
+    ],
+    [
+     "B",
+     "Why do you think so?",
+     "Nega bunday deb o'ylaysiz?"
+    ],
+    [
+     "A",
+     "I think it is creative and well paid.",
+     "Menimcha, bu ijodiy va yaxshi haq to'lanadigan kasb."
+    ],
+    [
+     "B",
+     "Both jobs are important for society.",
+     "Ikkala kasb ham jamiyat uchun muhim."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Fikr bildirish",
+    "text": "In my opinion... (fikrimcha), I think / I believe... (o'ylaymanki), As far as I am concerned... (menga kelsak). Rozilik: I agree, Exactly. Norozilik: I do not agree, I see it differently.",
+    "examples": [
+     [
+      "I believe that reading is important.",
+      "Menimcha, o'qish muhim."
+     ],
+     [
+      "I see it differently.",
+      "Men buni boshqacha ko'raman."
+     ]
+    ]
+   },
+   {
+    "title": "Sabab va izoh so'rash",
+    "text": "Why do you think so? — Nega unday deb o'ylaysiz? For example, / For instance, — masalan. Fikringizni misol bilan quvvatlang.",
+    "examples": [
+     [
+      "For example, many people work from home.",
+      "Masalan, ko'p odamlar uydan ishlaydi."
+     ],
+     [
+      "That is why I agree.",
+      "Shuning uchun men roziman."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "Two cultures, one world",
+   "text": "My friend is from Japan and I am from Uzbekistan. Our cultures are different, but we have a lot in common. In both countries people respect their elders and love tea. When I visited her family, I learned to eat with chopsticks. She learned to bake bread in a tandoor.",
+   "uz": "Do'stim Yaponiyadan, men O'zbekistondanman. Madaniyatlarimiz har xil, lekin umumiy jihatlarimiz ko'p. Ikkala mamlakatda ham odamlar kattalarni hurmat qiladi va choyni yaxshi ko'radi. Uning oilasiga borganimda tayoqcha bilan ovqatlanishni o'rgandim. U tandirda non yopishni o'rgandi.",
+   "questions": [
+    [
+     "Where is the writer's friend from?",
+     "From Japan."
+    ],
+    [
+     "What do both countries love?",
+     "Tea (and respect for elders)."
+    ],
+    [
+     "What did the friend learn?",
+     "To bake bread in a tandoor."
+    ]
+   ]
+  }
+ },
+ "m25": {
+  "dialog2": {
+   "title": "Choosing a university",
+   "lines": [
+    [
+     "A",
+     "Which university do you want to enter?",
+     "Qaysi universitetga kirmoqchisiz?"
+    ],
+    [
+     "B",
+     "I want to enter the one that has a good IT faculty.",
+     "Yaxshi IT fakulteti bor universitetga kirmoqchiman."
+    ],
+    [
+     "A",
+     "Is it the university which is near the metro?",
+     "Metro yaqinidagi universitetmi?"
+    ],
+    [
+     "B",
+     "Yes, that is the one I mean.",
+     "Ha, men aytayotgan o'sha."
+    ],
+    [
+     "A",
+     "Do you have to take an entrance exam?",
+     "Kirish imtihonini topshirishingiz kerakmi?"
+    ],
+    [
+     "B",
+     "Yes, because the competition is high.",
+     "Ha, chunki tanlov katta."
+    ],
+    [
+     "A",
+     "I am sure you will pass.",
+     "Ishonchim komil, o'tasiz."
+    ],
+    [
+     "B",
+     "I hope so. I am studying every day.",
+     "Umid qilaman. Har kuni tayyorlanyapman."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Nisbiy olmoshlar: who, which, that",
+    "text": "who — odamlar uchun, which — narsalar uchun, that — ikkalasi uchun. Ular gapga ma'lumot qo'shadi: The teacher who teaches us is kind.",
+    "examples": [
+     [
+      "The book that I read was interesting.",
+      "Men o'qigan kitob qiziqarli edi."
+     ],
+     [
+      "The student who won is my friend.",
+      "G'olib bo'lgan talaba mening do'stim."
+     ]
+    ]
+   },
+   {
+    "title": "Because va because of",
+    "text": "because + gap (because it rained), because of + ot (because of the rain). Ikkalasi ham 'sababli' degani, lekin tuzilishi boshqa.",
+    "examples": [
+     [
+      "We stayed home because of the storm.",
+      "Bo'ron sababli uyda qoldik."
+     ],
+     [
+      "We stayed home because there was a storm.",
+      "Bo'ron bo'lgani uchun uyda qoldik."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "Student life",
+   "text": "University life is very different from school. Students choose their own subjects and decide how to spend their time. There are many clubs, which help people to find friends. The most important thing is to study regularly, because exams are serious.",
+   "uz": "Universitet hayoti maktabdan juda farq qiladi. Talabalar o'z fanlarini tanlaydi va vaqtini o'zi taqsimlaydi. Ko'plab to'garaklar bor, ular do'st topishga yordam beradi. Eng muhimi — muntazam o'qish, chunki imtihonlar jiddiy.",
+   "questions": [
+    [
+     "What do students choose?",
+     "Their own subjects."
+    ],
+    [
+     "What do clubs help people to do?",
+     "Find friends."
+    ],
+    [
+     "What is the most important thing?",
+     "To study regularly."
+    ]
+   ]
+  }
+ },
+ "m26": {
+  "dialog2": {
+   "title": "Saving the environment",
+   "lines": [
+    [
+     "A",
+     "Have you heard about the new recycling project?",
+     "Yangi qayta ishlash loyihasi haqida eshitdingizmi?"
+    ],
+    [
+     "B",
+     "Yes. People living in our street collect plastic.",
+     "Ha. Ko'chamizda yashovchilar plastik yig'adi."
+    ],
+    [
+     "A",
+     "Walking to work also helps nature.",
+     "Ishga piyoda borish ham tabiatga yordam beradi."
+    ],
+    [
+     "B",
+     "True. Cars produce a lot of smoke.",
+     "To'g'ri. Mashinalar ko'p tutun chiqaradi."
+    ],
+    [
+     "A",
+     "Having planted fifty trees, our class won a prize.",
+     "Ellikta daraxt ekib, sinfimiz sovrin yutdi."
+    ],
+    [
+     "B",
+     "Congratulations! Trees give us clean air.",
+     "Tabriklayman! Daraxtlar bizga toza havo beradi."
+    ],
+    [
+     "A",
+     "We must protect nature for the next generation.",
+     "Kelajak avlod uchun tabiatni asrashimiz kerak."
+    ],
+    [
+     "B",
+     "I completely agree.",
+     "Men butunlay qo'shilaman."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Participle iboralar: -ing",
+    "text": "-ing sifatdosh asosiy gapga qisqa ma'lumot qo'shadi: The man standing there is my uncle (= who is standing). Walking home, I met a friend (= While I was walking...).",
+    "examples": [
+     [
+      "The girl sitting by the window is my sister.",
+      "Deraza yonida o'tirgan qiz mening singlim."
+     ],
+     [
+      "Feeling tired, he went to bed.",
+      "Charchagan holda u uxlashga yotdi."
+     ]
+    ]
+   },
+   {
+    "title": "-ed sifatdosh",
+    "text": "-ed (yoki 3-shakl) sifatdosh majhul ma'no beradi: a broken window (sindirilgan oyna), the book written by Tolstoy (Tolstoy yozgan kitob).",
+    "examples": [
+     [
+      "The trees planted last year are growing.",
+      "O'tgan yili ekilgan daraxtlar o'syapti."
+     ],
+     [
+      "A lost key",
+      "yo'qolgan kalit"
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "Our green planet",
+   "text": "Our planet is facing serious problems: pollution, climate change and the loss of forests. Governments must act, but each person can help too. Using less plastic, saving water and planting trees are simple steps. If everybody does a little, the result will be big.",
+   "uz": "Sayyoramiz jiddiy muammolarga duch kelmoqda: ifloslanish, iqlim o'zgarishi va o'rmonlarning kamayishi. Hukumatlar harakat qilishi kerak, lekin har bir inson ham yordam bera oladi. Kamroq plastik ishlatish, suvni tejash va daraxt ekish — oddiy qadamlar. Agar hamma ozgina qilsa, natija katta bo'ladi.",
+   "questions": [
+    [
+     "What problems does the planet face?",
+     "Pollution, climate change, loss of forests."
+    ],
+    [
+     "Who must act?",
+     "Governments (and each person too)."
+    ],
+    [
+     "Name one simple step.",
+     "Using less plastic / saving water / planting trees."
+    ]
+   ]
+  }
+ },
+ "m27": {
+  "dialog2": {
+   "title": "Did you read the news?",
+   "lines": [
+    [
+     "A",
+     "Did you read the news this morning?",
+     "Bugun ertalab yangiliklarni o'qidingizmi?"
+    ],
+    [
+     "B",
+     "Yes. The article said that the economy was growing.",
+     "Ha. Maqolada iqtisodiyot o'syapti deyilgan edi."
+    ],
+    [
+     "A",
+     "The reporter told us that it would continue.",
+     "Muxbir bu davom etishini aytdi."
+    ],
+    [
+     "B",
+     "I asked my father if he trusted the news.",
+     "Otamdan yangiliklarga ishonasizmi, deb so'radim."
+    ],
+    [
+     "A",
+     "What did he answer?",
+     "U nima deb javob berdi?"
+    ],
+    [
+     "B",
+     "He said that he checked several sources.",
+     "U bir necha manbani tekshirishini aytdi."
+    ],
+    [
+     "A",
+     "That is a wise habit.",
+     "Bu dono odat."
+    ],
+    [
+     "B",
+     "Yes, fake news spreads quickly.",
+     "Ha, yolg'on xabarlar tez tarqaladi."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Reported speech: zamon siljishi",
+    "text": "Gapni boshqa odamga uzatganda zamon bir pog'ona orqaga suriladi: am/is → was, will → would, go → went. 'I am tired' → He said that he was tired.",
+    "examples": [
+     [
+      "She said, 'I like music.' → She said that she liked music.",
+      "U musiqani yoqtirishini aytdi."
+     ],
+     [
+      "'I will come.' → He said he would come.",
+      "U kelishini aytdi."
+     ]
+    ]
+   },
+   {
+    "title": "Savollarni uzatish",
+    "text": "Ha/yo'q savollarda if/whether, so'z savollarda savol so'zi ishlatiladi, tartib darak gap kabi bo'ladi: He asked where I lived.",
+    "examples": [
+     [
+      "She asked if I was ready.",
+      "U tayyormisiz deb so'radi."
+     ],
+     [
+      "They asked where we were going.",
+      "Ular qayerga ketyapmiz deb so'rashdi."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "Media in our lives",
+   "text": "Every day we get news from television, newspapers and the internet. Social media is fast, but it is not always reliable. A good reader always asks: who wrote this and why? Teachers say that checking two or three sources is the best way to avoid fake news.",
+   "uz": "Har kuni yangiliklarni televizor, gazeta va internetdan olamiz. Ijtimoiy tarmoqlar tez, lekin har doim ishonchli emas. Yaxshi o'quvchi doim so'raydi: buni kim yozgan va nega? O'qituvchilar yolg'on xabardan qochishning eng yaxshi yo'li — ikki-uch manbani tekshirish, deydi.",
+   "questions": [
+    [
+     "Where do we get news?",
+     "From TV, newspapers and the internet."
+    ],
+    [
+     "Is social media always reliable?",
+     "No, it is not."
+    ],
+    [
+     "What is the best way to avoid fake news?",
+     "Checking two or three sources."
+    ]
+   ]
+  }
+ },
+ "m28": {
+  "dialog2": {
+   "title": "At the museum",
+   "lines": [
+    [
+     "A",
+     "This painting looks like a photograph.",
+     "Bu rasm fotosuratga o'xshaydi."
+    ],
+    [
+     "B",
+     "It looks as if the artist used a camera!",
+     "Go'yo rassom kameradan foydalangandek!"
+    ],
+    [
+     "A",
+     "I prefer abstract art, to be honest.",
+     "Rostini aytsam, men abstrakt san'atni afzal ko'raman."
+    ],
+    [
+     "B",
+     "Really? To me it seems like a mess of colours.",
+     "Rostdanmi? Menga u ranglar g'ovlashiga o'xshaydi."
+    ],
+    [
+     "A",
+     "Art is not the same as science; there is no single answer.",
+     "San'at fan bilan bir xil emas; yagona javob yo'q."
+    ],
+    [
+     "B",
+     "You are right. Who is your favourite writer?",
+     "To'g'ri aytasiz. Sevimli yozuvchingiz kim?"
+    ],
+    [
+     "A",
+     "Abdulla Qodiriy. His novels are unforgettable.",
+     "Abdulla Qodiriy. Uning romanlari unutilmas."
+    ],
+    [
+     "B",
+     "I agree. I read \"O'tgan kunlar\" twice.",
+     "Qo'shilaman. Men 'O'tgan kunlar'ni ikki marta o'qidim."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "like, as, as if",
+    "text": "like + ot: She sings like a bird. as if / as though + gap: He talks as if he knew everything. the same as — bilan bir xil; different from — dan farqli.",
+    "examples": [
+     [
+      "He runs like the wind.",
+      "U shamoldek yuguradi."
+     ],
+     [
+      "It looks as if it is going to rain.",
+      "Yomg'ir yog'adiganga o'xshaydi."
+     ]
+    ]
+   },
+   {
+    "title": "San'at haqida gapirish",
+    "text": "masterpiece (durdona), exhibition (ko'rgazma), portrait (portret), landscape (manzara), novel (roman), poet (shoir). Fikr: It reminds me of... (menga ... ni eslatadi).",
+    "examples": [
+     [
+      "This poem reminds me of my childhood.",
+      "Bu she'r menga bolaligimni eslatadi."
+     ],
+     [
+      "We visited an art exhibition.",
+      "Biz san'at ko'rgazmasiga bordik."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "The power of books",
+   "text": "A good book can change your life. It teaches you new things, shows other worlds and helps you understand people. My grandfather says that a house without books is like a body without a soul. Now I try to read at least twenty pages every day.",
+   "uz": "Yaxshi kitob hayotingizni o'zgartirishi mumkin. U sizga yangi narsalarni o'rgatadi, boshqa olamlarni ko'rsatadi va odamlarni tushunishga yordam beradi. Bobom kitobsiz uy ruhsiz tanaga o'xshaydi, deydi. Hozir men har kuni kamida yigirma bet o'qishga harakat qilaman.",
+   "questions": [
+    [
+     "What can a good book do?",
+     "Change your life."
+    ],
+    [
+     "What does the grandfather say?",
+     "A house without books is like a body without a soul."
+    ],
+    [
+     "How many pages does the writer try to read daily?",
+     "At least twenty."
+    ]
+   ]
+  }
+ },
+ "m10": {
+  "dialog2": {
+   "title": "Discussing a text",
+   "lines": [
+    [
+     "A",
+     "What is the main idea of this text?",
+     "Bu matnning asosiy g'oyasi nima?"
+    ],
+    [
+     "B",
+     "The author argues that technology changes how we think.",
+     "Muallif texnologiya fikrlash tarzimizni o'zgartiradi, deb ta'kidlaydi."
+    ],
+    [
+     "A",
+     "Which word could replace \"important\"?",
+     "'Important' o'rniga qaysi so'z ishlatilishi mumkin?"
+    ],
+    [
+     "B",
+     "\"Significant\" or \"essential\", depending on the context.",
+     "Kontekstga qarab 'significant' yoki 'essential'."
+    ],
+    [
+     "A",
+     "Is \"huge\" a synonym of \"enormous\"?",
+     "'Huge' — 'enormous' ning sinonimimi?"
+    ],
+    [
+     "B",
+     "Yes, but \"enormous\" sounds a bit more formal.",
+     "Ha, lekin 'enormous' biroz rasmiyroq eshitiladi."
+    ],
+    [
+     "A",
+     "I see. Style really depends on word choice.",
+     "Tushundim. Uslub so'z tanloviga bog'liq ekan."
+    ],
+    [
+     "B",
+     "Exactly. That is why a wide vocabulary matters.",
+     "Aynan. Shuning uchun boy lug'at muhim."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Sinonimlar va ularning ottenkasi",
+    "text": "Sinonimlar ma'nosi yaqin, lekin uslubi va kuchi har xil: big — large — enormous; say — state — declare. Rasmiy matnda kuchliroq, aniqroq so'zlar tanlanadi.",
+    "examples": [
+     [
+      "The company faces a significant challenge.",
+      "Kompaniya jiddiy qiyinchilikka duch kelmoqda."
+     ],
+     [
+      "She declared her intention to resign.",
+      "U iste'foga chiqish niyatini e'lon qildi."
+     ]
+    ]
+   },
+   {
+    "title": "Matn bilan ishlash",
+    "text": "Matnni o'qiganda: 1) asosiy g'oyani toping (main idea), 2) dalillarni belgilang (supporting details), 3) noma'lum so'zni kontekstdan taxmin qiling.",
+    "examples": [
+     [
+      "The main idea is that exercise improves memory.",
+      "Asosiy g'oya shuki, mashq xotirani yaxshilaydi."
+     ],
+     [
+      "This detail supports the author's claim.",
+      "Bu tafsilot muallifning da'vosini quvvatlaydi."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "Why vocabulary matters",
+   "text": "Researchers say that people with a rich vocabulary understand texts better and express their ideas more clearly. To expand your vocabulary, read widely, keep a notebook of new words and use them in your own sentences. Memorising lists alone is not enough; context is the key.",
+   "uz": "Tadqiqotchilarning aytishicha, boy lug'atga ega odamlar matnlarni yaxshiroq tushunadi va fikrini aniqroq ifodalaydi. Lug'atni boyitish uchun ko'p o'qing, yangi so'zlar daftarini yuriting va ularni o'z gaplaringizda ishlating. Faqat ro'yxatni yodlash yetarli emas; kontekst — asosiy kalit.",
+   "questions": [
+    [
+     "Who understands texts better?",
+     "People with a rich vocabulary."
+    ],
+    [
+     "Name one way to expand vocabulary.",
+     "Read widely / keep a notebook / use words in sentences."
+    ],
+    [
+     "What is the key?",
+     "Context."
+    ]
+   ]
+  }
+ },
+ "m11": {
+  "dialog2": {
+   "title": "A school debate",
+   "lines": [
+    [
+     "A",
+     "Today's topic: should students wear school uniforms?",
+     "Bugungi mavzu: o'quvchilar maktab formasini kiyishi kerakmi?"
+    ],
+    [
+     "B",
+     "I am in favour. Uniforms make everyone equal.",
+     "Men tarafdorman. Forma hammani tenglashtiradi."
+    ],
+    [
+     "A",
+     "On the other hand, they limit self-expression.",
+     "Boshqa tomondan, ular o'zini ifodalashni cheklaydi."
+    ],
+    [
+     "B",
+     "That is a fair point; however, they save time and money.",
+     "Bu o'rinli fikr; biroq ular vaqt va pulni tejaydi."
+    ],
+    [
+     "A",
+     "I would argue that students should have a choice.",
+     "Men o'quvchilarda tanlov bo'lishi kerak, deb bahslashaman."
+    ],
+    [
+     "B",
+     "I partly agree, but a choice can create competition.",
+     "Qisman qo'shilaman, lekin tanlov raqobat keltirib chiqarishi mumkin."
+    ],
+    [
+     "A",
+     "In conclusion, both sides have strong arguments.",
+     "Xulosa qilib aytganda, ikkala tomonning ham kuchli dalillari bor."
+    ],
+    [
+     "B",
+     "Agreed. Let us vote.",
+     "Kelishdik. Ovoz beraylik."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Bahs tuzilmasi",
+    "text": "Kirish: Today I will talk about... Dalil: Firstly, ... Secondly, ... Qarshi fikr: On the other hand, ... Xulosa: In conclusion, ... Har bir dalil misol bilan quvvatlanadi.",
+    "examples": [
+     [
+      "Firstly, it saves time. Secondly, it is cheap.",
+      "Birinchidan, vaqtni tejaydi. Ikkinchidan, arzon."
+     ],
+     [
+      "In conclusion, I strongly support this idea.",
+      "Xulosa qilib, bu g'oyani qat'iy qo'llab-quvvatlayman."
+     ]
+    ]
+   },
+   {
+    "title": "Rozilik va e'tiroz",
+    "text": "To'liq rozilik: I totally agree. Qisman: I partly agree, but... E'tiroz: I am afraid I disagree because... Hurmat bilan e'tiroz qiling, shaxsga emas, fikrga qarshi chiqing.",
+    "examples": [
+     [
+      "I see your point, but I disagree.",
+      "Fikringizni tushunaman, lekin qo'shilmayman."
+     ],
+     [
+      "That is exactly what I think.",
+      "Men ham aynan shunday o'ylayman."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "Should homework be banned?",
+   "text": "Some countries are thinking about banning homework. Supporters say that children need time to rest and play. Opponents argue that homework teaches discipline and helps students remember lessons. Perhaps a balanced approach is best: short, meaningful tasks instead of long, boring ones.",
+   "uz": "Ba'zi mamlakatlar uy vazifasini taqiqlashni o'ylamoqda. Tarafdorlar bolalarga dam olish va o'yin uchun vaqt kerak, deydi. Qarshilar uy vazifasi intizomni o'rgatadi va darsni eslab qolishga yordam beradi, deb ta'kidlaydi. Ehtimol, muvozanatli yondashuv eng yaxshisi: uzun, zerikarli vazifalar o'rniga qisqa, mazmunli topshiriqlar.",
+   "questions": [
+    [
+     "What do supporters of the ban say?",
+     "Children need time to rest and play."
+    ],
+    [
+     "What do opponents say?",
+     "Homework teaches discipline."
+    ],
+    [
+     "What is the suggested solution?",
+     "A balanced approach with short, meaningful tasks."
+    ]
+   ]
+  }
+ },
+ "m12": {
+  "dialog2": {
+   "title": "A job interview",
+   "lines": [
+    [
+     "HR",
+     "Tell me a little about yourself.",
+     "O'zingiz haqingizda ozgina gapirib bering."
+    ],
+    [
+     "Candidate",
+     "I graduated last year and I have two years of experience.",
+     "Men o'tgan yili bitirdim va ikki yillik tajribam bor."
+    ],
+    [
+     "HR",
+     "What are your strengths?",
+     "Kuchli tomonlaringiz qanday?"
+    ],
+    [
+     "Candidate",
+     "I am organised, responsible and a fast learner.",
+     "Men tartibli, mas'uliyatli va tez o'rganuvchiman."
+    ],
+    [
+     "HR",
+     "Why do you want to work for us?",
+     "Nega bizning kompaniyada ishlamoqchisiz?"
+    ],
+    [
+     "Candidate",
+     "Because your company values growth and teamwork.",
+     "Chunki kompaniyangiz o'sish va jamoaviy ishni qadrlaydi."
+    ],
+    [
+     "HR",
+     "Do you have any questions for us?",
+     "Bizga savollaringiz bormi?"
+    ],
+    [
+     "Candidate",
+     "Yes. What does a typical day look like in this role?",
+     "Ha. Bu lavozimda odatiy kun qanday o'tadi?"
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Taqdimot tuzilishi",
+    "text": "Yaxshi taqdimot: 1) Greeting va mavzu, 2) Asosiy 2–3 nuqta, 3) Xulosa, 4) Savollar uchun taklif. Iboralar: Let me start by..., Moving on to..., To sum up..., Any questions?",
+    "examples": [
+     [
+      "Let me start by introducing our project.",
+      "Loyihamizni tanishtirishdan boshlay."
+     ],
+     [
+      "To sum up, we achieved all our goals.",
+      "Xulosa qilsak, barcha maqsadlarimizga erishdik."
+     ]
+    ]
+   },
+   {
+    "title": "Intervyu savollariga javob",
+    "text": "STAR usuli: Situation (vaziyat), Task (vazifa), Action (harakat), Result (natija). Javoblaringiz aniq va misolli bo'lsin.",
+    "examples": [
+     [
+      "I led a team of five and we finished two weeks early.",
+      "Men besh kishilik jamoani boshqardim va ikki hafta erta tugatdik."
+     ],
+     [
+      "My greatest strength is attention to detail.",
+      "Eng kuchli tomonim — mayda-chuydaga e'tibor."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "Preparing for an interview",
+   "text": "Before an interview, learn about the company and practise common questions. Dress neatly and arrive ten minutes early. During the conversation, make eye contact, listen carefully and give clear examples. After the interview, send a short thank-you message.",
+   "uz": "Intervyudan oldin kompaniya haqida bilib oling va odatiy savollarni mashq qiling. Chiroyli kiyining va o'n daqiqa oldin keling. Suhbat davomida ko'zga qarang, diqqat bilan tinglang va aniq misollar keltiring. Intervyudan so'ng qisqa minnatdorchilik xabarini yuboring.",
+   "questions": [
+    [
+     "When should you arrive?",
+     "Ten minutes early."
+    ],
+    [
+     "What should you do during the conversation?",
+     "Make eye contact, listen, give examples."
+    ],
+    [
+     "What should you send afterwards?",
+     "A thank-you message."
+    ]
+   ]
+  }
+ },
+ "m13": {
+  "dialog2": {
+   "title": "Calling the clinic",
+   "lines": [
+    [
+     "Patient",
+     "Hello, I would like to see a doctor.",
+     "Salom, shifokorga ko'rinmoqchiman."
+    ],
+    [
+     "Nurse",
+     "What is the problem?",
+     "Nima muammo?"
+    ],
+    [
+     "Patient",
+     "I have had a headache since yesterday.",
+     "Kechadan beri boshim og'riyapti."
+    ],
+    [
+     "Nurse",
+     "Have you taken any medicine?",
+     "Biror dori ichdingizmi?"
+    ],
+    [
+     "Patient",
+     "Yes, I have taken two tablets, but it has not helped.",
+     "Ha, ikki dona tabletka ichdim, lekin yordam bermadi."
+    ],
+    [
+     "Nurse",
+     "The doctor is free at four o'clock.",
+     "Shifokor soat to'rtda bo'sh."
+    ],
+    [
+     "Patient",
+     "That is fine. Thank you.",
+     "Yaxshi. Rahmat."
+    ],
+    [
+     "Nurse",
+     "Please bring your ID card.",
+     "Iltimos, shaxsiy hujjatingizni olib keling."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Present Perfect: have/has + V3",
+    "text": "Natijasi hozirga ta'sir qiladigan ish: I have lost my keys (hozir yo'q). for + davom, since + boshlanish payti: for two days, since Monday.",
+    "examples": [
+     [
+      "She has lived here for five years.",
+      "U bu yerda besh yildan beri yashaydi."
+     ],
+     [
+      "I have not eaten since morning.",
+      "Men ertalabdan beri hech narsa yemadim."
+     ]
+    ]
+   },
+   {
+    "title": "Ever, never, already, yet",
+    "text": "ever (hech) — savolda, never (hech qachon), already (allaqachon) — darakda, yet (hali) — inkor va savolda gap oxirida.",
+    "examples": [
+     [
+      "Have you ever been to a hospital?",
+      "Siz hech kasalxonada bo'lganmisiz?"
+     ],
+     [
+      "I have not finished yet.",
+      "Men hali tugatmadim."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "Stay healthy",
+   "text": "Doctors say that a healthy life is simple. Sleep at least seven hours, eat vegetables and fruit, drink enough water and walk every day. Do not forget to visit the doctor once a year, even if you feel fine. Prevention is better than cure.",
+   "uz": "Shifokorlar sog'lom hayot oddiy, deydi. Kamida yetti soat uxlang, sabzavot va meva iste'mol qiling, yetarli suv iching va har kuni sayr qiling. O'zingizni yaxshi his qilsangiz ham, yilda bir marta shifokorga ko'rinishni unutmang. Oldini olish davolashdan yaxshi.",
+   "questions": [
+    [
+     "How many hours should we sleep?",
+     "At least seven."
+    ],
+    [
+     "How often should we visit the doctor?",
+     "Once a year."
+    ],
+    [
+     "What is better than cure?",
+     "Prevention."
+    ]
+   ]
+  }
+ },
+ "m14": {
+  "dialog2": {
+   "title": "Checking in at the airport",
+   "lines": [
+    [
+     "Agent",
+     "Good morning. May I see your passport and ticket?",
+     "Xayrli tong. Pasport va chiptangizni ko'rsam bo'ladimi?"
+    ],
+    [
+     "Traveller",
+     "Here you are.",
+     "Marhamat."
+    ],
+    [
+     "Agent",
+     "Do you have any luggage to check in?",
+     "Topshiradigan yukingiz bormi?"
+    ],
+    [
+     "Traveller",
+     "Yes, one suitcase.",
+     "Ha, bitta chamadon."
+    ],
+    [
+     "Agent",
+     "Would you like a window or an aisle seat?",
+     "Deraza yonini yoki yo'lak tomonni xohlaysizmi?"
+    ],
+    [
+     "Traveller",
+     "A window seat, please.",
+     "Deraza yoni, iltimos."
+    ],
+    [
+     "Agent",
+     "Your gate is number twelve. Boarding starts at ten.",
+     "Chiqish eshigingiz o'n ikkinchi. Chiqish o'ndan boshlanadi."
+    ],
+    [
+     "Traveller",
+     "Thank you. Have a nice day.",
+     "Rahmat. Kuningiz xayrli o'tsin."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Going to va Will — sayohat rejalari",
+    "text": "Aniq reja: We are going to fly to Istanbul on Friday. Spontan qaror: The flight is delayed — I will wait in the cafe. Present Continuous ham yaqin rejalarda ishlatiladi: I am flying tomorrow.",
+    "examples": [
+     [
+      "We are going to visit Paris next month.",
+      "Biz kelasi oy Parijga boramiz."
+     ],
+     [
+      "I will carry your bag.",
+      "Men sumkangizni ko'taraman."
+     ]
+    ]
+   },
+   {
+    "title": "Aeroport lug'ati",
+    "text": "boarding pass (chiqish talonu), departure (jo'nash), arrival (yetib kelish), delay (kechikish), customs (bojxona), baggage claim (yukni olish).",
+    "examples": [
+     [
+      "The flight is delayed by one hour.",
+      "Reys bir soatga kechikdi."
+     ],
+     [
+      "Please go to passport control.",
+      "Iltimos, pasport nazoratiga boring."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "My first flight",
+   "text": "Last year I flew for the first time. I was nervous at the airport, but the staff were friendly. During take-off I held my seat tightly. After a few minutes I relaxed and looked out of the window. The clouds looked like white mountains.",
+   "uz": "O'tgan yili birinchi marta uchdim. Aeroportda hayajonlangan edim, lekin xodimlar mehribon edi. Ko'tarilish paytida o'rindiqni mahkam ushladim. Bir necha daqiqadan keyin tinchlanib, derazadan qaradim. Bulutlar oq tog'larga o'xshardi.",
+   "questions": [
+    [
+     "When did the writer fly for the first time?",
+     "Last year."
+    ],
+    [
+     "How did the writer feel at the airport?",
+     "Nervous."
+    ],
+    [
+     "What did the clouds look like?",
+     "White mountains."
+    ]
+   ]
+  }
+ },
+ "m15": {
+  "dialog2": {
+   "title": "A new app",
+   "lines": [
+    [
+     "A",
+     "Have you tried this new app?",
+     "Bu yangi ilovani sinab ko'rdingizmi?"
+    ],
+    [
+     "B",
+     "Yes. It was developed by a local company.",
+     "Ha. U mahalliy kompaniya tomonidan ishlab chiqilgan."
+    ],
+    [
+     "A",
+     "Is it used by many people?",
+     "U ko'p odam tomonidan ishlatiladimi?"
+    ],
+    [
+     "B",
+     "More than a million users have downloaded it.",
+     "Million dan ortiq foydalanuvchi uni yuklab olgan."
+    ],
+    [
+     "A",
+     "How is the data protected?",
+     "Ma'lumotlar qanday himoyalanadi?"
+    ],
+    [
+     "B",
+     "All files are encrypted and stored safely.",
+     "Barcha fayllar shifrlanadi va xavfsiz saqlanadi."
+    ],
+    [
+     "A",
+     "Sounds impressive. I will install it.",
+     "Ta'sirli eshitilyapti. Men ham o'rnataman."
+    ],
+    [
+     "B",
+     "Do not forget to update it regularly.",
+     "Uni muntazam yangilashni unutmang."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Passive Voice shakllari",
+    "text": "Passive: be + V3. Present: is made, Past: was made, Future: will be made, Perfect: has been made. Ish bajaruvchi muhim bo'lmaganda yoki noma'lum bo'lganda ishlatiladi; kerak bo'lsa 'by' bilan beriladi.",
+    "examples": [
+     [
+      "Phones are made in many countries.",
+      "Telefonlar ko'p mamlakatlarda ishlab chiqariladi."
+     ],
+     [
+      "The email was sent yesterday.",
+      "Xat kecha yuborilgan."
+     ]
+    ]
+   },
+   {
+    "title": "Active → Passive",
+    "text": "Aktiv: The company created the app. Passiv: The app was created by the company. Obyekt ega bo'ladi, fe'l be+V3 ga o'zgaradi.",
+    "examples": [
+     [
+      "Millions of people use this site.",
+      "Bu saytdan millionlab odam foydalanadi. → This site is used by millions of people."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "Technology and children",
+   "text": "Children today are born into a digital world. Phones and tablets are used for study, games and communication. Experts advise parents to limit screen time and to choose useful apps. Technology should serve people, not control them.",
+   "uz": "Bugungi bolalar raqamli dunyoda tug'iladi. Telefon va planshetlar o'qish, o'yin va muloqot uchun ishlatiladi. Mutaxassislar ota-onalarga ekran vaqtini cheklash va foydali ilovalarni tanlashni maslahat beradi. Texnologiya odamlarga xizmat qilishi kerak, ularni boshqarmasligi kerak.",
+   "questions": [
+    [
+     "What are phones and tablets used for?",
+     "Study, games and communication."
+    ],
+    [
+     "What do experts advise parents?",
+     "To limit screen time and choose useful apps."
+    ],
+    [
+     "What should technology do?",
+     "Serve people."
+    ]
+   ]
+  }
+ },
+ "m16": {
+  "dialog2": {
+   "title": "Course graduation",
+   "lines": [
+    [
+     "Teacher",
+     "Congratulations! You have completed the course.",
+     "Tabriklayman! Siz kursni tugatdingiz."
+    ],
+    [
+     "Student",
+     "Thank you. I am proud that I managed to pass the exam.",
+     "Rahmat. Imtihondan o'ta olganimdan faxrlanaman."
+    ],
+    [
+     "Teacher",
+     "You worked very hard this year.",
+     "Bu yil juda qattiq mehnat qildingiz."
+    ],
+    [
+     "Student",
+     "At first it was difficult, but I did not give up.",
+     "Avval qiyin edi, lekin taslim bo'lmadim."
+    ],
+    [
+     "Teacher",
+     "What are your plans now?",
+     "Endi rejalaringiz qanday?"
+    ],
+    [
+     "Student",
+     "I am going to take an international English exam.",
+     "Xalqaro ingliz tili imtihonini topshirmoqchiman."
+    ],
+    [
+     "Teacher",
+     "I am sure you will succeed.",
+     "Ishonchim komil, muvaffaqiyat qozonasiz."
+    ],
+    [
+     "Student",
+     "Thank you for everything.",
+     "Hamma narsa uchun rahmat."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Managed to va succeeded in",
+    "text": "manage to + fe'l = qiyinchilikka qaramay uddalamoq; succeed in + -ing = muvaffaqiyat qozonmoq. Inkori: failed to / did not manage to.",
+    "examples": [
+     [
+      "I managed to finish on time.",
+      "Men vaqtida tugatishga ulgurdim."
+     ],
+     [
+      "She succeeded in passing the exam.",
+      "U imtihondan o'ta oldi."
+     ]
+    ]
+   },
+   {
+    "title": "Fikr-tuyg'u: proud, grateful",
+    "text": "be proud of + ot/-ing (faxrlanmoq), be grateful for (minnatdor bo'lmoq), be satisfied with (mamnun bo'lmoq).",
+    "examples": [
+     [
+      "I am proud of my results.",
+      "Natijalarimdan faxrlanaman."
+     ],
+     [
+      "We are grateful for your help.",
+      "Yordamingiz uchun minnatdormiz."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "Looking back",
+   "text": "A year ago I could not speak English at all. Today I can talk about my life, read simple books and watch films with subtitles. I did not become perfect, but I made progress, and that is the most important thing. Learning never stops.",
+   "uz": "Bir yil oldin men umuman inglizcha gapira olmasdim. Bugun hayotim haqida gapira olaman, oddiy kitoblarni o'qiyman va filmlarni subtitr bilan tomosha qilaman. Men mukammal bo'lmadim, lekin oldinga siljidim va bu eng muhimi. O'rganish hech qachon to'xtamaydi.",
+   "questions": [
+    [
+     "What could the writer not do a year ago?",
+     "Speak English."
+    ],
+    [
+     "What can the writer do today?",
+     "Talk about life, read simple books, watch films with subtitles."
+    ],
+    [
+     "What is the most important thing?",
+     "Making progress."
+    ]
+   ]
+  }
+ },
+ "guide-a1": {
+  "dialog2": {
+   "title": "At the hotel reception",
+   "lines": [
+    [
+     "Guest",
+     "Hello, I have a reservation.",
+     "Salom, mening bronim bor."
+    ],
+    [
+     "Clerk",
+     "What is the name, please?",
+     "Ism nima, iltimos?"
+    ],
+    [
+     "Guest",
+     "Anvar Rakhimov.",
+     "Anvar Rahimov."
+    ],
+    [
+     "Clerk",
+     "Yes, a single room for two nights.",
+     "Ha, ikki kecha uchun bir kishilik xona."
+    ],
+    [
+     "Guest",
+     "Is breakfast included?",
+     "Nonushta kiradimi?"
+    ],
+    [
+     "Clerk",
+     "Yes, from seven to ten.",
+     "Ha, yettidan o'ngacha."
+    ],
+    [
+     "Guest",
+     "Thank you. What is the Wi-Fi password?",
+     "Rahmat. Wi-Fi paroli nima?"
+    ],
+    [
+     "Clerk",
+     "It is on the card. Enjoy your stay!",
+     "U kartada yozilgan. Yaxshi dam oling!"
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "A1 grammatika xulosasi",
+    "text": "A1 darajada asosiy tuzilmalar: to be (am/is/are), Present Simple, there is/are, can, have got. Gap tartibi: Ega + fe'l + to'ldiruvchi + joy + vaqt.",
+    "examples": [
+     [
+      "I can swim, but I cannot dance.",
+      "Men suza olaman, lekin raqsga tusha olmayman."
+     ],
+     [
+      "She has got two brothers.",
+      "Uning ikkita akasi bor."
+     ]
+    ]
+   },
+   {
+    "title": "Savol so'zlari",
+    "text": "What (nima), Where (qayer), When (qachon), Who (kim), Why (nega), How (qanday), How much/many (qancha). Savol so'zi + yordamchi fe'l + ega + fe'l.",
+    "examples": [
+     [
+      "Where do you work?",
+      "Qayerda ishlaysiz?"
+     ],
+     [
+      "How much is this?",
+      "Bu qancha turadi?"
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "My day",
+   "text": "My name is Anvar. I am a student. I get up at seven and go to university by bus. I have lunch with my friends. In the evening I read books and watch TV. I like my life.",
+   "uz": "Mening ismim Anvar. Men talabaman. Yettida turaman va universitetga avtobusda boraman. Do'stlarim bilan tushlik qilaman. Kechqurun kitob o'qiyman va televizor ko'raman. Men hayotimni yaxshi ko'raman.",
+   "questions": [
+    [
+     "What is the writer's name?",
+     "Anvar."
+    ],
+    [
+     "How does he go to university?",
+     "By bus."
+    ],
+    [
+     "What does he do in the evening?",
+     "Reads books and watches TV."
+    ]
+   ]
+  }
+ },
+ "guide-a2": {
+  "dialog2": {
+   "title": "Problems in the hotel room",
+   "lines": [
+    [
+     "Guest",
+     "Excuse me, the air conditioner does not work.",
+     "Kechirasiz, konditsioner ishlamayapti."
+    ],
+    [
+     "Clerk",
+     "I am very sorry. I will send someone at once.",
+     "Juda afsusdaman. Hozir birovni yuboraman."
+    ],
+    [
+     "Guest",
+     "Also, could I have an extra towel?",
+     "Yana, qo'shimcha sochiq olsam bo'ladimi?"
+    ],
+    [
+     "Clerk",
+     "Of course. Anything else?",
+     "Albatta. Yana biror narsa?"
+    ],
+    [
+     "Guest",
+     "What time is check-out?",
+     "Chiqish vaqti soat nechada?"
+    ],
+    [
+     "Clerk",
+     "Check-out is at noon.",
+     "Chiqish peshinda."
+    ],
+    [
+     "Guest",
+     "Thank you for your help.",
+     "Yordamingiz uchun rahmat."
+    ],
+    [
+     "Clerk",
+     "My pleasure.",
+     "Marhamat."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "A2: zamonlar umumlashmasi",
+    "text": "Present Simple — odat; Present Continuous — hozir; Past Simple — tugagan ish; going to/will — kelajak. Zamon belgilari: every day, now, yesterday, tomorrow.",
+    "examples": [
+     [
+      "I usually walk, but today I am taking a taxi.",
+      "Men odatda piyoda yuraman, lekin bugun taksi olyapman."
+     ],
+     [
+      "Yesterday we visited a museum.",
+      "Kecha biz muzeyga bordik."
+     ]
+    ]
+   },
+   {
+    "title": "Modal fe'llar",
+    "text": "can (qila olmoq), must (majbur), should (maslahat), may (ruxsat). Modal fe'ldan keyin to siz asl fe'l keladi.",
+    "examples": [
+     [
+      "You should drink more water.",
+      "Siz ko'proq suv ichishingiz kerak."
+     ],
+     [
+      "May I come in?",
+      "Kirsam bo'ladimi?"
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "A city break",
+   "text": "Last weekend my friend and I visited Bukhara. We stayed in a small hotel near the old town. In the morning we visited the market and bought souvenirs. In the evening we ate plov in a traditional restaurant. It was a short trip, but we will remember it for a long time.",
+   "uz": "O'tgan dam olish kunlari do'stim bilan Buxoroga bordik. Eski shahar yaqinidagi kichik mehmonxonada qoldik. Ertalab bozorga borib, esdalik sovg'alar oldik. Kechqurun an'anaviy restoranda palov yedik. Qisqa sayohat edi, lekin uni uzoq eslaymiz.",
+   "questions": [
+    [
+     "Where did they stay?",
+     "In a small hotel near the old town."
+    ],
+    [
+     "What did they buy?",
+     "Souvenirs."
+    ],
+    [
+     "What did they eat in the evening?",
+     "Plov."
+    ]
+   ]
+  }
+ },
+ "guide-b1": {
+  "dialog2": {
+   "title": "Negotiating a work schedule",
+   "lines": [
+    [
+     "Manager",
+     "I heard you want to change your working hours.",
+     "Ish vaqtingizni o'zgartirmoqchi ekansiz."
+    ],
+    [
+     "Employee",
+     "Yes. If I started earlier, I could finish at four.",
+     "Ha. Agar erta boshlasam, to'rtda tugata olardim."
+    ],
+    [
+     "Manager",
+     "Why is that important for you?",
+     "Bu siz uchun nega muhim?"
+    ],
+    [
+     "Employee",
+     "I am taking evening classes, and I would not be late.",
+     "Men kechki kurslarga qatnayman va kechikmagan bo'lardim."
+    ],
+    [
+     "Manager",
+     "If the whole team agrees, I will approve it.",
+     "Agar butun jamoa rozi bo'lsa, tasdiqlayman."
+    ],
+    [
+     "Employee",
+     "I have already spoken to them. They do not mind.",
+     "Men ular bilan allaqachon gaplashganman. Qarshi emaslar."
+    ],
+    [
+     "Manager",
+     "Then let us try it for a month.",
+     "Unda bir oyga sinab ko'raylik."
+    ],
+    [
+     "Employee",
+     "Thank you. I will not let you down.",
+     "Rahmat. Sizni umidsizlantirmayman."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Conditionals 0, 1, 2",
+    "text": "0: If you heat ice, it melts (fakt). 1: If it rains, I will stay (real kelajak). 2: If I had time, I would travel (xayoliy hozir/kelajak) — if + Past Simple, would + fe'l.",
+    "examples": [
+     [
+      "If I were you, I would accept the offer.",
+      "Sizning o'rningizda bo'lsam, taklifni qabul qilardim."
+     ],
+     [
+      "If we hurry, we will catch the train.",
+      "Shoshilsak, poyezdga ulguramiz."
+     ]
+    ]
+   },
+   {
+    "title": "Present Perfect va Past Simple",
+    "text": "Aniq o'tgan payt bo'lsa — Past Simple (yesterday, in 2020); payt noma'lum yoki hozirgacha davom etsa — Present Perfect (already, ever, for, since).",
+    "examples": [
+     [
+      "I lived in Samarkand in 2015.",
+      "Men 2015 yilda Samarqandda yashaganman."
+     ],
+     [
+      "I have lived here since 2015.",
+      "Men 2015 yildan beri shu yerda yashayman."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "Work-life balance",
+   "text": "Many employees now ask for flexible schedules. Companies that agree often see higher productivity, because happy people work better. However, flexibility needs trust and clear rules. If both sides are honest, everybody benefits.",
+   "uz": "Ko'p xodimlar endi moslashuvchan jadval so'ramoqda. Rozi bo'lgan kompaniyalar ko'pincha yuqori samaradorlikka erishadi, chunki baxtli odamlar yaxshiroq ishlaydi. Biroq moslashuvchanlik ishonch va aniq qoidalarni talab qiladi. Agar ikki tomon halol bo'lsa, hamma foyda ko'radi.",
+   "questions": [
+    [
+     "What do many employees ask for?",
+     "Flexible schedules."
+    ],
+    [
+     "Why is productivity higher?",
+     "Happy people work better."
+    ],
+    [
+     "What does flexibility need?",
+     "Trust and clear rules."
+    ]
+   ]
+  }
+ },
+ "guide-b2": {
+  "dialog2": {
+   "title": "A debate on remote work",
+   "lines": [
+    [
+     "A",
+     "Remote work has transformed the modern workplace.",
+     "Masofaviy ish zamonaviy ish joyini o'zgartirib yubordi."
+    ],
+    [
+     "B",
+     "Admittedly, but it has also blurred the line between work and home.",
+     "To'g'ri, lekin u ish va uy o'rtasidagi chegarani xiralashtirdi."
+    ],
+    [
+     "A",
+     "Had companies not adopted it, many would have gone bankrupt.",
+     "Agar kompaniyalar uni qo'llamaganida, ko'plari bankrot bo'lardi."
+    ],
+    [
+     "B",
+     "Nevertheless, isolation is a genuine problem for employees.",
+     "Shunga qaramay, yakkalanish xodimlar uchun haqiqiy muammo."
+    ],
+    [
+     "A",
+     "Hybrid models might offer the best of both worlds.",
+     "Gibrid modellar ikkala dunyoning eng yaxshisini berishi mumkin."
+    ],
+    [
+     "B",
+     "That is a compelling argument, provided it is well organised.",
+     "Bu ishonarli dalil, agar yaxshi tashkil etilsa."
+    ],
+    [
+     "A",
+     "Ultimately, flexibility is what matters.",
+     "Oxir-oqibat, muhimi — moslashuvchanlik."
+    ],
+    [
+     "B",
+     "I could not agree more.",
+     "Bunga to'liq qo'shilaman."
+    ]
+   ]
+  },
+  "grammarMore": [
+   {
+    "title": "Inversion va murakkab shartlar",
+    "text": "Rasmiy uslubda if tushirilib, ega va yordamchi fe'l o'rni almashadi: Had I known, I would have called (= If I had known). Should you need help, call us. Were I you, I would wait.",
+    "examples": [
+     [
+      "Had she studied harder, she would have passed.",
+      "U ko'proq o'qiganida, o'tgan bo'lardi."
+     ],
+     [
+      "Should you have any questions, please ask.",
+      "Savollaringiz bo'lsa, so'rang."
+     ]
+    ]
+   },
+   {
+    "title": "Akademik bog'lovchilar",
+    "text": "nevertheless / nonetheless (shunga qaramay), furthermore / moreover (bundan tashqari), consequently (natijada), provided that (agar sharti bilan), whereas (holbuki).",
+    "examples": [
+     [
+      "The plan is risky; nevertheless, we will try.",
+      "Reja xavfli; shunga qaramay, urinib ko'ramiz."
+     ],
+     [
+      "He is calm, whereas his brother is nervous.",
+      "U xotirjam, ukasi esa asabiy."
+     ]
+    ]
+   }
+  ],
+  "reading": {
+   "title": "The age of information",
+   "text": "We live in an age of information overload. Every minute thousands of articles and videos appear online, and it is hard to tell truth from rumour. Critical thinking has therefore become one of the most valuable skills. Those who learn to question sources, compare evidence and stay open-minded will navigate the modern world with confidence.",
+   "uz": "Biz axborot ortiqcha bo'lib ketgan asrda yashayapmiz. Har daqiqada onlaynda minglab maqola va video paydo bo'ladi, haqiqatni mish-mishdan ajratish qiyin. Shu sababli tanqidiy fikrlash eng qimmatli ko'nikmalardan biriga aylandi. Manbalarni so'roq qilish, dalillarni solishtirish va ochiq fikrli bo'lishni o'rganganlar zamonaviy dunyoda ishonch bilan harakat qiladi.",
+   "questions": [
+    [
+     "What do we live in?",
+     "An age of information overload."
+    ],
+    [
+     "Which skill has become valuable?",
+     "Critical thinking."
+    ],
+    [
+     "What should people learn to do?",
+     "Question sources, compare evidence, stay open-minded."
+    ]
+   ]
+  }
+ }
+}

@@ -1,0 +1,190 @@
+# 20. Shahar hayoti va xizmatlar
+20.1|полиция|Вызовите полицию!|polis|Polisi arayın!
+20.2|пожарная часть|Пожарная часть рядом со школой.|itfaiye istasyonu|İtfaiye istasyonu okulun yanında.
+20.3|посольство|Я ходил в посольство.|büyükelçilik|Büyükelçiliğe gittim.
+20.4|мэрия, хокимият|Мэрия находится в центре.|belediye binası|Belediye binası merkezde.
+20.5|здание суда|Здание суда очень большое.|adliye binası|Adliye binası çok büyük.
+20.6|парикмахер (мужской)|Парикмахер подстриг его.|berber|Berber saçını kesti.
+20.7|парикмахер|Она парикмахер.|kuaför|O bir kuaför.
+20.8|пекарня|Я покупаю хлеб в пекарне.|fırın (ekmek)|Ekmeği fırından alırım.
+20.9|мясник|Мясник продаёт мясо.|kasap|Kasap et satıyor.
+20.10|продуктовый магазин|Продуктовый магазин открыт.|bakkal, market|Bakkal açık.
+20.11|прачечная, стирка|По воскресеньям я стираю.|çamaşırhane, çamaşır|Pazar günü çamaşır yıkarım.
+20.12|ремонт; ремонтировать|Машине нужен ремонт.|tamir; tamir etmek|Arabanın tamire ihtiyacı var.
+20.13|портной|Портной сшил костюм.|terzi|Terzi bir takım elbise dikti.
+20.14|механик|Механик починил мою машину.|tamirci|Tamirci arabamı tamir etti.
+20.15|сантехник|Вызови сантехника.|tesisatçı|Bir tesisatçı çağır.
+20.16|электрик|Электрик починил свет.|elektrikçi|Elektrikçi ışığı tamir etti.
+20.17|строитель|Строитель работает.|inşaat işçisi|İnşaat işçisi çalışıyor.
+20.18|маляр|Маляр покрасил стену.|boyacı|Boyacı duvarı boyadı.
+20.19|садовник|Садовник поливает растения.|bahçıvan|Bahçıvan bitkileri suluyor.
+20.20|уборщик|Уборщица приходит каждый день.|temizlikçi|Temizlikçi her gün geliyor.
+20.21|охранник|Охранник у ворот.|bekçi, güvenlik görevlisi|Bekçi kapıda.
+20.22|курьер|Курьер пришёл в полдень.|kurye|Kurye öğlen geldi.
+20.23|марка|Мне нужна марка.|pul|Bir pula ihtiyacım var.
+20.24|конверт|Положи письмо в конверт.|zarf|Mektubu zarfa koy.
+20.25|посылка, пакет|Посылка тяжёлая.|paket|Paket ağır.
+20.26|бланк, анкета|Заполните этот бланк.|form|Bu formu doldurun.
+20.27|очередь|Там длинная очередь.|sıra, kuyruk|Uzun bir kuyruk var.
+20.28|удостоверение личности|Покажите удостоверение личности.|kimlik kartı|Kimlik kartınızı gösterin.
+20.29|плата, сбор|Плата — десять долларов.|ücret|Ücret on dolar.
+20.30|штраф|Он заплатил штраф.|ceza (para cezası)|Para cezası ödedi.
+20.31|разрешение|Вам нужно разрешение.|izin belgesi|İzin belgesine ihtiyacınız var.
+20.32|страховка|У меня есть автостраховка.|sigorta|Araba sigortam var.
+20.33|чрезвычайная ситуация|Это экстренный случай.|acil durum|Bu bir acil durum.
+20.34|скорая помощь|Вызовите скорую!|ambulans|Ambulans çağırın!
+20.35|опасность|Впереди опасность.|tehlike|İleride tehlike var.
+20.36|безопасность|Безопасность важна.|güvenlik|Güvenlik önemlidir.
+20.37|знак, вывеска|Прочитай знак.|tabela, işaret|Tabelayı oku.
+20.38|пешеходный переход|Пользуйтесь переходом.|yaya geçidi|Yaya geçidini kullanın.
+20.39|тротуар|Идите по тротуару.|kaldırım|Kaldırımda yürüyün.
+# 21. Fikrlash va muloqot
+21.1|мысль|У меня появилась мысль.|düşünce|Aklıma bir düşünce geldi.
+21.2|память|У меня хорошая память.|hafıza|Hafızam iyidir.
+21.3|ум, разум|Я передумал.|akıl, fikir|Fikrimi değiştirdim.
+21.4|воображение|У детей богатое воображение.|hayal gücü|Çocukların hayal gücü geniştir.
+21.5|любопытство|Любопытство помогает нам учиться.|merak|Merak öğrenmemize yardım eder.
+21.6|сомнение|У меня нет сомнений.|şüphe|Hiç şüphem yok.
+21.7|убеждение, вера|Это моё убеждение.|inanç|Bu benim inancım.
+21.8|уверенность|Она говорит уверенно.|özgüven|Özgüvenle konuşuyor.
+21.9|стресс|Я испытываю сильный стресс.|stres|Çok stres hissediyorum.
+21.10|давление|Он под давлением.|baskı|Baskı altında.
+21.11|облегчение|Какое облегчение.|rahatlama|Bu bir rahatlama.
+21.12|настроение|У меня хорошее настроение.|ruh hâli, keyif|Keyfim yerinde.
+21.13|чувство|Это странное чувство.|his|Garip bir his.
+21.14|эмоция|Она не показала никаких эмоций.|duygu|Hiçbir duygu göstermedi.
+21.15|характер|У него сильный характер.|karakter|Güçlü bir karakteri var.
+21.16|личность|У неё прекрасный характер.|kişilik|Çok hoş bir kişiliği var.
+21.17|поведение|Его поведение грубое.|davranış|Davranışı kaba.
+21.18|манеры; способ|У него хорошие манеры.|tavır, görgü; tarz|Görgü kurallarını bilir.
+21.19|отношение|Позитивное отношение помогает.|tutum|Olumlu bir tutum yardımcı olur.
+21.20|точка зрения|С моей точки зрения, это неправильно.|bakış açısı|Bana göre bu yanlış.
+21.21|спор; довод|Мы поспорили.|tartışma|Bir tartışma yaşadık.
+21.22|соглашение|Мы подписали соглашение.|anlaşma|Bir anlaşma imzaladık.
+21.23|обсуждение|Обсуждение было долгим.|tartışma, görüşme|Görüşme uzun sürdü.
+21.24|разговор|У нас был приятный разговор.|sohbet|Güzel bir sohbet ettik.
+21.25|речь|Он произнёс короткую речь.|konuşma|Kısa bir konuşma yaptı.
+21.26|заявление|Он сделал заявление.|açıklama|Bir açıklama yaptı.
+21.27|комментарий|Оставьте комментарий ниже.|yorum|Aşağıya bir yorum bırakın.
+21.28|шутка|Он рассказал смешную шутку.|şaka|Komik bir şaka yaptı.
+21.29|рассказ, история|Она рассказала нам историю.|hikâye|Bize bir hikâye anlattı.
+21.30|слух|Это всего лишь слух.|söylenti|Bu sadece bir söylenti.
+21.31|сплетни|Я не люблю сплетни.|dedikodu|Dedikoduyu sevmem.
+21.32|новость, сообщение|Я прочитал новость.|haber|Bir haber okudum.
+21.33|оправдание|У него нет оправдания.|bahane|Hiçbir bahanesi yok.
+21.34|извинение|Я должен перед тобой извиниться.|özür|Sana bir özür borçluyum.
+21.35|комплимент|Она сделала мне комплимент.|iltifat|Bana bir iltifat etti.
+21.36|критика|Он принял критику.|eleştiri|Eleştiriyi kabul etti.
+21.37|жалоба|У меня есть жалоба.|şikâyet|Bir şikâyetim var.
+21.38|просьба|У меня есть просьба.|rica, istek|Bir ricam var.
+21.39|приглашение|Я получил приглашение.|davetiye|Bir davetiye aldım.
+21.40|предложение (совет)|У меня есть предложение.|öneri|Bir önerim var.
+21.41|инструкция|Прочитайте инструкцию.|talimat|Talimatları okuyun.
+21.42|объяснение|Мне нужно объяснение.|açıklama|Bir açıklamaya ihtiyacım var.
+21.43|описание|Напиши краткое описание.|tanım, betimleme|Kısa bir betimleme yaz.
+21.44|определение|Я знаю определение.|tanım|Tanımı biliyorum.
+21.45|краткое содержание|Напиши краткое изложение.|özet|Kısa bir özet yaz.
+21.46|тема|Тема интересная.|konu|Konu ilginç.
+21.47|название, заголовок|Как называется книга?|başlık|Kitabın adı ne?
+# 22. Fe'llar (qo'shimcha)
+22.1|расставлять|Пожалуйста, расставь книги на полке.|düzenlemek|Lütfen kitapları rafa diz.
+22.2|предполагать|Я полагаю, он дома.|varsaymak|Evde olduğunu varsayıyorum.
+22.3|посещать (занятия)|Я посещаю занятия по английскому.|katılmak (derse)|İngilizce derslerine katılıyorum.
+22.4|избегать|Избегайте оживлённых улиц.|kaçınmak|Kalabalık sokaklardan kaçının.
+22.5|побеждать (кого-то)|Наша команда обыграла их команду.|yenmek|Takımımız onlarınkini yendi.
+22.6|кусать|Собака может тебя укусить.|ısırmak|Köpek seni ısırabilir.
+22.7|дуть|Ветер дует с севера.|esmek, üflemek|Rüzgâr kuzeyden esiyor.
+22.8|гореть, сжигать|Не сожги хлеб.|yakmak, yanmak|Ekmeği yakma.
+22.9|праздновать|Мы празднуем Навруз в марте.|kutlamak|Nevruz'u martta kutlarız.
+22.10|взимать плату|За вход берут десять долларов.|ücret almak|Giriş için on dolar alıyorlar.
+22.11|гнаться|Собака гонится за кошкой.|kovalamak|Köpek kediyi kovalıyor.
+22.12|хлопать|Зрители начали хлопать.|alkışlamak|Seyirciler alkışlamaya başladı.
+22.13|собирать|Он собирает старые монеты.|toplamak, biriktirmek|Eski paraları biriktiriyor.
+22.14|сочетать, соединять|Соедини муку и сахар.|birleştirmek|Unu ve şekeri birleştir.
+22.15|соревноваться|Они соревнуются в забеге.|yarışmak|Yarışta yarışıyorlar.
+22.16|сосредотачиваться|Сегодня я не могу сосредоточиться.|odaklanmak|Bugün odaklanamıyorum.
+22.17|подтверждать|Пожалуйста, подтвердите бронь.|onaylamak|Lütfen rezervasyonunuzu onaylayın.
+22.18|поздравлять|Поздравляю тебя с успехом.|tebrik etmek|Başarından dolayı seni tebrik ederim.
+22.19|состоять (из)|Команда состоит из десяти игроков.|oluşmak|Takım on oyuncudan oluşuyor.
+22.20|связываться|Свяжитесь со мной по телефону.|iletişime geçmek|Benimle telefonla iletişime geç.
+22.21|убеждать|Я не могу его убедить.|ikna etmek|Onu ikna edemiyorum.
+22.22|исправлять|Пожалуйста, исправьте ошибки.|düzeltmek|Lütfen hataları düzeltin.
+22.23|разбиваться, сталкиваться|Две машины столкнулись.|çarpışmak|İki araba çarpıştı.
+22.24|сметь|Я не смею ему сказать.|cesaret etmek|Ona söylemeye cesaret edemiyorum.
+22.25|иметь дело; сделка|Мы должны решить эту проблему.|ilgilenmek; anlaşma|Bu sorunla ilgilenmeliyiz.
+22.26|доставлять|Они доставляют еду на дом.|teslim etmek|Yemeği evinize teslim ediyorlar.
+22.27|отрицать|Он отрицал эту историю.|inkâr etmek|Hikâyeyi inkâr etti.
+22.28|разрушать|Пожар уничтожил дом.|yok etmek|Yangın evi yok etti.
+22.29|исчезать|Мои ключи исчезли.|kaybolmak|Anahtarlarım kayboldu.
+22.30|открывать (делать открытие)|Учёные открывают новое.|keşfetmek|Bilim insanları yeni şeyler keşfeder.
+22.31|не любить|Я не люблю холодную погоду.|sevmemek|Soğuk havayı sevmem.
+22.32|нанимать (на работу)|В компании работают пятьдесят человек.|istihdam etmek|Şirket elli kişiyi istihdam ediyor.
+22.33|поощрять|Учителя поощряют учеников.|cesaretlendirmek|Öğretmenler öğrencileri cesaretlendirir.
+22.34|веселиться|Тебе понравилось на вечеринке?|eğlenmek|Partide eğlendin mi?
+22.35|осматривать|Врач осмотрел пациента.|muayene etmek|Doktor hastayı muayene etti.
+22.36|обмениваться|В праздники мы обмениваемся подарками.|değiş tokuş etmek|Bayramlarda hediyeleşiriz.
+22.37|исследовать|Мы исследуем старый город.|keşfetmek|Eski şehri keşfediyoruz.
+22.38|выражать|Он выразил благодарность.|ifade etmek|Teşekkürlerini ifade etti.
+22.39|пристёгивать|Пристегните ремень безопасности.|bağlamak (kemer)|Emniyet kemerinizi bağlayın.
+22.40|сходить и принести|Принеси мне стакан воды.|gidip getirmek|Bana bir bardak su getir.
+22.41|вписываться, освоиться|В новой школе трудно освоиться.|uyum sağlamak|Yeni bir okula uyum sağlamak zor.
+22.42|течь|Река течёт к морю.|akmak|Nehir denize akıyor.
+22.43|сосредоточиться|Сосредоточься на своей работе.|odaklanmak|İşine odaklan.
+22.44|складывать|Сложи бумагу пополам.|katlamak|Kâğıdı ikiye katla.
+22.45|собираться|Люди собираются на площади.|toplanmak|İnsanlar meydanda toplanıyor.
+22.46|приветствовать|Он поприветствовал меня с улыбкой.|selamlamak|Beni gülümseyerek selamladı.
+22.47|вести, показывать дорогу|Он провёл нас по старому городу.|rehberlik etmek|Bize eski şehirde rehberlik etti.
+22.48|справляться|Она может справиться с любой проблемой.|başa çıkmak|Her sorunla başa çıkabilir.
+22.49|вешать|Повесь пальто на крючок.|asmak|Paltonu askıya as.
+22.50|колебаться|Не стесняйтесь спрашивать.|tereddüt etmek|Sormaktan çekinme.
+22.51|нанимать|Они хотят нанять водителя.|işe almak|Bir şoför işe almak istiyorlar.
+22.52|спешить|Мы должны спешить.|acele etmek|Acele etmeliyiz.
+22.53|болеть, причинять боль|У меня болит нога.|acımak, incitmek|Bacağım acıyor.
+22.54|игнорировать|Не игнорируйте правила.|görmezden gelmek|Kuralları görmezden gelme.
+22.55|производить впечатление|Она хочет произвести впечатление на начальника.|etkilemek|Patronunu etkilemek istiyor.
+22.56|сообщать|Пожалуйста, сообщите мне об изменениях.|bilgilendirmek|Lütfen değişiklikler hakkında beni bilgilendirin.
+22.57|настаивать|Он настаивает на том, чтобы заплатить.|ısrar etmek|Ödemekte ısrar ediyor.
+22.58|знакомить, представлять|Позвольте представить моего друга.|tanıştırmak|Arkadaşımı tanıştırayım.
+22.59|изобретать|Он изобрёл новую машину.|icat etmek|Yeni bir makine icat etti.
+22.60|включать в себя|Работа связана с поездками.|içermek, gerektirmek|İş seyahat gerektiriyor.
+22.61|судить; судья|Не суди людей по одежде.|yargılamak; hakim|İnsanları kıyafetlerine göre yargılama.
+22.62|сбивать, валить|Ветер повалил дерево.|devirmek|Rüzgâr ağacı devirdi.
+22.63|класть|Положи книгу на стол.|koymak (yatırmak)|Kitabı masaya koy.
+22.64|упоминать|Он упомянул твоё имя.|bahsetmek|Senin adından bahsetti.
+22.65|отмечать, обращать внимание|Пожалуйста, запомните дату.|not etmek|Lütfen tarihi not edin.
+22.66|слушаться|Дети должны слушаться родителей.|itaat etmek|Çocuklar ebeveynlerine itaat etmeli.
+22.67|наблюдать|Они наблюдают за звёздами.|gözlemlemek|Yıldızları gözlemliyorlar.
+22.68|получать, добывать|Он получил визу.|elde etmek|Vize aldı.
+22.69|владеть|Он владеет маленьким магазином.|sahip olmak|Küçük bir dükkânı var.
+22.70|красить|Они красят стены в белый цвет.|boyamak|Duvarları beyaza boyuyorlar.
+22.71|выступать, исполнять|Актёры выступают на сцене.|sahne almak|Oyuncular sahnede oynuyor.
+22.72|уговаривать|Я уговорю его прийти.|ikna etmek|Onu gelmeye ikna edeceğim.
+22.73|полировать, чистить|Почисти обувь.|cilalamak, boyamak|Ayakkabılarını boya.
+22.74|обладать|Он владеет большим количеством земли.|sahip olmak|Çok fazla toprağı var.
+22.75|предсказывать|Никто не может предсказать будущее.|tahmin etmek|Kimse geleceği tahmin edemez.
+22.76|нажимать|Нажми красную кнопку.|basmak|Kırmızı düğmeye bas.
+22.77|притворяться|Ребёнок притворяется, что спит.|-miş gibi yapmak|Çocuk uyuyormuş gibi yapıyor.
+22.78|предотвращать|Вакцины предотвращают болезни.|önlemek|Aşılar hastalıkları önler.
+22.79|доказывать|Докажи свою идею.|kanıtlamak|Fikrini kanıtla.
+22.80|издавать, публиковать|Они издают журнал.|yayımlamak|Bir dergi yayımlıyorlar.
+22.81|бросать (работу и т. п.)|Он уволился с работы.|bırakmak|İşini bıraktı.
+22.82|сожалеть|Я сожалею о своих словах.|pişman olmak|Sözlerimden pişmanım.
+22.83|расслабляться|Расслабься и наслаждайся музыкой.|rahatlamak|Rahatla ve müziğin tadını çıkar.
+22.84|полагаться|Ты можешь на меня положиться.|güvenmek|Bana güvenebilirsin.
+22.85|напоминать|Напомни мне позвонить ему.|hatırlatmak|Onu aramamı bana hatırlat.
+22.86|снимать, убирать|Снимите обувь.|çıkarmak, kaldırmak|Ayakkabılarınızı çıkarın.
+22.87|повторять|Повторяйте за мной.|tekrar etmek|Benden sonra tekrar edin.
+22.88|заменять|Замени старую батарейку.|değiştirmek|Eski pili değiştir.
+22.89|отдыхать|Отдохни несколько минут.|dinlenmek|Birkaç dakika dinlen.
+22.90|выходить на пенсию|В следующем году он выйдет на пенсию.|emekli olmak|Gelecek yıl emekli olacak.
+22.91|раскрывать|Она раскрыла секрет.|açığa çıkarmak|Sırrı açığa çıkardı.
+22.92|просматривать, повторять|Повтори свои записи перед экзаменом.|gözden geçirmek|Sınavdan önce notlarını gözden geçir.
+22.93|катиться|Мяч покатился с холма.|yuvarlanmak|Top tepeden aşağı yuvarlandı.
+22.94|торопиться|Не торопись.|acele etmek|Acele etme.
+22.95|пугать|Шум напугал малыша.|korkutmak|Gürültü bebeği korkuttu.
+22.96|царапать|Кошка меня поцарапала.|tırmalamak|Kedi beni tırmaladı.
+22.97|искать, стремиться|Они ищут помощи.|aramak|Yardım arıyorlar.
+22.98|выбирать|Выберите цвет.|seçmek|Bir renk seçin.
+22.99|поселяться|Они поселились в новом городе.|yerleşmek|Yeni bir şehre yerleştiler.
+22.100|светить, сиять|Солнце ярко светит.|parlamak|Güneş parlak bir şekilde parlıyor.
+22.101|закрывать|Закрой дверь, пожалуйста.|kapatmak|Kapıyı kapat, lütfen.

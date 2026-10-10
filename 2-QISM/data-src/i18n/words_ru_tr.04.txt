@@ -1,0 +1,173 @@
+# 5. Ovqat va ichimlik
+5.1|еда|Индийская еда острая.|yemek|Hint yemekleri acıdır.
+5.2|приём пищи, блюдо|Ужин — мой любимый приём пищи.|öğün|Akşam yemeği en sevdiğim öğün.
+5.3|завтрак|На завтрак я ем яйца.|kahvaltı|Kahvaltıda yumurta yerim.
+5.4|обед|Мы обедаем в час дня.|öğle yemeği|Öğle yemeğini saat birde yeriz.
+5.5|ужин|Ужин готов.|akşam yemeği|Akşam yemeği hazır.
+5.6|перекус|В четыре я перекусываю.|atıştırmalık|Saat dörtte bir şeyler atıştırırım.
+5.7|хлеб|Свежий хлеб чудесно пахнет.|ekmek|Taze ekmek harika kokar.
+5.8|рис|Мы едим рис с мясом.|pirinç|Pirinci etle yeriz.
+5.9|мясо|Он не ест мясо.|et|Et yemiyor.
+5.10|говядина|Мы купили немного говядины.|sığır eti|Biraz sığır eti aldık.
+5.11|баранина|Баранина очень вкусная с рисом.|kuzu eti|Kuzu eti pilavla çok lezzetli.
+5.12|курица|Мне, пожалуйста, курицу.|tavuk|Ben tavuk alayım, lütfen.
+5.13|яйцо|Каждое утро я съедаю яйцо.|yumurta|Her sabah bir yumurta yerim.
+5.14|молоко|Дети пьют молоко.|süt|Çocuklar süt içer.
+5.15|сыр|Я люблю сыр на хлебе.|peynir|Ekmeğin üstünde peyniri severim.
+5.16|сливочное масло|Намажь масло на хлеб.|tereyağı|Ekmeğe tereyağı sür.
+5.17|йогурт|На завтрак я ем йогурт.|yoğurt|Kahvaltıda yoğurt yerim.
+5.18|сахар|Я не кладу сахар в чай.|şeker|Çayıma şeker koymam.
+5.19|соль|В суп нужно добавить соли.|tuz|Çorbaya daha fazla tuz lazım.
+5.20|перец|Добавь немного перца.|biber|Biraz biber ekle.
+5.21|масло (растительное)|Пожарь это в горячем масле.|yağ|Kızgın yağda kızart.
+5.22|мука|Для торта нам нужна мука.|un|Pasta için una ihtiyacımız var.
+5.23|суп|Суп горячий.|çorba|Çorba sıcak.
+5.24|салат|Я приготовил свежий салат.|salata|Taze bir salata yaptım.
+5.25|макароны|На ужин у нас были макароны.|makarna|Akşam yemeğinde makarna yedik.
+5.26|бутерброд|Он ест бутерброд в обед.|sandviç|Öğle yemeğinde sandviç yiyor.
+5.27|пицца|Давай закажем пиццу.|pizza|Hadi pizza sipariş edelim.
+5.28|торт|Она испекла шоколадный торт.|pasta|Çikolatalı bir pasta yaptı.
+5.29|печенье|Ребёнок съел печенье.|kurabiye|Çocuk bir kurabiye yedi.
+5.30|шоколад|Я люблю тёмный шоколад.|çikolata|Bitter çikolatayı severim.
+5.31|конфета|Мальчик хочет конфет.|şeker (tatlı)|Çocuk biraz şeker istiyor.
+5.32|мороженое|Летом мы едим мороженое.|dondurma|Yazın dondurma yeriz.
+5.33|мёд|Положи немного мёда в чай.|bal|Çaya biraz bal koy.
+5.34|варенье|Она любит хлеб с вареньем.|reçel|Reçelli ekmeği sever.
+5.35|овощ|Ешь больше овощей.|sebze|Daha çok sebze ye.
+5.36|фрукт|Мы едим фрукты каждый день.|meyve|Her gün meyve yeriz.
+5.37|яблоко|Яблоко в день — и ты здоров.|elma|Günde bir elma seni sağlıklı tutar.
+5.38|банан|Обезьяна ест банан.|muz|Maymun muz yiyor.
+5.39|апельсин|Каждое утро я пью апельсиновый сок.|portakal|Her sabah portakal suyu içerim.
+5.40|лимон|Добавь в чай дольку лимона.|limon|Çaya bir dilim limon ekle.
+5.41|виноград|Осенью виноград сладкий.|üzüm|Sonbaharda üzümler tatlıdır.
+5.42|арбуз|Арбуз отлично подходит для лета.|karpuz|Karpuz yazın harikadır.
+5.43|дыня|Эта дыня очень сладкая.|kavun|Bu kavun çok tatlı.
+5.44|персик|Персик спелый.|şeftali|Şeftali olgun.
+5.45|груша|Я съедаю грушу каждый день.|armut|Her gün bir armut yerim.
+5.46|вишня, черешня|Вишня цветёт.|kiraz|Kiraz ağacı çiçek açtı.
+5.47|клубника|Она обожает клубничное варенье.|çilek|Çilek reçelini çok sever.
+5.48|абрикос|Сушёный абрикос очень вкусный.|kayısı|Kuru kayısı çok lezzetli.
+5.49|гранат|Гранатовый сок полезен.|nar|Nar suyu sağlıklıdır.
+5.50|картофель|Пожарь картошку на масле.|patates|Patatesi yağda kızart.
+5.51|помидор|Нарежь помидор на кусочки.|domates|Domatesi parçalara kes.
+5.52|лук|Нарежь лук.|soğan|Soğanı doğra.
+5.53|чеснок|Добавь в суп немного чеснока.|sarımsak|Çorbaya biraz sarımsak ekle.
+5.54|морковь|Кролики любят морковь.|havuç|Tavşanlar havucu sever.
+5.55|огурец|Я положил огурец в салат.|salatalık|Salataya bir salatalık koydum.
+5.56|капуста|Мы сварили капустный суп.|lahana|Lahana çorbası pişirdik.
+5.57|тыква|Тыква очень большая.|balkabağı|Balkabağı çok büyük.
+5.58|гриб|Мы нашли гриб в лесу.|mantar|Ormanda bir mantar bulduk.
+5.59|фасоль|Я люблю фасолевый суп.|fasulye|Fasulye çorbasını severim.
+5.60|орех|У него аллергия на орехи.|fındık, ceviz|Kuruyemişlere alerjisi var.
+5.61|чай|Хотите чаю?|çay|Biraz çay ister misiniz?
+5.62|кофе|Каждое утро я пью кофе.|kahve|Her sabah kahve içerim.
+5.63|сок|Дети пьют яблочный сок.|meyve suyu|Çocuklar elma suyu içiyor.
+5.64|газировка|Он купил бутылку газировки.|gazlı içecek|Bir şişe gazlı içecek aldı.
+5.65|пиво|Он заказал пиво.|bira|Bir bira sipariş etti.
+5.66|вино|За ужином они пьют вино.|şarap|Akşam yemeğinde şarap içerler.
+5.67|рецепт|Дай мне рецепт этого супа.|tarif|Bana bu çorbanın tarifini ver.
+5.68|ингредиент|Соль — важный ингредиент.|malzeme|Tuz önemli bir malzemedir.
+5.69|меню|Можно посмотреть меню?|menü|Menüyü görebilir miyim, lütfen?
+5.70|чаевые|Мы оставили чаевые официанту.|bahşiş|Garsona bahşiş bıraktık.
+5.71|вкусный|Торт вкусный.|lezzetli|Pasta çok lezzetli.
+5.72|сладкий|Чай слишком сладкий.|tatlı|Çay çok tatlı.
+5.73|кислый|Этот лимон кислый.|ekşi|Bu limon ekşi.
+5.74|горький|Кофе на вкус горький.|acı (tat)|Kahvenin tadı acı.
+5.75|острый|Я не люблю острую еду.|acı, baharatlı|Acı yemekleri sevmem.
+5.76|свежий|Хлеб свежий.|taze|Ekmek taze.
+5.77|сырой|Не ешь сырое мясо.|çiğ|Çiğ et yeme.
+5.78|спелый|Яблоки спелые.|olgun|Elmalar olgun.
+5.79|горячий|Суп очень горячий.|sıcak|Çorba çok sıcak.
+# 6. Kiyim-kechak
+6.1|одежда|Мне нужна новая одежда.|kıyafet|Yeni kıyafetlere ihtiyacım var.
+6.2|рубашка|Он носит белую рубашку.|gömlek|Beyaz bir gömlek giyiyor.
+6.3|футболка|Летом я ношу футболку.|tişört|Yazın tişört giyerim.
+6.4|юбка|Она купила длинную юбку.|etek|Uzun bir etek aldı.
+6.5|брюки|Эти брюки слишком длинные.|pantolon|Bu pantolon çok uzun.
+6.6|джинсы|Я люблю синие джинсы.|kot pantolon|Mavi kot pantolonu severim.
+6.7|шорты|Летом он носит шорты.|şort|Yazın şort giyer.
+6.8|куртка|Возьми куртку, холодно.|ceket, mont|Montunu al, hava soğuk.
+6.9|пальто|Она надела пальто.|palto|Paltosunu giydi.
+6.10|свитер|Мне нужен тёплый свитер.|kazak|Sıcak bir kazağa ihtiyacım var.
+6.11|шляпа, шапка|Зимой он носит шапку.|şapka|Kışın şapka takar.
+6.12|кепка|Мальчик носит синюю кепку.|kasket, şapka|Çocuk mavi bir şapka takıyor.
+6.13|шарф|У неё красный шарф.|atkı|Kırmızı bir atkısı var.
+6.14|перчатки|Надень перчатки, очень холодно.|eldiven|Eldiven giy, hava buz gibi.
+6.15|носки|Мне нужны новые носки.|çorap|Yeni çoraplara ihtiyacım var.
+6.16|обувь, туфли|Моя обувь грязная.|ayakkabı|Ayakkabılarım kirli.
+6.17|сапоги|Зимой я ношу сапоги.|bot, çizme|Kışın bot giyerim.
+6.18|сандалии|Летом она носит сандалии.|sandalet|Yazın sandalet giyer.
+6.19|ремень|Он носит чёрный ремень.|kemer|Siyah bir kemer takıyor.
+6.20|карман|Ключ у меня в кармане.|cep|Anahtar cebimde.
+6.21|пуговица|Не хватает одной пуговицы.|düğme|Bir düğme eksik.
+6.22|молния|Молния на моей сумке сломана.|fermuar|Çantamın fermuarı bozuk.
+6.23|размер|Какой размер ты носишь?|beden|Kaç beden giyiyorsun?
+6.24|мода|Она любит моду.|moda|Modayı seviyor.
+6.25|стиль|Мне нравится твой стиль.|tarz|Tarzını beğeniyorum.
+6.26|форма (одежда)|Ученики носят форму.|üniforma|Öğrenciler üniforma giyiyor.
+6.27|нижнее бельё|Он купил новое нижнее бельё.|iç çamaşırı|Yeni iç çamaşırı aldı.
+6.28|пижама|Дети в пижамах.|pijama|Çocuklar pijamalarını giymiş.
+6.29|зонт|Возьми с собой зонт.|şemsiye|Yanına bir şemsiye al.
+6.30|очки|Мне нужны очки, чтобы читать.|gözlük|Okumak için gözlüğe ihtiyacım var.
+6.31|ожерелье|Она носит золотое ожерелье.|kolye|Altın bir kolye takıyor.
+6.32|браслет|Он подарил ей браслет.|bilezik|Ona bir bilezik hediye etti.
+6.33|серьги|Она потеряла одну серёжку.|küpe|Küpelerinden birini kaybetti.
+# 7. Joylar va shahar
+7.1|город|Ташкент — большой город.|şehir|Taşkent büyük bir şehir.
+7.2|городок|Они живут в маленьком городке.|kasaba|Küçük bir kasabada yaşıyorlar.
+7.3|деревня|Мои бабушка и дедушка живут в деревне.|köy|Büyükannemle büyükbabam bir köyde yaşıyor.
+7.4|страна|Узбекистан — красивая страна.|ülke|Özbekistan güzel bir ülke.
+7.5|столица|Ташкент — столица Узбекистана.|başkent|Taşkent, Özbekistan'ın başkentidir.
+7.6|улица|Наша улица очень тихая.|sokak|Sokağımız çok sakin.
+7.7|дорога|Дорога в деревню длинная.|yol|Köye giden yol uzun.
+7.8|проспект|Магазин находится на главном проспекте.|cadde, bulvar|Dükkân ana caddede.
+7.9|площадь|Мы встретились на городской площади.|meydan|Şehir meydanında buluştuk.
+7.10|парк|Каждый вечер мы гуляем в парке.|park|Her akşam parkta yürürüz.
+7.11|мост|Мост проходит над рекой.|köprü|Köprü nehrin üzerinde.
+7.12|рынок|Я покупаю фрукты на рынке.|pazar|Meyveyi pazardan alırım.
+7.13|магазин|Магазин закрывается в девять.|dükkân, mağaza|Dükkân dokuzda kapanıyor.
+7.14|супермаркет|По воскресеньям мы ходим за покупками в супермаркет.|süpermarket|Pazar günleri süpermarketten alışveriş yaparız.
+7.15|торговый центр|Торговый центр полон людей.|alışveriş merkezi|Alışveriş merkezi insanlarla dolu.
+7.16|банк|Мне нужно сходить в банк.|banka|Bankaya gitmem gerekiyor.
+7.17|почта|Почта открывается в девять.|postane|Postane dokuzda açılıyor.
+7.18|библиотека|Я занимаюсь в библиотеке.|kütüphane|Kütüphanede ders çalışırım.
+7.19|музей|Вчера мы были в музее.|müze|Dün müzeyi ziyaret ettik.
+7.20|театр|Они пошли в театр.|tiyatro|Tiyatroya gittiler.
+7.21|кинотеатр|Пойдём сегодня вечером в кино.|sinema|Bu akşam sinemaya gidelim.
+7.22|ресторан|Мы ужинали в ресторане.|restoran|Bir restoranda akşam yemeği yedik.
+7.23|кафе|Давай встретимся в кафе.|kafe|Kafede buluşalım.
+7.24|гостиница|Гостиница рядом с вокзалом.|otel|Otel istasyonun yakınında.
+7.25|школа|Моя сестра ходит в школу.|okul|Kız kardeşim okula gidiyor.
+7.26|университет|Он учится в университете.|üniversite|Üniversitede okuyor.
+7.27|колледж|Она учится в колледже.|kolej|Koleje gidiyor.
+7.28|офис|Мой офис на пятом этаже.|ofis|Ofisim beşinci katta.
+7.29|завод|Он работает на заводе.|fabrika|Bir fabrikada çalışıyor.
+7.30|ферма|Они живут на ферме.|çiftlik|Bir çiftlikte yaşıyorlar.
+7.31|мечеть|Мечеть очень старая.|cami|Cami çok eski.
+7.32|церковь|Рядом с парком есть церковь.|kilise|Parkın yanında bir kilise var.
+7.33|стадион|Сегодня стадион полон.|stadyum|Stadyum bugün dolu.
+7.34|аэропорт|Аэропорт далеко от города.|havalimanı|Havalimanı şehirden uzak.
+7.35|вокзал, станция|Вокзал поблизости.|istasyon|Tren istasyonu yakında.
+7.36|порт|Корабль прибыл в порт.|liman|Gemi limana vardı.
+7.37|автобусная остановка|Автобусная остановка на углу.|otobüs durağı|Otobüs durağı köşede.
+7.38|парковка|Здесь бесплатная парковка.|otopark|Burada ücretsiz otopark var.
+7.39|угол|На углу поверни налево.|köşe|Köşeden sola dön.
+7.40|центр|В центре города многолюдно.|merkez|Şehir merkezi kalabalık.
+7.41|пригород|Они живут в пригороде.|banliyö|Banliyöde yaşıyorlar.
+7.42|район, область|Этот район очень безопасный.|bölge|Bu bölge çok güvenli.
+7.43|место|Это хорошее место.|yer|Burası güzel bir yer.
+7.44|расположение|Расположение отеля идеальное.|konum|Otelin konumu mükemmel.
+7.45|адрес|Какой у тебя адрес?|adres|Adresin ne?
+7.46|карта|Посмотри на карту.|harita|Haritaya bak.
+7.47|направление|В каком направлении вокзал?|yön|İstasyon hangi yönde?
+7.48|север|Ветер дует с севера.|kuzey|Rüzgâr kuzeyden esiyor.
+7.49|юг|Они поехали на юг.|güney|Güneye gittiler.
+7.50|восток|Солнце встаёт на востоке.|doğu|Güneş doğudan doğar.
+7.51|запад|Солнце садится на западе.|batı|Güneş batıdan batar.
+7.52|налево, левый|Здесь поверни налево.|sol|Burada sola dön.
+7.53|направо, правый|Банк справа.|sağ|Banka sağda.
+7.54|перед|Машина стоит перед домом.|ön|Araba evin önünde.
+7.55|сторона|Магазин на другой стороне улицы.|taraf|Dükkân sokağın diğer tarafında.
+7.56|середина|Он стоял посреди комнаты.|orta|Odanın ortasında durdu.
+7.57|край|Не стой у края.|kenar|Kenara yakın durma.
+7.58|расстояние|Расстояние — десять километров.|mesafe|Mesafe on kilometre.

@@ -1,0 +1,506 @@
+{
+  "_speakers": {
+    "Admin": "Görevli", "Seller": "Satıcı", "Buyer": "Müşteri", "Guest": "Misafir", "Waiter": "Garson",
+    "Driver": "Şoför", "HR": "İK uzmanı", "Candidate": "Aday", "Patient": "Hasta", "Nurse": "Hemşire",
+    "Agent": "Görevli", "Traveller": "Yolcu", "Teacher": "Öğretmen", "Student": "Öğrenci", "Clerk": "Resepsiyonist",
+    "Manager": "Müdür", "Employee": "Çalışan"
+  },
+  "m0": {
+    "dialog2": { "title": "Yeni bir sınıf arkadaşıyla tanışma", "lines": [
+      "Merhaba! Benim adım Ali. Senin adın ne?",
+      "Merhaba Ali. Ben Dilya. Tanıştığıma memnun oldum.",
+      "Adını nasıl yazıyorsun?",
+      "D-İ-L-Y-A.",
+      "Teşekkürler. Yeni öğrenci misin?",
+      "Evet. Bugün ilk günüm.",
+      "Hoş geldin! Sana sınıfı göstereyim.",
+      "Çok teşekkür ederim!"
+    ] },
+    "reading": { "title": "İlk Türkçe dersim",
+      "text": "Bugün ilk Türkçe dersim. Öğretmen çok nazik. Tahtaya alfabeyi yazıyor. Harfleri birlikte okuyoruz: A, B, C, Ç. Sonra adlarımızı harf harf söylüyoruz. Biraz utangacım ama mutluyum.",
+      "uz": "Bugun mening birinchi turk tili darsim. O'qituvchi juda mehribon. U doskaga alifboni yozadi. Harflarni birga o'qiymiz: A, B, C, Ç. Keyin ismlarimizni harflab aytamiz. Men biroz uyatchanman, lekin xursandman.",
+      "questions": [["Bugün hangi ders var?", "İlk Türkçe dersi."], ["Öğretmen tahtaya ne yazıyor?", "Alfabeyi."], ["Öğrenci kendini nasıl hissediyor?", "Biraz utangaç ama mutlu."]] }
+  },
+  "m1": {
+    "dialog2": { "title": "Dil merkezinde", "lines": [
+      "Günaydın. Size nasıl yardımcı olabilirim?",
+      ["Türkçe kursuna kaydolmak istiyorum.", "Men turk tili kursiga yozilmoqchiman."],
+      "Tabii. Tam adınız nedir?",
+      "Adım Sara Karimova. S-A-R-A.",
+      "Telefon numaranız nedir?",
+      "90 123 45 67.",
+      "Teşekkürler. Kurs pazartesi başlıyor.",
+      "Harika. Pazartesi görüşürüz!"
+    ] },
+    "reading": { "title": "Sara ile tanışın",
+      "text": "Sara yirmi yaşında. Semerkantlı. Üniversite öğrencisi. Şimdi dil merkezinde, çünkü Türkçeyi iyi konuşmak istiyor. Telefon numarası 90 123 45 67.",
+      "uz": "Sara yigirma yoshda. U Samarqanddan. U universitet talabasi. Hozir u til markazida, chunki u turkchani yaxshi gapirishni xohlaydi. Uning telefon raqami 90 123 45 67.",
+      "questions": [["Sara kaç yaşında?", "Yirmi yaşında."], ["Nereli?", "Semerkantlı."], ["Neden dil merkezinde?", "Çünkü Türkçeyi iyi konuşmak istiyor."]] }
+  },
+  "m2": {
+    "dialog2": { "title": "Meyve alışverişi", "lines": [
+      "İyi günler! Ne istersiniz?",
+      "Biraz elma ve muz istiyorum.",
+      "Kaç kilo elma istersiniz?",
+      "İki kilo, lütfen. Ne kadar?",
+      "Kilosu on bin som.",
+      "Tamam. İki kilo elma alıyorum.",
+      "Buyurun. Başka bir şey?",
+      "Hayır, teşekkürler. Bu kadar."
+    ] },
+    "reading": { "title": "Pazarda bir gün",
+      "text": "Annem her cumartesi pazara gider. Sebze, meyve ve ekmek alır. Satıcı onu tanır ve her zaman selam verir. Annem taze elmaları sever ama pahalı şeyleri sevmez. Ben de sık sık çantaları taşımasına yardım ederim.",
+      "questions": [["Anne pazara ne zaman gider?", "Her cumartesi."], ["Ne alır?", "Sebze, meyve ve ekmek."], ["Çantaları taşımasına kim yardım eder?", "Çocuğu (ben) sık sık yardım eder."]] }
+  },
+  "m3": {
+    "dialog2": { "title": "Kırtasiye alışverişi", "lines": [
+      "Affedersiniz, defteriniz var mı?",
+      "Evet, defterimiz ve kalemimiz var.",
+      "Bir kalem ve bir silgi lazım.",
+      "İşte mavi bir kalem ve bir silgi.",
+      "Bir de iki defter, lütfen.",
+      "Defterler rafta.",
+      "Teşekkürler. Turuncu bir kalem de alıyorum.",
+      "Tabii. Başka bir şey?"
+    ] },
+    "reading": { "title": "Yeni sınıf",
+      "text": "Sınıfımız yeni. Yirmi sandalye, on masa ve büyük bir tahta var. Duvarda eski bir saat var. Her öğrencinin bir defteri ve bir kalemi var. Öğretmenin turuncu bir çantası ve bir sürü kitabı var.",
+      "questions": [["Kaç sandalye var?", "Yirmi sandalye var."], ["Duvarda ne var?", "Eski bir saat."], ["Öğretmenin nesi var?", "Turuncu bir çantası ve bir sürü kitabı."]] }
+  },
+  "m17": {
+    "dialog2": { "title": "Ev hakkında konuşma", "lines": [
+      "Nerede oturuyorsun?",
+      "Ailemle büyük bir evde oturuyorum.",
+      "Kaç oda var?",
+      "Beş oda ve bir bahçe var.",
+      "Yatak odan büyük mü?",
+      "Hayır, küçük ama rahat.",
+      "Seninle kim yaşıyor?",
+      "Annem, babam, kardeşim ve büyükannem."
+    ] },
+    "reading": { "title": "Büyükannem",
+      "text": "Büyükannem bizimle yaşıyor. Yetmiş yaşında. Erken kalkar ve herkese çay demler. Akşamları çocuklara masal anlatır. Odası mutfağın yanında. Onu çok seviyoruz.",
+      "questions": [["Büyükanne kaç yaşında?", "Yetmiş."], ["Akşamları ne yapar?", "Çocuklara masal anlatır."], ["Odası nerede?", "Mutfağın yanında."]] }
+  },
+  "m18": {
+    "dialog2": { "title": "Hangi rengi seversin?", "lines": [
+      "Yeni çantan ne renk?",
+      "Koyu yeşil. Yeşili çok severim.",
+      "Büyük mü, küçük mü?",
+      "Orta boy, yuvarlak bir çanta.",
+      "Benim en sevdiğim renk gökyüzü gibi mavi.",
+      "Mavi güzel. Kırmızıyı da sever misin?",
+      "Pek değil. Kırmızı bana çok parlak geliyor.",
+      "Anlıyorum. Herkesin zevki farklı."
+    ] },
+    "reading": { "title": "Etrafımızdaki renkler",
+      "text": "Gökyüzü mavi, çimen yeşil. Güneş sarı, kar beyaz. Odamda duvarlar açık sarı, halı ise kahverengi. Parlak renkleri severim çünkü beni mutlu ediyorlar.",
+      "questions": [["Gökyüzü ne renk?", "Mavi."], ["Odadaki duvarlar ne renk?", "Açık sarı."], ["Yazar neden parlak renkleri seviyor?", "Onu mutlu ediyorlar."]] }
+  },
+  "m19": {
+    "dialog2": { "title": "Masa ayırtma", "lines": [
+      "Merhaba, dört kişilik bir masa ayırtmak istiyorum.",
+      "Tabii. Saat kaç için?",
+      "Bu akşam saat yedi için.",
+      "Adınızı alabilir miyim?",
+      "Evet, Rustam Aliyev.",
+      "Pencere kenarında bir masa ister misiniz?",
+      "Evet, çok güzel olur.",
+      "Harika. Saat yedide görüşmek üzere."
+    ] },
+    "reading": { "title": "Restoranda akşam yemeği",
+      "text": "Cuma günü güzel bir restorana gittik. Garson menüyü getirdi. Ben çorba ve ızgara tavuk sipariş ettim, kız kardeşim ise salata istedi. Tatlı olarak dondurma yedik. Yemekler lezzetliydi, servis de çok kibardı.",
+      "questions": [["Yazar ne sipariş etti?", "Çorba ve ızgara tavuk."], ["Kız kardeşi ne sipariş etti?", "Salata."], ["Servis nasıldı?", "Çok kibardı."]] }
+  },
+  "m20": {
+    "dialog2": { "title": "Günlük programın nasıl?", "lines": [
+      "Saat kaçta kalkıyorsun?",
+      "Altı buçukta kalkıyorum.",
+      "Kahvaltıdan sonra ne yapıyorsun?",
+      "Saat sekizde işe gidiyorum.",
+      "Öğle yemeğini ne zaman yiyorsun?",
+      "Saat birde, genellikle iş arkadaşlarımla.",
+      "Peki ne zaman yatıyorsun?",
+      "On bire doğru. Akşamları hep yorgun oluyorum."
+    ] },
+    "reading": { "title": "Yoğun bir gün",
+      "text": "Kerim'in günü yoğun. Altıda kalkar, kahvaltı yapar ve sekizde üniversiteye gider. Dersleri üçte biter. Sonra bir saat spor salonuna gider. Akşam ödevlerini yapar ve kitap okur. Saat on birde yatar.",
+      "questions": [["Kerim ne zaman kalkar?", "Altıda."], ["Derslerden sonra ne yapar?", "Spor salonuna gider."], ["Ne zaman yatar?", "Saat on birde."]] }
+  },
+  "m4": {
+    "dialog2": { "title": "Dağlarda bir hafta sonu", "lines": [
+      "Geçen hafta sonu bir yere gittin mi?",
+      "Evet, dağlara gittik.",
+      "Nasıl gittiniz?",
+      "Önce otobüse bindik, sonra üç saat yürüdük.",
+      "Fotoğraf çektin mi?",
+      "Tabii ki. Yüzden fazla fotoğraf çektim.",
+      "Hava güzel miydi?",
+      "Güneşliydi ama biraz soğuktu."
+    ] },
+    "reading": { "title": "Çimgan gezisi",
+      "text": "Geçen yaz arkadaşlarımla Çimgan'a gittik. Sabah erkenden yola çıktık ve saat onda vardık. Nehir boyunca yürüdük ve çimenlerin üzerinde öğle yemeği yedik. Öğleden sonra biraz yağmur yağdı, biz de otobüse döndük. Yorucu ama harika bir gündü.",
+      "questions": [["Saat kaçta vardılar?", "Saat onda."], ["Öğle yemeğinde ne yaptılar?", "Çimenlerin üzerinde yemek yediler."], ["Neden otobüse döndüler?", "Çünkü yağmur yağdı."]] }
+  },
+  "m5": {
+    "dialog2": { "title": "Gelecek yılın planları", "lines": [
+      "Gelecek yıl ne yapacaksın?",
+      ["İstanbul'da Türkçe öğreneceğim.", "Men Istanbulda turk tilini o'rganmoqchiman."],
+      "Pahalı olacak mı?",
+      "Sanırım buradan daha pahalı olacak.",
+      "Orada çalışacak mısın?",
+      "Belki. Yarı zamanlı bir iş arayacağım.",
+      "Eminim çok başarılı olacaksın.",
+      "Teşekkürler, çok naziksin."
+    ] },
+    "reading": { "title": "Gelecek planım",
+      "text": "Beş yıl sonra doktor olmak istiyorum. Önce okulu bitireceğim, sonra tıp fakültesine gireceğim. Zor olacak ama çok çalışacağım. Babam iyi bir doktorun dünyanın en mutlu insanı olduğunu söylüyor.",
+      "questions": [["Yazar ne olmak istiyor?", "Doktor."], ["Önce ne yapacak?", "Okulu bitirecek."], ["Babası ne diyor?", "İyi bir doktor dünyanın en mutlu insanıdır."]] }
+  },
+  "m6": {
+    "dialog2": { "title": "Nerede?", "lines": [
+      "Affedersiniz, postane nerede?",
+      "Bankayla eczanenin arasında.",
+      "Buraya uzak mı?",
+      "Hayır, parkın karşısında.",
+      "Teşekkürler. Otobüs durağı nerede?",
+      "Şu binanın arkasında, kafenin yanında.",
+      "Harika, şimdi görüyorum.",
+      "Rica ederim."
+    ] },
+    "reading": { "title": "Mahallem",
+      "text": "Mahallem sakin ve yeşil. Evimin önünde küçük bir park, parkın yanında da bir fırın var. Fırının arkasında bir okul var. Her sabah parkın içinden geçerek eczanenin karşısındaki otobüs durağına yürürüm.",
+      "questions": [["Evin önünde ne var?", "Küçük bir park."], ["Fırının arkasında ne var?", "Bir okul."], ["Otobüs durağı nerede?", "Eczanenin karşısında."]] }
+  },
+  "m21": {
+    "dialog2": { "title": "Piknik planı", "lines": [
+      "Bugün hava nasıl?",
+      "Güneşli ve sıcak.",
+      "O zaman piknik yapalım!",
+      "İyi fikir. Ama hava tahminine göre yarın yağmur yağacak.",
+      "O zaman bugün gitmeliyiz.",
+      "Ben bir battaniye ve sandviç getiririm.",
+      "Ben de meyve suyu ve meyve alırım.",
+      "Harika. Öğlen buluşalım."
+    ] },
+    "reading": { "title": "Dört mevsim",
+      "text": "Ülkemde dört mevsim vardır. İlkbahar yeşil ve tazedir. Yaz çok sıcaktır, bol bol karpuz yeriz. Sonbahar yağmurlu ve altın renklidir. Kış soğuktur, bazen kar yağar. En sevdiğim mevsim sonbahardır çünkü hava ılımandır.",
+      "questions": [["Kaç mevsim var?", "Dört."], ["Yazın ne yenir?", "Bol bol karpuz."], ["Yazar neden sonbaharı seviyor?", "Çünkü hava ılıman."]] }
+  },
+  "m22": {
+    "dialog2": { "title": "Taksiye binmek", "lines": [
+      "Nereye gidiyoruz, hanımefendi?",
+      "Tren istasyonuna, lütfen.",
+      "Yaklaşık yirmi dakika sürer.",
+      "Trafik ışıklarından sola dönün, lütfen.",
+      "Tamam. Sonra düz mü?",
+      "Evet, düz gidin ve köşede durun.",
+      "Geldik. On beş bin.",
+      "Buyurun. Üstü kalsın."
+    ] },
+    "reading": { "title": "Şehirde kayboldum",
+      "text": "Geçen hafta büyük bir şehirde kayboldum. Bir polisten yardım istedim. Bana şöyle dedi: dümdüz gidin, ikinci sokaktan sağa dönün, müzeyi solunuzda göreceksiniz. Ona teşekkür ettim ve tarifine uydum. On dakika sonra otelimdeydim.",
+      "questions": [["Yazar kimden yardım istedi?", "Bir polisten."], ["Nereden dönmesini söyledi?", "İkinci sokaktan sağa."], ["Otele varmak ne kadar sürdü?", "On dakika."]] }
+  },
+  "m23": {
+    "dialog2": { "title": "Hobiler ve spor", "lines": [
+      "Boş zamanlarında ne yaparsın?",
+      "Arkadaşlarımla futbol oynamayı severim.",
+      "Ne sıklıkla oynarsın?",
+      "Haftada iki kez, salı ve cumartesi.",
+      "Ben yüzmeyi severim ama koşmaktan nefret ederim.",
+      "Gerçekten mi? Koşmak sağlığa iyi gelir.",
+      "Biliyorum ama havuzu tercih ederim.",
+      "O zaman birlikte yüzmeye gidelim!"
+    ] },
+    "reading": { "title": "En sevdiğim spor",
+      "text": "En sevdiğim spor basketbol. Okuldan sonra sınıf arkadaşlarımla oynarım. Küçük bir takımımız var ve haftada iki kez avluda oynuyoruz. Spor beni güçlü yapıyor ve yeni arkadaşlar edinmeme yardım ediyor. Gelecek yıl gerçek bir kulübe katılmak istiyorum.",
+      "questions": [["Yazarın en sevdiği spor ne?", "Basketbol."], ["Ne sıklıkla oynuyorlar?", "Haftada iki kez."], ["Yazar gelecek yıl ne yapmak istiyor?", "Gerçek bir kulübe katılmak."]] }
+  },
+  "m24": {
+    "dialog2": { "title": "Kıyafet denemek", "lines": [
+      "Yardımcı olabilir miyim?",
+      "Evet, bir ceket arıyorum.",
+      "Kaç beden giyiyorsunuz?",
+      "Orta beden. Bunu deneyebilir miyim?",
+      "Tabii. Deneme kabini şurada.",
+      "Çok küçük. Daha büyüğü var mı?",
+      "Evet, bu daha büyük ve daha ucuz.",
+      "Harika, bunu alıyorum."
+    ] },
+    "reading": { "title": "İnternetten alışveriş",
+      "text": "Bugün birçok insan kıyafetlerini internetten alıyor. Kolay ve hızlı, fiyatlar da genellikle daha düşük. Ama bir sorun var: ürünleri deneyemezsiniz. Kız kardeşim çok uzun gelen bir elbise aldı ve geri gönderdi. Artık beden tablosunu her zaman dikkatlice kontrol ediyor.",
+      "questions": [["İnsanlar neden internetten kıyafet alıyor?", "Kolay, hızlı ve daha ucuz."], ["Elbisenin sorunu neydi?", "Çok uzundu."], ["Kız kardeş artık ne yapıyor?", "Beden tablosunu dikkatlice kontrol ediyor."]] }
+  },
+  "m7": {
+    "dialog2": { "title": "Neden geç kaldın?", "lines": [
+      "Neden yine geç kaldın?",
+      "Çünkü otobüs bozuldu.",
+      "Peki buraya nasıl geldin?",
+      "Yürüdüm, bu yüzden yorgunum.",
+      "Yorgun olsan da raporu bitirmelisin.",
+      "Bitireceğim ama önce bir kahveye ihtiyacım var.",
+      "Peki. Ancak bir dahaki sefere lütfen beni ara.",
+      "Söz veriyorum."
+    ] },
+    "reading": { "title": "Kötü bir sabah",
+      "text": "Dün sabah alarmım çalmadı, bu yüzden geç uyandım. Otobüs durağına koştum ama otobüs çoktan gitmişti. Taksiye binmeme rağmen on dakika geç kaldım. Patronum kızmadı çünkü her şeyi dürüstçe anlattım.",
+      "questions": [["Yazar neden geç uyandı?", "Alarm çalmadı."], ["Yazar işe nasıl gitti?", "Taksiyle."], ["Patron neden kızmadı?", "Çünkü yazar her şeyi dürüstçe anlattı."]] }
+  },
+  "m8": {
+    "dialog2": { "title": "Kibar bir e-posta yazmak", "lines": [
+      "Müdürüme bir e-posta yazmam lazım.",
+      ["«Sayın Ahmet Bey» diye başla.", "«Hurmatli Ahmet bey» deb boshlang."],
+      ["Onun yerine «Selam» yazsam olur mu?", "Uning o'rniga «Salom» deb yozsam bo'ladimi?"],
+      "Hayır, bu bir müdür için fazla samimi.",
+      "E-postayı nasıl bitireyim?",
+      ["«Saygılarımla» ya da «İyi çalışmalar» yaz.", "«Hurmat bilan» yoki «Ishlaringizga omad» deb yozing."],
+      "Teşekkürler, kulağa profesyonel geliyor.",
+      "Yazım hatalarını kontrol etmeyi unutma."
+    ] },
+    "reading": { "title": "İlk iş başvurum",
+      "text": "Geçen ay ilk işime başvurdum. Resmî bir mektup yazdım ve özgeçmişimi ekledim. 'Başvurmak amacıyla yazıyorum' ve 'Cevabınızı bekliyorum' gibi kibar ifadeler kullandım. Bir hafta sonra şirket beni mülakata çağırdı.",
+      "questions": [["Yazar mektuba ne ekledi?", "Özgeçmişini."], ["Hangi kibar ifadeyi kullandı?", "'Cevabınızı bekliyorum.'"], ["Bir hafta sonra ne oldu?", "Şirket yazarı mülakata çağırdı."]] }
+  },
+  "m9": {
+    "dialog2": { "title": "Meslek seçimi", "lines": [
+      "Gelecekte ne olmak istiyorsun?",
+      "Bence öğretmenlik asil bir meslek.",
+      "Katılıyorum ama maaşı düşük.",
+      "Doğru, yine de insanlara yardım eden bir işi tercih ederim.",
+      "Bana gelince, mühendis olmak isterim.",
+      "Neden öyle düşünüyorsun?",
+      "Bence yaratıcı ve iyi kazandıran bir iş.",
+      "İki meslek de toplum için önemli."
+    ] },
+    "reading": { "title": "İki kültür, tek dünya",
+      "text": "Arkadaşım Japonyalı, ben Özbekistanlıyım. Kültürlerimiz farklı ama birçok ortak noktamız var. İki ülkede de insanlar büyüklerine saygı gösterir ve çayı sever. Ailesini ziyaret ettiğimde yemek çubuklarıyla yemeyi öğrendim. O da tandırda ekmek pişirmeyi öğrendi.",
+      "questions": [["Yazarın arkadaşı nereli?", "Japonyalı."], ["İki ülke neyi sever?", "Çayı (ve büyüklere saygı gösterir)."], ["Arkadaşı ne öğrendi?", "Tandırda ekmek pişirmeyi."]] }
+  },
+  "m25": {
+    "dialog2": { "title": "Üniversite seçimi", "lines": [
+      "Hangi üniversiteye girmek istiyorsun?",
+      "İyi bir bilişim fakültesi olana girmek istiyorum.",
+      "Metroya yakın olan üniversite mi?",
+      "Evet, kastettiğim o.",
+      "Giriş sınavına girmen gerekiyor mu?",
+      "Evet, çünkü rekabet yüksek.",
+      "Eminim geçeceksin.",
+      "Umarım. Her gün çalışıyorum."
+    ] },
+    "reading": { "title": "Öğrenci hayatı",
+      "text": "Üniversite hayatı okuldan çok farklıdır. Öğrenciler derslerini kendileri seçer ve zamanlarını nasıl geçireceklerine karar verir. Arkadaş edinmeye yardım eden birçok kulüp vardır. En önemli şey düzenli çalışmaktır çünkü sınavlar ciddidir.",
+      "questions": [["Öğrenciler neyi seçer?", "Kendi derslerini."], ["Kulüpler neye yardım eder?", "Arkadaş edinmeye."], ["En önemli şey ne?", "Düzenli çalışmak."]] }
+  },
+  "m26": {
+    "dialog2": { "title": "Çevreyi korumak", "lines": [
+      "Yeni geri dönüşüm projesini duydun mu?",
+      "Evet. Sokağımızda oturanlar plastik topluyor.",
+      "İşe yürüyerek gitmek de doğaya yardım ediyor.",
+      "Doğru. Arabalar çok duman çıkarıyor.",
+      "Elli ağaç diktiğimiz için sınıfımız ödül kazandı.",
+      "Tebrikler! Ağaçlar bize temiz hava veriyor.",
+      "Doğayı gelecek nesil için korumalıyız.",
+      "Tamamen katılıyorum."
+    ] },
+    "reading": { "title": "Yeşil gezegenimiz",
+      "text": "Gezegenimiz ciddi sorunlarla karşı karşıya: kirlilik, iklim değişikliği ve ormanların yok olması. Hükümetler harekete geçmeli ama her insan da yardım edebilir. Daha az plastik kullanmak, su tasarrufu yapmak ve ağaç dikmek basit adımlardır. Herkes biraz yaparsa sonuç büyük olur.",
+      "questions": [["Gezegen hangi sorunlarla karşı karşıya?", "Kirlilik, iklim değişikliği, ormanların yok olması."], ["Kim harekete geçmeli?", "Hükümetler (ve her insan da)."], ["Basit bir adım söyleyin.", "Daha az plastik / su tasarrufu / ağaç dikmek."]] }
+  },
+  "m27": {
+    "dialog2": { "title": "Haberleri okudun mu?", "lines": [
+      "Bu sabah haberleri okudun mu?",
+      "Evet. Makalede ekonominin büyüdüğü yazıyordu.",
+      "Muhabir bunun devam edeceğini söyledi.",
+      "Babama haberlere güvenip güvenmediğini sordum.",
+      "Ne cevap verdi?",
+      "Birkaç kaynağı kontrol ettiğini söyledi.",
+      "Bu akıllıca bir alışkanlık.",
+      "Evet, sahte haberler hızla yayılıyor."
+    ] },
+    "reading": { "title": "Hayatımızda medya",
+      "text": "Her gün televizyondan, gazetelerden ve internetten haber alıyoruz. Sosyal medya hızlıdır ama her zaman güvenilir değildir. İyi bir okur her zaman sorar: bunu kim yazdı ve neden? Öğretmenler sahte haberlerden kaçınmanın en iyi yolunun iki üç kaynağı kontrol etmek olduğunu söylüyor.",
+      "questions": [["Haberleri nereden alıyoruz?", "Televizyondan, gazetelerden ve internetten."], ["Sosyal medya her zaman güvenilir mi?", "Hayır, değil."], ["Sahte haberlerden kaçınmanın en iyi yolu ne?", "İki üç kaynağı kontrol etmek."]] }
+  },
+  "m28": {
+    "dialog2": { "title": "Müzede", "lines": [
+      "Bu tablo fotoğraf gibi görünüyor.",
+      "Sanki ressam fotoğraf makinesi kullanmış!",
+      "Açıkçası ben soyut sanatı tercih ederim.",
+      "Gerçekten mi? Bana renk karmaşası gibi geliyor.",
+      "Sanat bilim gibi değil; tek bir cevabı yok.",
+      "Haklısın. En sevdiğin yazar kim?",
+      "Abdulla Kadiri. Romanları unutulmaz.",
+      "Katılıyorum. «Geçmiş Günler»i iki kez okudum."
+    ] },
+    "reading": { "title": "Kitapların gücü",
+      "text": "İyi bir kitap hayatınızı değiştirebilir. Size yeni şeyler öğretir, başka dünyalar gösterir ve insanları anlamanıza yardım eder. Dedem kitapsız bir evin ruhsuz bir beden gibi olduğunu söyler. Artık her gün en az yirmi sayfa okumaya çalışıyorum.",
+      "questions": [["İyi bir kitap ne yapabilir?", "Hayatınızı değiştirebilir."], ["Dede ne diyor?", "Kitapsız bir ev ruhsuz bir beden gibidir."], ["Yazar her gün kaç sayfa okumaya çalışıyor?", "En az yirmi."]] }
+  },
+  "m10": {
+    "dialog2": { "title": "Bir metni tartışmak", "lines": [
+      "Bu metnin ana fikri ne?",
+      "Yazar, teknolojinin düşünme biçimimizi değiştirdiğini savunuyor.",
+      ["«Önemli» yerine hangi kelime kullanılabilir?", "«Önemli» (muhim) o'rniga qaysi so'z ishlatilishi mumkin?"],
+      ["Bağlama göre «kayda değer» ya da «temel».", "Kontekstga qarab «kayda değer» yoki «temel»."],
+      ["«Kocaman», «devasa»nın eş anlamlısı mı?", "«Kocaman» — «devasa» ning sinonimimi?"],
+      ["Evet ama «devasa» biraz daha güçlü ve resmî.", "Ha, lekin «devasa» biroz kuchliroq va rasmiyroq."],
+      "Anlıyorum. Üslup gerçekten kelime seçimine bağlı.",
+      "Kesinlikle. Bu yüzden zengin bir kelime hazinesi önemli."
+    ] },
+    "reading": { "title": "Kelime hazinesi neden önemli?",
+      "text": "Araştırmacılara göre zengin bir kelime hazinesine sahip olanlar metinleri daha iyi anlar ve düşüncelerini daha açık ifade eder. Kelime hazinenizi genişletmek için bol okuyun, yeni kelimeler için bir defter tutun ve onları kendi cümlelerinizde kullanın. Yalnızca liste ezberlemek yetmez; anahtar bağlamdır.",
+      "questions": [["Metinleri kim daha iyi anlar?", "Zengin kelime hazinesi olanlar."], ["Kelime hazinesini genişletmenin bir yolunu söyleyin.", "Bol okumak / defter tutmak / kelimeleri cümlede kullanmak."], ["Anahtar nedir?", "Bağlam."]] }
+  },
+  "m11": {
+    "dialog2": { "title": "Okulda münazara", "lines": [
+      "Bugünün konusu: öğrenciler okul üniforması giymeli mi?",
+      "Ben destekliyorum. Üniforma herkesi eşit yapar.",
+      "Öte yandan, kendini ifade etmeyi sınırlar.",
+      "Haklı bir nokta; ancak zamandan ve paradan tasarruf sağlar.",
+      "Bence öğrencilerin seçim hakkı olmalı.",
+      "Kısmen katılıyorum ama seçim rekabet yaratabilir.",
+      "Sonuç olarak, iki tarafın da güçlü argümanları var.",
+      "Anlaştık. Oylayalım."
+    ] },
+    "reading": { "title": "Ödevler yasaklanmalı mı?",
+      "text": "Bazı ülkeler ödevleri yasaklamayı düşünüyor. Destekçiler, çocukların dinlenmeye ve oynamaya zamana ihtiyacı olduğunu söylüyor. Karşı çıkanlar ise ödevin disiplin kazandırdığını ve dersleri hatırlamaya yardım ettiğini savunuyor. Belki en iyisi dengeli bir yaklaşımdır: uzun ve sıkıcı ödevler yerine kısa ve anlamlı görevler.",
+      "questions": [["Yasağın destekçileri ne diyor?", "Çocukların dinlenmeye ve oynamaya zamana ihtiyacı var."], ["Karşı çıkanlar ne diyor?", "Ödev disiplin kazandırır."], ["Önerilen çözüm ne?", "Kısa ve anlamlı görevlerle dengeli bir yaklaşım."]] }
+  },
+  "m12": {
+    "dialog2": { "title": "İş mülakatı", "lines": [
+      "Bana biraz kendinizden bahseder misiniz?",
+      "Geçen yıl mezun oldum ve iki yıllık deneyimim var.",
+      "Güçlü yönleriniz neler?",
+      "Düzenliyim, sorumluluk sahibiyim ve hızlı öğrenirim.",
+      "Neden bizimle çalışmak istiyorsunuz?",
+      "Çünkü şirketiniz gelişime ve takım çalışmasına değer veriyor.",
+      "Bize sormak istediğiniz bir şey var mı?",
+      "Evet. Bu pozisyonda sıradan bir gün nasıl geçiyor?"
+    ] },
+    "reading": { "title": "Mülakata hazırlık",
+      "text": "Mülakattan önce şirket hakkında bilgi edinin ve sık sorulan soruları çalışın. Düzgün giyinin ve on dakika erken gidin. Konuşma sırasında göz teması kurun, dikkatle dinleyin ve açık örnekler verin. Mülakattan sonra kısa bir teşekkür mesajı gönderin.",
+      "questions": [["Ne zaman gitmelisiniz?", "On dakika erken."], ["Konuşma sırasında ne yapmalısınız?", "Göz teması kurmak, dinlemek, örnek vermek."], ["Sonrasında ne göndermelisiniz?", "Bir teşekkür mesajı."]] }
+  },
+  "m13": {
+    "dialog2": { "title": "Kliniği aramak", "lines": [
+      "Merhaba, doktora görünmek istiyorum.",
+      "Şikâyetiniz nedir?",
+      "Dünden beri başım ağrıyor.",
+      "Herhangi bir ilaç aldınız mı?",
+      "Evet, iki hap aldım ama işe yaramadı.",
+      "Doktor saat dörtte müsait.",
+      "Olur. Teşekkür ederim.",
+      "Lütfen kimlik kartınızı getirin."
+    ] },
+    "reading": { "title": "Sağlıklı kalın",
+      "text": "Doktorlara göre sağlıklı yaşam basittir. En az yedi saat uyuyun, sebze ve meyve yiyin, yeterince su için ve her gün yürüyün. Kendinizi iyi hissetseniz bile yılda bir kez doktora gitmeyi unutmayın. Önlemek tedavi etmekten iyidir.",
+      "questions": [["Kaç saat uyumalıyız?", "En az yedi saat."], ["Ne sıklıkla doktora gitmeliyiz?", "Yılda bir kez."], ["Tedaviden daha iyi olan ne?", "Önlem almak."]] }
+  },
+  "m14": {
+    "dialog2": { "title": "Havalimanında check-in", "lines": [
+      "Günaydın. Pasaportunuzu ve biletinizi görebilir miyim?",
+      "Buyurun.",
+      "Teslim edeceğiniz bagaj var mı?",
+      "Evet, bir bavul.",
+      "Cam kenarı mı, koridor tarafı mı istersiniz?",
+      "Cam kenarı, lütfen.",
+      "Kapınız on iki numara. Biniş saat onda başlıyor.",
+      "Teşekkürler. İyi günler."
+    ] },
+    "reading": { "title": "İlk uçuşum",
+      "text": "Geçen yıl ilk kez uçağa bindim. Havalimanında gergindim ama görevliler çok güler yüzlüydü. Kalkış sırasında koltuğuma sıkıca tutundum. Birkaç dakika sonra rahatladım ve pencereden dışarı baktım. Bulutlar beyaz dağlara benziyordu.",
+      "questions": [["Yazar ilk kez ne zaman uçtu?", "Geçen yıl."], ["Havalimanında nasıl hissetti?", "Gergindi."], ["Bulutlar neye benziyordu?", "Beyaz dağlara."]] }
+  },
+  "m15": {
+    "dialog2": { "title": "Yeni bir uygulama", "lines": [
+      "Bu yeni uygulamayı denedin mi?",
+      "Evet. Yerli bir şirket tarafından geliştirildi.",
+      "Birçok kişi kullanıyor mu?",
+      "Bir milyondan fazla kullanıcı indirdi.",
+      "Veriler nasıl korunuyor?",
+      "Bütün dosyalar şifreleniyor ve güvenle saklanıyor.",
+      "Etkileyici. Hemen yükleyeceğim.",
+      "Düzenli olarak güncellemeyi unutma."
+    ] },
+    "reading": { "title": "Teknoloji ve çocuklar",
+      "text": "Bugünün çocukları dijital bir dünyaya doğuyor. Telefonlar ve tabletler ders, oyun ve iletişim için kullanılıyor. Uzmanlar ebeveynlere ekran süresini sınırlamalarını ve faydalı uygulamalar seçmelerini tavsiye ediyor. Teknoloji insanlara hizmet etmeli, onları kontrol etmemeli.",
+      "questions": [["Telefon ve tabletler ne için kullanılıyor?", "Ders, oyun ve iletişim için."], ["Uzmanlar ebeveynlere ne tavsiye ediyor?", "Ekran süresini sınırlamayı ve faydalı uygulamalar seçmeyi."], ["Teknoloji ne yapmalı?", "İnsanlara hizmet etmeli."]] }
+  },
+  "m16": {
+    "dialog2": { "title": "Kurs mezuniyeti", "lines": [
+      "Tebrikler! Kursu tamamladınız.",
+      "Teşekkürler. Sınavı geçebildiğim için gurur duyuyorum.",
+      "Bu yıl çok çalıştınız.",
+      "Başta zordu ama pes etmedim.",
+      "Şimdi planlarınız neler?",
+      ["Uluslararası Türkçe yeterlik sınavına gireceğim.", "Xalqaro turk tili imtihonini topshirmoqchiman."],
+      "Eminim başaracaksınız.",
+      "Her şey için teşekkürler."
+    ] },
+    "reading": { "title": "Geriye bakış",
+      "text": "Bir yıl önce hiç Türkçe konuşamıyordum. Bugün hayatım hakkında konuşabiliyor, basit kitaplar okuyabiliyor ve altyazılı filmler izleyebiliyorum. Mükemmel olmadım ama ilerleme kaydettim; en önemlisi de bu. Öğrenmek hiç bitmez.",
+      "uz": "Bir yil oldin men umuman turkcha gapira olmasdim. Bugun hayotim haqida gapira olaman, oddiy kitoblarni o'qiyman va filmlarni subtitr bilan tomosha qilaman. Men mukammal bo'lmadim, lekin oldinga siljidim va bu eng muhimi. O'rganish hech qachon to'xtamaydi.",
+      "questions": [["Yazar bir yıl önce neyi yapamıyordu?", "Türkçe konuşmayı."], ["Yazar bugün neler yapabiliyor?", "Hayatı hakkında konuşabiliyor, basit kitaplar okuyabiliyor, altyazılı film izleyebiliyor."], ["En önemli şey ne?", "İlerleme kaydetmek."]] }
+  },
+  "guide-a1": {
+    "dialog2": { "title": "Otel resepsiyonunda", "lines": [
+      "Merhaba, rezervasyonum var.",
+      "Adınız, lütfen?",
+      "Anvar Rahimov.",
+      "Evet, iki gece için tek kişilik oda.",
+      "Kahvaltı dahil mi?",
+      "Evet, yediden ona kadar.",
+      "Teşekkürler. Wi-Fi şifresi ne?",
+      "Kartın üzerinde yazıyor. İyi konaklamalar!"
+    ] },
+    "reading": { "title": "Benim günüm",
+      "text": "Benim adım Anvar. Öğrenciyim. Saat yedide kalkarım ve üniversiteye otobüsle giderim. Öğle yemeğini arkadaşlarımla yerim. Akşamları kitap okur ve televizyon izlerim. Hayatımı seviyorum.",
+      "questions": [["Yazarın adı ne?", "Anvar."], ["Üniversiteye nasıl gidiyor?", "Otobüsle."], ["Akşamları ne yapıyor?", "Kitap okuyor ve televizyon izliyor."]] }
+  },
+  "guide-a2": {
+    "dialog2": { "title": "Otel odasında sorunlar", "lines": [
+      "Affedersiniz, klima çalışmıyor.",
+      "Çok özür dilerim. Hemen birini gönderiyorum.",
+      "Bir de fazladan bir havlu alabilir miyim?",
+      "Tabii. Başka bir şey?",
+      "Çıkış saati kaçta?",
+      "Çıkış öğlen.",
+      "Yardımınız için teşekkürler.",
+      "Rica ederim."
+    ] },
+    "reading": { "title": "Kısa bir şehir tatili",
+      "text": "Geçen hafta sonu arkadaşımla Buhara'ya gittik. Eski şehrin yakınında küçük bir otelde kaldık. Sabah çarşıyı gezdik ve hediyelik eşya aldık. Akşam geleneksel bir restoranda pilav yedik. Kısa bir geziydi ama onu uzun süre hatırlayacağız.",
+      "questions": [["Nerede kaldılar?", "Eski şehrin yakınında küçük bir otelde."], ["Ne aldılar?", "Hediyelik eşya."], ["Akşam ne yediler?", "Pilav."]] }
+  },
+  "guide-b1": {
+    "dialog2": { "title": "Çalışma saatleri üzerine görüşme", "lines": [
+      "Çalışma saatlerini değiştirmek istediğini duydum.",
+      "Evet. Daha erken başlasam saat dörtte bitirebilirim.",
+      "Bu senin için neden önemli?",
+      "Akşam derslerine gidiyorum, böylece geç kalmam.",
+      "Bütün ekip kabul ederse onaylarım.",
+      "Onlarla zaten konuştum. Sakıncası yokmuş.",
+      "O zaman bir ay deneyelim.",
+      "Teşekkürler. Sizi hayal kırıklığına uğratmayacağım."
+    ] },
+    "reading": { "title": "İş ve özel hayat dengesi",
+      "text": "Artık birçok çalışan esnek çalışma saatleri istiyor. Bunu kabul eden şirketler genellikle daha yüksek verimlilik görüyor, çünkü mutlu insanlar daha iyi çalışır. Ancak esneklik güven ve net kurallar gerektirir. İki taraf da dürüst olursa herkes kazanır.",
+      "questions": [["Birçok çalışan ne istiyor?", "Esnek çalışma saatleri."], ["Verimlilik neden daha yüksek?", "Mutlu insanlar daha iyi çalışır."], ["Esneklik neyi gerektirir?", "Güven ve net kurallar."]] }
+  },
+  "guide-b2": {
+    "dialog2": { "title": "Uzaktan çalışma üzerine münazara", "lines": [
+      "Uzaktan çalışma modern iş yerini dönüştürdü.",
+      "Kabul ediyorum ama iş ile ev arasındaki sınırı da bulanıklaştırdı.",
+      "Şirketler bunu benimsemeseydi birçoğu iflas ederdi.",
+      "Yine de yalnızlık çalışanlar için gerçek bir sorun.",
+      "Hibrit modeller iki dünyanın en iyisini sunabilir.",
+      "İyi organize edilirse bu ikna edici bir argüman.",
+      "Sonuçta önemli olan esneklik.",
+      "Kesinlikle katılıyorum."
+    ] },
+    "reading": { "title": "Bilgi çağı",
+      "text": "Aşırı bilgi yüklemesi çağında yaşıyoruz. Her dakika internette binlerce makale ve video çıkıyor ve doğruyu söylentiden ayırmak zor. Bu nedenle eleştirel düşünme en değerli becerilerden biri hâline geldi. Kaynakları sorgulamayı, kanıtları karşılaştırmayı ve açık fikirli kalmayı öğrenenler modern dünyada kendinden emin ilerleyecek.",
+      "questions": [["Nasıl bir çağda yaşıyoruz?", "Aşırı bilgi yüklemesi çağında."], ["Hangi beceri değerli hâle geldi?", "Eleştirel düşünme."], ["İnsanlar ne yapmayı öğrenmeli?", "Kaynakları sorgulamayı, kanıtları karşılaştırmayı, açık fikirli kalmayı."]] }
+  }
+}

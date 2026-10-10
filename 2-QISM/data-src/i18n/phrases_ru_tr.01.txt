@@ -1,0 +1,160 @@
+# Iboralar: rus va turk tarjimasi. Format: bo'lim.qator|rus ibora|rus gap|turk ibora|turk gap
+# 1. Salomlashish va xayrlashish
+1.1|Как у тебя дела?|Привет, Дилноза, как дела? Я не видел тебя всю неделю.|Nasıl gidiyor?|Selam Dilnoza, nasıl gidiyor? Bütün hafta seni görmedim.
+1.2|Как жизнь?|Привет, Том, как жизнь? Новая работа нормальная?|İşler nasıl?|Selam Tom, işler nasıl? Yeni işin iyi mi?
+1.3|Что нового?|Привет, ребята, что нового? Вы готовы к игре?|Ne var ne yok?|Selam çocuklar, ne var ne yok? Maça hazır mısınız?
+1.4|Сколько лет, сколько зим!|Сколько лет, сколько зим! Ты совсем не изменился!|Görüşmeyeli uzun zaman oldu.|Görüşmeyeli uzun zaman oldu. Hiç değişmemişsin!
+1.5|Приятно познакомиться.|Приятно познакомиться. Меня зовут Азиз.|Tanıştığıma memnun oldum.|Tanıştığıma memnun oldum. Benim adım Aziz.
+1.6|Рад снова тебя видеть.|Рад снова тебя видеть. Как прошла поездка?|Seni tekrar görmek güzel.|Seni tekrar görmek güzel. Yolculuğun nasıldı?
+1.7|Неплохо, спасибо.|«Как работа?» — «Неплохо, спасибо. А у тебя?»|Fena değil, teşekkürler.|"İşler nasıl?" "Fena değil, teşekkürler. Ya sen?"
+1.8|Не жалуюсь.|«Как жизнь?» — «Не жалуюсь. Всё хорошо».|Şikâyet edemem.|"Hayat nasıl?" "Şikâyet edemem. Her şey yolunda."
+1.9|Береги себя.|Уже поздно. Береги себя и позвони, когда доберёшься домой.|Kendine iyi bak.|Geç oluyor. Kendine iyi bak, eve varınca beni ara.
+1.10|Увидимся позже.|У меня сейчас встреча, так что увидимся позже.|Sonra görüşürüz.|Şimdi bir toplantım var, sonra görüşürüz.
+1.11|Ещё увидимся.|Спасибо, что подвёз, Али. Ещё увидимся.|Görüşürüz.|Beni bıraktığın için teşekkürler Ali. Görüşürüz.
+1.12|Хорошего дня.|Урок окончен. Всем хорошего дня!|İyi günler.|Ders bitti. Herkese iyi günler!
+1.13|Передавай привет семье.|Пожалуйста, передай от меня привет своей семье.|Ailene selam söyle.|Lütfen benden ailene selam söyle.
+1.14|Скоро поговорим.|Мне нужно идти, но скоро поговорим.|Yakında konuşuruz.|Şimdi gitmem lazım ama yakında konuşuruz.
+1.15|До скорого!|Я опаздываю на урок, так что до скорого!|Sonra yakalarım seni!|Derse geç kaldım, sonra görüşürüz!
+# 2. Minnatdorchilik va kechirim so'rash
+2.1|Большое спасибо.|Ты помог мне с домашним заданием. Большое спасибо.|Çok teşekkürler.|Ödevimde bana yardım ettin. Çok teşekkürler.
+2.2|Я очень это ценю.|Ты отвёз меня в аэропорт, и я очень это ценю.|Gerçekten minnettarım.|Beni havalimanına götürdün, gerçekten minnettarım.
+2.3|Это очень мило с вашей стороны.|Вы занесли мои сумки наверх? Это очень мило с вашей стороны.|Çok naziksiniz.|Çantalarımı yukarı mı taşıdınız? Çok naziksiniz.
+2.4|Не за что.|«Спасибо за подарок!» — «Не за что».|Lafı bile olmaz.|"Hediye için teşekkürler!" "Lafı bile olmaz."
+2.5|Пожалуйста. / Не за что.|«Спасибо за помощь». — «Пожалуйста».|Rica ederim.|"Yardımın için teşekkürler." "Rica ederim."
+2.6|Никаких проблем.|«Можете передвинуть машину?» — «Без проблем».|Hiç sorun değil.|"Arabanızı çekebilir misiniz?" "Hiç sorun değil."
+2.7|С удовольствием.|«Спасибо, что приготовил ужин». — «С удовольствием».|Ne demek, zevkti.|"Akşam yemeğini yaptığın için teşekkürler." "Ne demek, zevkti."
+2.8|Мне очень жаль.|Мне очень жаль. Я разбил твою чашку.|Çok özür dilerim.|Çok özür dilerim. Fincanını kırdım.
+2.9|Извините за задержку.|Извините за задержку. Пробки были ужасные.|Gecikme için özür dilerim.|Gecikme için özür dilerim. Trafik berbattı.
+2.10|Извините.|Извините, это место занято?|Affedersiniz.|Affedersiniz, bu koltuk dolu mu?
+2.11|Простите, что?|Простите, что? Я не расслышал ваше имя.|Efendim? / Pardon?|Pardon? Adınızı duyamadım.
+2.12|Это моя вина.|Это моя вина. Я забыл отправить письмо.|Benim hatam.|Benim hatam. E-postayı göndermeyi unuttum.
+2.13|Я не хотел.|Я не хотел тебя обидеть.|İstemeden oldu.|Kalbini kırmak istemedim.
+2.14|Неважно. / Ничего страшного.|Ничего страшного. Я сам найду ключи.|Boş ver.|Boş ver. Anahtarları kendim bulurum.
+2.15|Это не имеет значения.|Если не сможешь прийти, ничего страшного. Встретимся на следующей неделе.|Fark etmez.|Gelemezsen fark etmez. Gelecek hafta buluşabiliriz.
+# 3. Tanishuv va o'zingiz haqingizda
+3.1|Откуда вы?|Откуда вы? У вас интересный акцент.|Nerelisiniz?|Nerelisiniz? Aksanınız ilginç.
+3.2|Я родом из...|Я родом из Самарканда, но сейчас живу в Ташкенте.|Aslen ...lıyım.|Aslen Semerkantlıyım ama şimdi Taşkent'te yaşıyorum.
+3.3|Чем вы занимаетесь?|Кем вы работаете? Вы учитель?|Ne iş yapıyorsunuz?|Ne iş yapıyorsunuz? Öğretmen misiniz?
+3.4|Я работаю...|Я работаю медсестрой в городской больнице.|... olarak çalışıyorum.|Şehir hastanesinde hemşire olarak çalışıyorum.
+3.5|Я студент.|Я студент. Я изучаю медицину в университете.|Öğrenciyim.|Öğrenciyim. Üniversitede tıp okuyorum.
+3.6|Я увлекаюсь спортом.|Я увлекаюсь спортом. Каждые выходные играю в футбол.|Sporla ilgileniyorum.|Sporla ilgileniyorum. Her hafta sonu futbol oynarım.
+3.7|Сколько вам лет?|Сколько вам лет? Вы выглядите очень молодо.|Kaç yaşındasınız?|Kaç yaşındasınız? Çok genç görünüyorsunuz.
+3.8|У вас есть хобби?|У вас есть хобби? Я люблю рисовать.|Hobileriniz var mı?|Hobileriniz var mı? Ben resim yapmayı severim.
+3.9|В свободное время я...|В свободное время я читаю книги и гуляю в парке.|Boş zamanlarımda ...|Boş zamanlarımda kitap okur ve parkta yürürüm.
+3.10|Я живу с семьёй.|Я живу с семьёй. У нас маленький дом.|Ailemle yaşıyorum.|Ailemle yaşıyorum. Küçük bir evimiz var.
+3.11|У меня два брата.|У меня два брата. Один старше, другой младше.|İki erkek kardeşim var.|İki erkek kardeşim var. Biri büyük, biri küçük.
+3.12|Я учу английский.|Я учу английский. Я занимаюсь каждый вечер.|İngilizce öğreniyorum.|İngilizce öğreniyorum. Her akşam çalışıyorum.
+3.13|Мой английский не идеален.|Мой английский не идеален, но я стараюсь изо всех сил.|İngilizcem mükemmel değil.|İngilizcem mükemmel değil ama elimden geleni yapıyorum.
+3.14|Я из Узбекистана.|Я из Узбекистана. Это красивая страна.|Özbekistanlıyım.|Özbekistanlıyım. Çok güzel bir ülke.
+3.15|Позвольте представиться.|Позвольте представиться. Я Нодира, новый менеджер.|Kendimi tanıtayım.|Kendimi tanıtayım. Ben Nodira, yeni müdür.
+# 4. Fikr bildirish
+4.1|По моему мнению...|По моему мнению, этот план слишком рискованный.|Bence...|Bence bu plan çok riskli.
+4.2|Я думаю, что...|Я думаю, нам стоит начать раньше.|Bence ... / Sanırım...|Bence daha erken başlamalıyız.
+4.3|Честно говоря...|Честно говоря, мне не понравился фильм.|Açıkçası...|Açıkçası filmi beğenmedim.
+4.4|Насколько я знаю...|Насколько я знаю, магазин закрывается в девять.|Bildiğim kadarıyla...|Bildiğim kadarıyla dükkân dokuzda kapanıyor.
+4.5|Мне кажется, что...|Мне кажется, что он говорит неправду.|Bana öyle geliyor ki...|Bana öyle geliyor ki doğruyu söylemiyor.
+4.6|Полностью согласен.|«Этот город потрясающий!» — «Полностью согласен».|Daha fazla katılamazdım.|"Bu şehir harika!" "Kesinlikle katılıyorum."
+4.7|Я полностью согласен.|Я полностью согласен с твоей идеей.|Tamamen katılıyorum.|Fikrine tamamen katılıyorum.
+4.8|Я понимаю, что ты имеешь в виду.|Я понимаю твою мысль, но у меня другая идея.|Ne demek istediğini anlıyorum.|Ne demek istediğini anlıyorum ama benim farklı bir fikrim var.
+4.9|Я в этом не уверен.|Я в этом не уверен. Давай проверим факты.|Bundan pek emin değilim.|Bundan pek emin değilim. Gerçekleri kontrol edelim.
+4.10|Я так не думаю.|«Это хорошая идея?» — «Не думаю».|Sanmıyorum.|"İyi bir fikir mi?" "Sanmıyorum."
+4.11|Хорошее замечание.|Хорошее замечание. Мы не подумали о стоимости.|Haklı bir nokta.|Haklı bir nokta. Maliyeti düşünmemiştik.
+4.12|Смотря как. / Зависит от обстоятельств.|«Ты придёшь?» — «Смотря как. Я могу быть занят».|Duruma bağlı.|"Gelecek misin?" "Duruma bağlı. Meşgul olabilirim."
+4.13|Это логично.|Хочешь сначала накопить денег? Это логично.|Mantıklı.|Önce para biriktirmek mi istiyorsun? Mantıklı.
+4.14|Возможно, ты прав.|Возможно, ты прав. Я ещё раз об этом подумаю.|Haklı olabilirsin.|Haklı olabilirsin. Bunu tekrar düşüneceğim.
+4.15|Боюсь, я не согласен.|Боюсь, я не согласен. Данные показывают другое.|Korkarım katılmıyorum.|Korkarım katılmıyorum. Veriler başka bir şey gösteriyor.
+# 5. Tushunmaslik va aniqlashtirish
+5.1|Я не понимаю.|Извините, я не понимаю. Какой вопрос?|Anlamıyorum.|Pardon, anlamıyorum. Soru ne?
+5.2|Не могли бы вы повторить?|Не могли бы вы повторить? Я пропустил последнюю часть.|Tekrar eder misiniz?|Tekrar eder misiniz? Son kısmı kaçırdım.
+5.3|Не могли бы вы говорить помедленнее?|Не могли бы вы говорить помедленнее? Я ещё учусь.|Daha yavaş konuşabilir misiniz?|Daha yavaş konuşabilir misiniz? Hâlâ öğreniyorum.
+5.4|Что вы имеете в виду?|Что вы имеете в виду? Пожалуйста, объясните.|Bununla ne demek istiyorsunuz?|Bununla ne demek istiyorsunuz? Lütfen açıklayın.
+5.5|Что значит ...?|Что значит «пунктуальный»?|... ne demek?|"Dakik" ne demek?
+5.6|Как сказать ... по-русски?|Как сказать «kitob» по-русски?|... Türkçe nasıl denir?|"Kitob" Türkçe nasıl denir?
+5.7|Можете объяснить ещё раз?|Можете объяснить ещё раз? Было немного сложно.|Tekrar açıklayabilir misiniz?|Tekrar açıklayabilir misiniz? Biraz zordu.
+5.8|Я не расслышал.|Я не расслышал. Музыка была слишком громкой.|Duyamadım.|Duyamadım. Müzik çok yüksekti.
+5.9|Давайте уточним.|Давайте уточним. Вы хотите уехать в понедельник?|Şunu netleştireyim.|Şunu netleştireyim: pazartesi mi gitmek istiyorsun?
+5.10|То есть вы говорите, что...|То есть вы говорите, что встреча отменена?|Yani diyorsunuz ki...|Yani toplantının iptal edildiğini mi söylüyorsunuz?
+5.11|Не могли бы вы привести пример?|Не могли бы вы привести пример? Хочу быть уверенным.|Bir örnek verebilir misiniz?|Bir örnek verebilir misiniz? Emin olmak istiyorum.
+5.12|Я не улавливаю вашу мысль.|Я не улавливаю вашу мысль. Давайте по шагам?|Sizi takip edemiyorum.|Sizi takip edemiyorum. Adım adım gidebilir miyiz?
+5.13|Это понятно?|Это правило на сегодня. Понятно?|Anlaşıldı mı?|Bugünün kuralı bu. Anlaşıldı mı?
+5.14|Это понятно? / Логично?|Это понятно? Могу объяснить по-другому.|Mantıklı geldi mi?|Anlaşılır mı? Farklı şekilde de açıklayabilirim.
+5.15|Можете продиктовать по буквам?|Продиктуйте по буквам, пожалуйста. Хочу написать правильно.|Harf harf söyler misiniz?|Harf harf söyler misiniz lütfen? Doğru yazmak istiyorum.
+# 6. So'rov va iltimos
+6.1|Не могли бы вы мне помочь?|Не могли бы вы мне помочь? Я не могу найти свой класс.|Bana yardım edebilir misiniz?|Bana yardım edebilir misiniz? Sınıfımı bulamıyorum.
+6.2|Можно попросить вас об одолжении?|Можно тебя кое о чём попросить? Мне нужно, чтобы меня завтра подвезли.|Sizden bir ricada bulunabilir miyim?|Senden bir ricam var. Yarın beni arabayla götürebilir misin?
+6.3|Вы не против открыть окно?|Здесь очень жарко. Вы не могли бы открыть окно?|Pencereyi açar mısınız?|Burası çok sıcak. Pencereyi açar mısınız?
+6.4|Вы не против, если я сяду здесь?|Можно я сяду здесь? Все остальные места заняты.|Buraya oturmamın sakıncası var mı?|Buraya oturabilir miyim? Diğer bütün yerler dolu.
+6.5|Можно одолжить вашу ручку?|Можно одолжить вашу ручку? Моя не пишет.|Kaleminizi ödünç alabilir miyim?|Kaleminizi ödünç alabilir miyim? Benimki yazmıyor.
+6.6|Не хотите чаю?|Вы выглядите замёрзшим. Хотите чаю?|Biraz çay ister misiniz?|Üşümüş görünüyorsunuz. Biraz çay ister misiniz?
+6.7|Угощайтесь.|Фрукты на столе. Угощайтесь.|Buyurun, alın.|Meyveler masada. Buyurun, alın.
+6.8|Передайте, пожалуйста, соль.|Передайте, пожалуйста, соль. Суп пресный.|Tuzu uzatır mısınız?|Tuzu uzatır mısınız? Çorba tatsız.
+6.9|Я хотел бы кое-что спросить.|Я хотел бы кое-что спросить о домашнем задании.|Bir şey sormak istiyorum.|Ödevle ilgili bir şey sormak istiyorum.
+6.10|Ничего, если я...?|Ничего, если я сегодня уйду пораньше?|... sakıncası var mı?|Bugün erken çıkmamın sakıncası var mı?
+6.11|Можно с вами поговорить?|Можно с вами поговорить? Это насчёт проекта.|Sizinle biraz konuşabilir miyim?|Sizinle biraz konuşabilir miyim? Projeyle ilgili.
+6.12|Можете сделать мне одолжение?|Можешь сделать мне одолжение? Пожалуйста, полей мои растения.|Bana bir iyilik yapar mısınız?|Bana bir iyilik yapar mısın? Lütfen bitkilerimi sula.
+6.13|Одну минуту, пожалуйста.|Одну минуту, пожалуйста. Я найду документ.|Bir dakika lütfen.|Bir dakika lütfen. Belgeyi bulacağım.
+6.14|Подожди секунду.|Подожди секунду. Кто-то стучит в дверь.|Bir saniye bekle.|Bir saniye bekle. Kapıda biri var.
+# 7. Rejalar va takliflar
+7.1|Давай сходим куда-нибудь вечером.|Мне скучно дома. Давай сходим куда-нибудь вечером.|Bu akşam dışarı çıkalım.|Evde sıkıldım. Bu akşam dışarı çıkalım.
+7.2|Как насчёт того, чтобы сходить в кино?|Как насчёт того, чтобы сходить в кино? Вышла новая комедия.|Sinemaya gitmeye ne dersin?|Sinemaya gitmeye ne dersin? Yeni bir komedi var.
+7.3|Почему бы нам не встретиться завтра?|Почему бы нам не встретиться завтра? Я буду свободен после обеда.|Neden yarın buluşmuyoruz?|Neden yarın buluşmuyoruz? Öğleden sonra boşum.
+7.4|Ты свободен в эти выходные?|Ты свободен в эти выходные? Мы едем в горы.|Bu hafta sonu boş musun?|Bu hafta sonu boş musun? Dağlara gidiyoruz.
+7.5|Я с нетерпением этого жду.|Концерт в пятницу, и я с нетерпением его жду.|Dört gözle bekliyorum.|Konser cuma günü ve dört gözle bekliyorum.
+7.6|Чем занимаешься?|Чем занимаешься? Хочешь присоединиться к нам?|Ne yapıyorsun?|Ne yapıyorsun? Bize katılmak ister misin?
+7.7|Я планирую...|В следующем месяце я планирую навестить бабушку и дедушку.|... planlıyorum.|Gelecek ay büyükanne ve büyükbabamı ziyaret etmeyi planlıyorum.
+7.8|Начнём?|Все здесь. Начнём?|Başlayalım mı?|Herkes burada. Başlayalım mı?
+7.9|Звучит здорово.|Пикник в воскресенье? Звучит здорово.|Harika olur.|Pazar günü piknik mi? Harika olur.
+7.10|Я бы с радостью, но не могу.|Я бы с радостью, но не могу. Мне нужно работать.|Çok isterdim ama yapamam.|Çok isterdim ama gelemem. Çalışmam gerekiyor.
+7.11|Я в деле.|Вы идёте в поход? Я с вами.|Ben de varım.|Doğa yürüyüşüne mi gidiyorsunuz? Ben de varım.
+7.12|Без меня.|Для меня сегодня слишком поздно, так что без меня.|Beni saymayın.|Bu gece benim için çok geç, beni saymayın.
+7.13|Давай попробуем.|Я никогда раньше не готовил плов, но давай попробуем.|Bir deneyelim.|Daha önce hiç pilav yapmadım ama bir deneyelim.
+7.14|Я не против. / Я за.|Прогулка после ужина? Я за.|Ben varım.|Akşam yemeğinden sonra yürüyüş mü? Ben varım.
+7.15|Мы могли бы так сделать.|Если пойдёт дождь, мы могли бы сделать это в помещении.|Bunu yapabiliriz.|Yağmur yağarsa bunu içeride yapabiliriz.
+# 8. Vaqt va uchrashuv
+8.1|Который час?|Мои часы остановились. Который час?|Saat kaç?|Saatim durdu. Saat kaç?
+8.2|Давно пора.|Ты наконец убрал свою комнату. Давно пора.|Tam zamanı.|Sonunda odanı topladın. Tam zamanı.
+8.3|Я опаздываю.|Извините, я опаздываю. Начинайте без меня.|Geç kalıyorum.|Pardon, geç kalıyorum. Bensiz başlayın.
+8.4|Я буду через пять минут.|Не уходите пока. Я буду через пять минут.|Beş dakikaya oradayım.|Henüz gitme. Beş dakikaya oradayım.
+8.5|Ты успеваешь?|Автобус отправляется в восемь. Ты успеваешь?|Zamanında mısın?|Otobüs sekizde kalkıyor. Yetişebilecek misin?
+8.6|Давай встретимся в полдень.|Давай встретимся в полдень у библиотеки.|Öğlen buluşalım.|Öğlen kütüphanenin önünde buluşalım.
+8.7|Извините, что заставил ждать.|Извините, что заставил вас ждать. Очередь была длинной.|Beklettiğim için özür dilerim.|Beklettiğim için özür dilerim. Kuyruk uzundu.
+8.8|Я спешу.|Я не могу сейчас говорить. Я спешу.|Acelem var.|Şimdi konuşamam. Acelem var.
+8.9|Не спешите.|Тест не ограничен по времени, так что не спешите.|Acele etme.|Sınavda süre sınırı yok, acele etme.
+8.10|Лучше поздно, чем никогда.|Он опоздал на час, но лучше поздно, чем никогда.|Geç olsun, güç olmasın.|Bir saat geç geldi ama geç olsun, güç olmasın.
+8.11|Время летит.|Уже декабрь! Время летит.|Zaman uçup gidiyor.|Şimdiden aralık! Zaman uçup gidiyor.
+8.12|У меня мало времени.|Пожалуйста, побыстрее. У меня мало времени.|Fazla vaktim yok.|Lütfen çabuk ol. Fazla vaktim yok.
+8.13|Встреча перенесена.|Хорошая новость для ленивых студентов: встреча перенесена.|Toplantı ertelendi.|Tembel öğrenciler için iyi haber: toplantı ertelendi.
+8.14|Давайте перенесём.|У меня приём у стоматолога, так что давайте перенесём.|Başka bir zamana alalım.|Dişçi randevum var, başka bir zamana alalım.
+8.15|Увидимся в пять часов.|Пока что до свидания. Увидимся в пять часов.|Saat beşte görüşürüz.|Şimdilik hoşça kal. Saat beşte görüşürüz.
+# 9. Restoran va ovqat
+9.1|Можно посмотреть меню?|Можно посмотреть меню, пожалуйста?|Menüyü görebilir miyim?|Menüyü görebilir miyim, lütfen?
+9.2|Я хотел бы сделать заказ.|Я хотел бы сделать заказ. Мы готовы.|Sipariş vermek istiyorum.|Sipariş vermek istiyorum. Artık hazırız.
+9.3|Я возьму курицу.|На основное блюдо я возьму курицу.|Ben tavuk alayım.|Ana yemek olarak ben tavuk alayım.
+9.4|Что вы посоветуете?|Я здесь впервые. Что вы посоветуете?|Ne önerirsiniz?|Buraya ilk kez geliyorum. Ne önerirsiniz?
+9.5|Принесите, пожалуйста, счёт.|Мы закончили. Принесите, пожалуйста, счёт.|Hesabı alabilir miyiz?|Bitirdik. Hesabı alabilir miyiz, lütfen?
+9.6|Сдачи не надо.|Еда была отличной, так что сдачи не надо.|Üstü kalsın.|Yemek harikaydı, üstü kalsın.
+9.7|Обслуживание включено?|Прежде чем оставить чаевые: обслуживание включено?|Servis ücreti dahil mi?|Bahşiş bırakmadan önce soruyorum, servis ücreti dahil mi?
+9.8|Я умираю с голоду.|Я пропустил обед, так что умираю с голоду.|Açlıktan ölüyorum.|Öğle yemeğini atladım, açlıktan ölüyorum.
+9.9|Я сыт.|Без десерта, спасибо. Я сыт.|Doydum.|Tatlı istemem, teşekkürler. Doydum.
+9.10|Очень вкусно.|Попробуй суп. Он очень вкусный.|Tadı harika.|Çorbayı dene. Tadı harika.
+9.11|Можно мне воды?|Можно мне воды? Я очень хочу пить.|Biraz su alabilir miyim?|Biraz su alabilir miyim? Çok susadım.
+9.12|У меня аллергия на орехи.|Пожалуйста, проверьте состав, потому что у меня аллергия на орехи.|Kuruyemişe alerjim var.|Lütfen malzemeleri kontrol edin, kuruyemişe alerjim var.
+9.13|Можно сделать менее острым?|Можно сделать менее острым? Я не ем острую еду.|Daha az acı yapabilir misiniz?|Daha az acı yapabilir misiniz? Acı yemek yiyemem.
+9.14|Столик на двоих, пожалуйста.|Добрый вечер. Столик на двоих, пожалуйста.|İki kişilik bir masa, lütfen.|İyi akşamlar. İki kişilik bir masa, lütfen.
+9.15|У вас есть бронь?|Добро пожаловать! У вас забронировано?|Rezervasyonunuz var mı?|Hoş geldiniz! Rezervasyonunuz var mı?
+# 10. Xarid qilish
+10.1|Сколько это стоит?|Сколько это стоит? Тут нет ценника.|Bu ne kadar?|Bu ne kadar? Fiyat etiketi yok.
+10.2|У вас есть это размером побольше?|Эта рубашка тесная. У вас есть размер побольше?|Bunun daha büyük bedeni var mı?|Bu gömlek dar. Bunun daha büyük bedeni var mı?
+10.3|Можно примерить?|Мне очень нравится эта куртка. Можно примерить?|Deneyebilir miyim?|Bu ceketi çok beğendim. Deneyebilir miyim?
+10.4|Это слишком дорого.|Мне нравится сумка, но она слишком дорогая.|Çok pahalı.|Çantayı beğendim ama çok pahalı.
+10.5|У вас есть что-нибудь подешевле?|У вас есть что-нибудь подешевле? У меня небольшой бюджет.|Daha ucuz bir şey var mı?|Daha ucuz bir şeyiniz var mı? Bütçem küçük.
+10.6|Я просто смотрю, спасибо.|Я просто смотрю, спасибо. Если понадобится помощь, спрошу.|Sadece bakıyorum, teşekkürler.|Sadece bakıyorum, teşekkürler. Yardıma ihtiyacım olursa sorarım.
+10.7|Я возьму это.|Цвет идеальный. Я беру.|Bunu alıyorum.|Renk mükemmel. Bunu alıyorum.
+10.8|Можно оплатить картой?|У меня нет наличных. Можно оплатить картой?|Kartla ödeyebilir miyim?|Nakit param yok. Kartla ödeyebilir miyim?
+10.9|Где примерочная?|Где примерочная? Я хотел бы примерить эти брюки.|Deneme kabini nerede?|Deneme kabini nerede? Bu pantolonu denemek istiyorum.
+10.10|Есть скидка?|Это обувь прошлого сезона. Есть скидка?|İndirim var mı?|Bunlar geçen sezonun ayakkabıları. İndirim var mı?
+10.11|Можно чек?|Можно чек? Возможно, мне придётся это вернуть.|Fiş alabilir miyim?|Fiş alabilir miyim? Belki iade etmem gerekir.
+10.12|Я хотел бы это вернуть.|Это не тот размер, поэтому я хотел бы это вернуть.|Bunu iade etmek istiyorum.|Bedeni yanlış, bu yüzden iade etmek istiyorum.
+10.13|Этого нет в наличии.|Извините, синего нет. Его нет в наличии.|Stokta yok.|Üzgünüz, mavisi kalmadı. Stokta yok.
+10.14|Это выгодная сделка.|Две рубашки по цене одной? Это выгодно.|Bu iyi bir fırsat.|Bir fiyatına iki gömlek mi? Bu iyi bir fırsat.
+10.15|Какая цена?|Какая цена? Нигде не написано.|Fiyatı ne?|Fiyatı ne? Hiçbir yerde yazmıyor.
