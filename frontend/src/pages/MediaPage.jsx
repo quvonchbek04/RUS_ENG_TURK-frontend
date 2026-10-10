@@ -5,41 +5,56 @@ import MediaUploader from '../components/MediaUploader.jsx';
 import MediaViewer from '../components/MediaViewer.jsx';
 import { AiText, EmptyState, LangChips, LANG_BY_KEY, Modal, PageHeader, formatBytes, formatDate } from '../components/ui.jsx';
 import { api } from '../lib/api.js';
-import { MEDIA_META } from '../lib/media.js';
+import { MEDIA_META, canUploadKind } from '../lib/media.js';
 import { useAuth } from '../context/AuthContext.jsx';
-import { isAdminRole } from '../lib/lessonProgress.js';
+import { t } from '../i18n/index.js';
 
 function LangBadge({ lang }) {
-  if (lang === 'all') return <span className="badge">🌐 Barcha</span>;
+  if (lang === 'all') return <span className="badge">{t('🌐 Barcha')}</span>;
   const l = LANG_BY_KEY[lang];
-  return <span className="badge">{l?.flag} {l?.short}</span>;
+  return (
+    <span className="badge">
+      {l?.flag} {l?.short}
+    </span>
+  );
 }
 
 function AdminTools({ item, index, total, onMove, onEdit, onDelete }) {
   return (
     <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
-      {!item.isPublished && <span className="badge badge-gold mr-1">Yashirin</span>}
-      <button type="button" className="btn btn-ghost btn-icon !w-8 !h-8 !min-h-8 text-xs" disabled={index === 0} onClick={() => onMove(index, -1)} title="Yuqoriga">
+      {!item.isPublished && <span className="badge badge-gold mr-1">{t('Yashirin')}</span>}
+      <button type="button" className="btn btn-ghost btn-icon !w-8 !h-8 !min-h-8 text-xs" disabled={index === 0} onClick={() => onMove(index, -1)} title={t('Yuqoriga')}>
         ↑
       </button>
-      <button type="button" className="btn btn-ghost btn-icon !w-8 !h-8 !min-h-8 text-xs" disabled={index === total - 1} onClick={() => onMove(index, 1)} title="Pastga">
+      <button type="button" className="btn btn-ghost btn-icon !w-8 !h-8 !min-h-8 text-xs" disabled={index === total - 1} onClick={() => onMove(index, 1)} title={t('Pastga')}>
         ↓
       </button>
-      <button type="button" className="btn btn-ghost btn-icon !w-8 !h-8 !min-h-8 text-xs" onClick={() => onEdit(item)} title="Tahrirlash">
+      <button type="button" className="btn btn-ghost btn-icon !w-8 !h-8 !min-h-8 text-xs" onClick={() => onEdit(item)} title={t('Tahrirlash')}>
         ✏️
       </button>
-      <button type="button" className="btn btn-danger btn-icon !w-8 !h-8 !min-h-8 text-xs" onClick={() => onDelete(item)} title="O'chirish">
+      <button type="button" className="btn btn-danger btn-icon !w-8 !h-8 !min-h-8 text-xs" onClick={() => onDelete(item)} title={t("O'chirish")}>
         🗑
       </button>
     </div>
   );
 }
 
+const SUBTITLES = {
+  audio: "Qo'shiqlar va audio darslar ketma-ket ijro etiladi — tinglang va matni bilan birga kuzating.",
+  video: 'Video darslar ketma-ketlikda — biri tugagach keyingisi boshlanadi.',
+  image: "Rasmli lug'atlar va o'quv kartalari.",
+  text: "Matnlarni o'qing va ovoz bilan tinglang, AI ustozdan vazifa oling.",
+  dialog: 'Yuklangan dialoglar: tinglang, takrorlang, AI bilan mashq qiling.',
+  vocab: "Yuklangan lug'at to'plamlari — har birini alohida mashq qilish mumkin.",
+  news: "Platformadagi yangiliklar va e'lonlar.",
+};
+
 export default function MediaPage() {
   const { kind } = useParams();
   const meta = MEDIA_META[kind];
   const { user, progress, updateProgress } = useAuth();
-  const isStaff = isAdminRole(user?.role);
+  // Yuklash, tahrirlash, o'chirish va tartiblash — faqat shu turga ruxsati bor adminlar (yoki super admin) uchun
+  const isStaff = canUploadKind(user, kind);
   const [items, setItems] = useState(null);
   const [error, setError] = useState('');
   const [lang, setLang] = useState('all');
@@ -66,7 +81,11 @@ export default function MediaPage() {
     load();
   }, [load]);
 
-  const list = useMemo(() => (items || []).filter((i) => lang === 'all' || i.lang === lang || i.lang === 'all'), [items, lang]);
+  // Yashirin materiallarni faqat ularni boshqara oladiganlar ko'radi (ruxsatsiz admin ham o'quvchidek ko'radi)
+  const list = useMemo(
+    () => (items || []).filter((i) => (lang === 'all' || i.lang === lang || i.lang === 'all') && (isStaff || i.isPublished)),
+    [items, lang, isStaff]
+  );
   const doneMap = progress.mediaDone || {};
 
   if (!meta) return <Navigate to="/" replace />;
@@ -91,7 +110,7 @@ export default function MediaPage() {
   }
 
   async function remove(item) {
-    if (!confirm(`"${item.title}" o'chirilsinmi? Bu amalni qaytarib bo'lmaydi.`)) return;
+    if (!confirm(t('"{title}" o\'chirilsinmi? Bu amalni qaytarib bo\'lmaydi.', { title: item.title }))) return;
     try {
       await api.deleteMedia(item);
       setItems((prev) => prev.filter((x) => x.id !== item.id));
@@ -126,23 +145,13 @@ export default function MediaPage() {
     <Layout>
       <div className="page">
         <PageHeader
-          eyebrow="Materiallar"
+          eyebrow={t('Materiallar')}
           title={`${meta.icon} ${meta.label}`}
-          subtitle={
-            {
-              audio: "Qo'shiqlar va audio darslar ketma-ket ijro etiladi — tinglang va matni bilan birga kuzating.",
-              video: 'Video darslar ketma-ketlikda — biri tugagach keyingisi boshlanadi.',
-              image: "Rasmli lug'atlar va o'quv kartalari.",
-              text: "Matnlarni o'qing va ovoz bilan tinglang, AI ustozdan vazifa oling.",
-              dialog: 'Yuklangan dialoglar: tinglang, takrorlang, AI bilan mashq qiling.',
-              vocab: "Yuklangan lug'at to'plamlari — har birini alohida mashq qilish mumkin.",
-              news: "Platformadagi yangiliklar va e'lonlar.",
-            }[kind]
-          }
+          subtitle={t(SUBTITLES[kind])}
           actions={
             isStaff && (
               <button type="button" className={`btn ${showUpload ? 'btn-ghost' : 'btn-gold'}`} onClick={() => setShowUpload((v) => !v)}>
-                {showUpload ? 'Yopish' : `+ ${kind === 'news' ? 'Yangilik' : 'Yuklash'}`}
+                {showUpload ? t('Yopish') : kind === 'news' ? t('+ Yangilik') : t('+ Yuklash')}
               </button>
             )
           }
@@ -174,9 +183,15 @@ export default function MediaPage() {
         {items && list.length === 0 && (
           <EmptyState
             icon={meta.icon}
-            title="Hozircha bo'sh"
-            text={isStaff ? `"${meta.label}" bo'limiga birinchi materialni yuklang.` : 'Administratorlar tez orada materiallar qo\'shadi.'}
-            action={isStaff && !showUpload && <button type="button" className="btn btn-gold" onClick={() => setShowUpload(true)}>+ Yuklash</button>}
+            title={t("Hozircha bo'sh")}
+            text={isStaff ? t('"{name}" bo\'limiga birinchi materialni yuklang.', { name: meta.label }) : t("Administratorlar tez orada materiallar qo'shadi.")}
+            action={
+              isStaff && !showUpload && (
+                <button type="button" className="btn btn-gold" onClick={() => setShowUpload(true)}>
+                  {t('+ Yuklash')}
+                </button>
+              )
+            }
           />
         )}
 
@@ -203,14 +218,14 @@ export default function MediaPage() {
                   />
                   <div className="flex flex-wrap items-center gap-2 mt-4">
                     <button type="button" className="btn btn-ghost" disabled={current === 0} onClick={() => setCurrent((c) => c - 1)}>
-                      ⏮ Oldingi
+                      {t('⏮ Oldingi')}
                     </button>
                     <button type="button" className="btn btn-ghost" disabled={current + 1 >= list.length} onClick={() => setCurrent((c) => c + 1)}>
-                      Keyingi ⏭
+                      {t('Keyingi ⏭')}
                     </button>
                     <label className="flex items-center gap-2 text-sm muted cursor-pointer ml-auto">
                       <input type="checkbox" checked={continuous} onChange={(e) => setContinuous(e.target.checked)} style={{ accentColor: 'var(--pine)' }} />
-                      Ketma-ket ijro
+                      {t('Ketma-ket ijro')}
                     </label>
                   </div>
                 </div>
@@ -229,7 +244,10 @@ export default function MediaPage() {
                   className="card p-3 flex items-center gap-3 cursor-pointer"
                   style={i === current ? { borderColor: 'var(--pine)', boxShadow: '0 0 0 3px var(--pine-soft)' } : undefined}
                 >
-                  <span className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold shrink-0" style={{ background: i === current ? 'var(--pine)' : 'var(--paper-soft)', color: i === current ? '#fff' : 'var(--ink-soft)' }}>
+                  <span
+                    className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold shrink-0"
+                    style={{ background: i === current ? 'var(--pine)' : 'var(--paper-soft)', color: i === current ? '#fff' : 'var(--ink-soft)' }}
+                  >
                     {i === current ? '▶' : doneMap[it.id] ? '✓' : i + 1}
                   </span>
                   <div className="flex-1 min-w-0">
@@ -313,9 +331,14 @@ export default function MediaPage() {
                   </div>
                   <div className="text-xs muted flex flex-wrap gap-x-2">
                     <span>{LANG_BY_KEY[it.lang]?.flag || '🌐'}</span>
-                    {kind === 'vocab' && <span>{(it.content?.words || []).length} ta so'z</span>}
-                    {kind === 'dialog' && <span>{(it.content?.lines || []).length} qator{it.fileUrl ? ' · 🎧 audio' : ''}</span>}
-                    {kind === 'text' && <span>{Math.ceil(String(it.content?.text || '').split(/\s+/).length / 180)} daqiqalik o'qish</span>}
+                    {kind === 'vocab' && <span>{t("{n} ta so'z", { n: (it.content?.words || []).length })}</span>}
+                    {kind === 'dialog' && (
+                      <span>
+                        {t('{n} qator', { n: (it.content?.lines || []).length })}
+                        {it.fileUrl ? ` · ${t('🎧 audio')}` : ''}
+                      </span>
+                    )}
+                    {kind === 'text' && <span>{t("{n} daqiqalik o'qish", { n: Math.ceil(String(it.content?.text || '').split(/\s+/).length / 180) })}</span>}
                     {it.description && <span className="truncate">· {it.description}</span>}
                   </div>
                 </div>
@@ -336,11 +359,11 @@ export default function MediaPage() {
           opened && (
             <div className="flex flex-wrap items-center gap-2">
               <button type="button" className="btn btn-ghost" disabled={openIdx === 0} onClick={() => setOpenIdx((i) => i - 1)}>
-                ← Oldingi
+                {t('← Oldingi')}
               </button>
               {kind !== 'image' && (
                 <button type="button" className={`btn ${doneMap[opened.id] ? 'btn-soft' : 'btn-ghost'}`} onClick={() => markDone(opened, !doneMap[opened.id])}>
-                  {doneMap[opened.id] ? "✓ O'rganildi" : "O'rganildi deb belgilash"}
+                  {doneMap[opened.id] ? t("✓ O'rganildi") : t("O'rganildi deb belgilash")}
                 </button>
               )}
               <button
@@ -352,7 +375,7 @@ export default function MediaPage() {
                   setOpenIdx((i) => i + 1);
                 }}
               >
-                Keyingisi →
+                {t('Keyingisi →')}
               </button>
             </div>
           )
@@ -362,40 +385,40 @@ export default function MediaPage() {
       </Modal>
 
       {/* Tahrirlash (admin) */}
-      <Modal open={!!editing} onClose={() => setEditing(null)} title="Tahrirlash">
+      <Modal open={!!editing} onClose={() => setEditing(null)} title={t('Tahrirlash')}>
         {editing && (
           <form onSubmit={saveEdit} className="space-y-3">
             <label className="field">
-              <span className="label">Sarlavha</span>
+              <span className="label">{t('Sarlavha')}</span>
               <input className="input" value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} required />
             </label>
             {editing.kind !== 'news' && (
               <label className="field">
-                <span className="label">Tavsif</span>
+                <span className="label">{t('Tavsif')}</span>
                 <input className="input" value={editing.description || ''} onChange={(e) => setEditing({ ...editing, description: e.target.value })} />
               </label>
             )}
             <label className="field">
-              <span className="label">Til</span>
+              <span className="label">{t('Til')}</span>
               <select className="select" value={editing.lang} onChange={(e) => setEditing({ ...editing, lang: e.target.value })}>
-                <option value="all">🌐 Barcha tillar</option>
-                <option value="en">🇬🇧 Ingliz tili</option>
-                <option value="ru">🇷🇺 Rus tili</option>
-                <option value="tr">🇹🇷 Turk tili</option>
+                <option value="all">{t('🌐 Barcha tillar')}</option>
+                <option value="en">🇬🇧 {t('Ingliz tili')}</option>
+                <option value="ru">🇷🇺 {t('Rus tili')}</option>
+                <option value="tr">🇹🇷 {t('Turk tili')}</option>
               </select>
             </label>
             {(editing.kind === 'news' || editing.kind === 'text') && (
               <label className="field">
-                <span className="label">Matn</span>
+                <span className="label">{t('Matn')}</span>
                 <textarea className="textarea" rows={8} value={editing.text} onChange={(e) => setEditing({ ...editing, text: e.target.value })} />
               </label>
             )}
             <label className="flex items-center gap-2 text-sm cursor-pointer">
               <input type="checkbox" checked={editing.isPublished} onChange={(e) => setEditing({ ...editing, isPublished: e.target.checked })} style={{ accentColor: 'var(--pine)' }} />
-              O'quvchilarga ko'rinsin
+              {t("O'quvchilarga ko'rinsin")}
             </label>
             <button type="submit" className="btn btn-primary">
-              Saqlash
+              {t('Saqlash')}
             </button>
           </form>
         )}

@@ -8,6 +8,7 @@ import { useContent } from '../lib/hooks.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { flattenMonths, isMonthDone, QUIZ_PASS_THRESHOLD, withActivity, withPracticeSession } from '../lib/lessonProgress.js';
 import { shuffle } from '../lib/practice.js';
+import { t } from '../i18n/index.js';
 
 /** Dars testi: dars so'zlari + Word fayldagi so'zlardan aralash savollar. To'xtatilsa ham
  *  javob berilmagan savollar xato hisoblanadi (umumiy son o'zgarmaydi). */
@@ -23,10 +24,10 @@ export default function VocabPractice() {
 
   const { items, pool } = useMemo(() => {
     if (!month) return { items: [], pool: [] };
-    const base = (month.vocab || []).map(([w, t, m]) => ({ w, t: t !== w ? t : '', m }));
+    const base = (month.vocab || []).map(([w, tr, m]) => ({ w, t: tr !== w ? tr : '', m }));
     const extra = shuffle(month.words || []).slice(0, 14).map(([w, m, s, st]) => ({ w, m, s, st }));
-    const pool = [...base, ...(month.words || []).map(([w, m]) => ({ w, m }))];
-    return { items: [...base, ...extra], pool };
+    const poolItems = [...base, ...(month.words || []).map(([w, m]) => ({ w, m }))];
+    return { items: [...base, ...extra], pool: poolItems };
   }, [month]);
 
   const onFinish = useCallback(
@@ -70,12 +71,17 @@ export default function VocabPractice() {
       </Layout>
     );
   }
-  if (!data) return <Layout><PageLoading /></Layout>;
+  if (!data)
+    return (
+      <Layout>
+        <PageLoading />
+      </Layout>
+    );
   if (!month) {
     return (
       <Layout>
         <div className="page-narrow">
-          <div className="alert alert-error">Dars topilmadi.</div>
+          <div className="alert alert-error">{t('Dars topilmadi.')}</div>
         </div>
       </Layout>
     );
@@ -90,7 +96,7 @@ export default function VocabPractice() {
     <Layout>
       <div className="page-narrow">
         <Link to={`/lang/${lang}/month/${moduleId}/${monthId}`} className="back-link mb-4">
-          ← {month.topic}
+          ← {t(month.topic)}
         </Link>
 
         {!result ? (
@@ -106,15 +112,15 @@ export default function VocabPractice() {
             label={retryItems ? `Xatolar: ${month.topic}` : `Dars testi: ${month.label} · ${month.topic}`}
             strict={!retryItems}
             extra={{ lessonId: monthId }}
-          onFinish={onFinish}
+            onFinish={onFinish}
           />
         ) : (
           <>
             {!retryItems && (
               <div className={`alert mb-4 ${pct >= QUIZ_PASS_THRESHOLD ? 'alert-success' : 'alert-warn'}`}>
                 {pct >= QUIZ_PASS_THRESHOLD
-                  ? `✅ ${pct}% — dars testi topshirildi!${done ? ' Dars to\'liq yakunlandi.' : ' Darsning qolgan bosqichlarini ham yakunlang.'}`
-                  : `${pct}% — darsni yakunlash uchun kamida ${QUIZ_PASS_THRESHOLD}% kerak. Xatolarni takrorlab, qayta urinib ko'ring.`}
+                  ? `${t('✅ {pct}% — dars testi topshirildi!', { pct })}${done ? ` ${t("Dars to'liq yakunlandi.")}` : ` ${t('Darsning qolgan bosqichlarini ham yakunlang.')}`}`
+                  : t("{pct}% — darsni yakunlash uchun kamida {min}% kerak. Xatolarni takrorlab, qayta urinib ko'ring.", { pct, min: QUIZ_PASS_THRESHOLD })}
               </div>
             )}
             <PracticeResult
@@ -132,11 +138,11 @@ export default function VocabPractice() {
               extraActions={
                 <>
                   <Link to={`/lang/${lang}/month/${moduleId}/${monthId}`} className="btn btn-ghost">
-                    Darsga qaytish
+                    {t('Darsga qaytish')}
                   </Link>
                   {done && nextLesson && (
                     <Link to={`/lang/${lang}/month/${nextLesson.moduleId}/${nextLesson.id}`} className="btn btn-brand">
-                      Keyingi dars →
+                      {t('Keyingi dars →')}
                     </Link>
                   )}
                 </>

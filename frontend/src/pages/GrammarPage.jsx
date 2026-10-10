@@ -7,6 +7,7 @@ import { GrammarMore } from '../components/LessonExtras.jsx';
 import { PageHeader, PageLoading } from '../components/ui.jsx';
 import { useContent } from '../lib/hooks.js';
 import { useTutor } from '../context/TutorContext.jsx';
+import { t } from '../i18n/index.js';
 
 export default function GrammarPage() {
   const { lang } = useParams();
@@ -31,7 +32,12 @@ export default function GrammarPage() {
       </Layout>
     );
   }
-  if (!data) return <Layout><PageLoading /></Layout>;
+  if (!data)
+    return (
+      <Layout>
+        <PageLoading />
+      </Layout>
+    );
 
   const q = query.trim().toLowerCase();
   const filtered = topics.filter(({ month, grammar }) => !q || `${grammar.title} ${grammar.text} ${month.topic}`.toLowerCase().includes(q));
@@ -40,12 +46,12 @@ export default function GrammarPage() {
     <Layout>
       <div className="page-narrow">
         <PageHeader
-          back={{ to: `/lang/${lang}`, label: data.meta.title }}
-          eyebrow={`${data.meta.flag} Grammatika`}
-          title={`Barcha mavzular · ${topics.length}`}
-          subtitle="Darslardagi barcha grammatik qoidalar bir joyda. Tushunmagan joyingizni AI ustozdan so'rang."
+          back={{ to: `/lang/${lang}`, label: t(data.meta.title) }}
+          eyebrow={`${data.meta.flag} ${t('Grammatika')}`}
+          title={t('Barcha mavzular · {n}', { n: topics.length })}
+          subtitle={t("Darslardagi barcha grammatik qoidalar bir joyda. Tushunmagan joyingizni AI ustozdan so'rang.")}
         />
-        <input className="input mb-4" placeholder="🔍 Mavzu qidirish…" value={query} onChange={(e) => setQuery(e.target.value)} />
+        <input className="input mb-4" placeholder={t('🔍 Mavzu qidirish…')} value={query} onChange={(e) => setQuery(e.target.value)} />
         <div className="space-y-3">
           {filtered.map(({ mod, month, grammar }) => {
             const isOpen = openId === month.id || !!q;
@@ -54,7 +60,7 @@ export default function GrammarPage() {
                 <button type="button" className="w-full text-left p-4 flex items-center gap-3" onClick={() => setOpenId(isOpen && !q ? null : month.id)}>
                   <div className="flex-1 min-w-0">
                     <div className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--gold)' }}>
-                      {month.label} · {month.topic}
+                      {t(month.label)} · {t(month.topic)}
                     </div>
                     <div className="font-display text-lg font-semibold" style={{ color: 'var(--ink)' }}>
                       {grammar.title}
@@ -82,11 +88,11 @@ export default function GrammarPage() {
                     </div>
                     <GrammarMore items={grammar.more} />
                     <div className="flex flex-wrap gap-2 mt-4">
-                      <button type="button" className="btn btn-soft btn-sm" onClick={() => ask(`"${grammar.title}" mavzusini sodda misollar bilan tushuntirib ber`)}>
-                        🤖 Ustozdan tushuntirish
+                      <button type="button" className="btn btn-soft btn-sm" onClick={() => ask(t('"{title}" mavzusini sodda misollar bilan tushuntirib ber', { title: grammar.title }))}>
+                        {t('🤖 Ustozdan tushuntirish')}
                       </button>
                       <Link to={`/lang/${lang}/month/${mod.id}/${month.id}`} className="btn btn-ghost btn-sm">
-                        📘 Darsga o'tish
+                        {t("📘 Darsga o'tish")}
                       </Link>
                     </div>
                     <AiTaskWidget

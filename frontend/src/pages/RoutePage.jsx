@@ -5,6 +5,7 @@ import { PageLoading, ProgressBar } from '../components/ui.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useContent } from '../lib/hooks.js';
 import { flattenMonths, isAdminRole, isMonthDone, isMonthUnlocked, monthProgressRatio, getMistakeBank } from '../lib/lessonProgress.js';
+import { t } from '../i18n/index.js';
 
 export default function RoutePage() {
   const { lang } = useParams();
@@ -44,21 +45,19 @@ export default function RoutePage() {
     <Layout>
       <div className="page-wide">
         <Link to="/" className="back-link mb-3">
-          ← Bosh sahifa
+          {t('← Bosh sahifa')}
         </Link>
 
         <div className="flex flex-wrap items-center gap-4 mb-6">
           <span className="text-5xl">{data.meta.flag}</span>
           <div className="flex-1 min-w-[220px]">
-            <h1 className="h1">{data.meta.title}</h1>
-            <div className="eyebrow mt-1">{data.meta.route}</div>
+            <h1 className="h1">{t(data.meta.title)}</h1>
+            <div className="eyebrow mt-1">{t(data.meta.route)}</div>
           </div>
           <div className="w-full sm:w-64">
             <div className="flex justify-between text-xs font-bold mb-1.5">
-              <span className="muted">Umumiy progress</span>
-              <span style={{ color: 'var(--pine)' }}>
-                {doneCount}/{flat.length} dars
-              </span>
+              <span className="muted">{t('Umumiy progress')}</span>
+              <span style={{ color: 'var(--pine)' }}>{t('{a}/{b} dars', { a: doneCount, b: flat.length })}</span>
             </div>
             <ProgressBar value={(doneCount / flat.length) * 100} />
           </div>
@@ -71,9 +70,9 @@ export default function RoutePage() {
           </span>
           <div className="flex-1 min-w-[200px]">
             <div className="text-xs font-bold uppercase tracking-[0.18em] opacity-80">
-              {nextRatio > 0 ? 'Davom ettirish' : 'Keyingi dars'} · {nextMonth.moduleTitle} · {nextMonth.label}
+              {nextRatio > 0 ? t('Davom ettirish') : t('Keyingi dars')} · {t(nextMonth.moduleTitle)} · {t(nextMonth.label)}
             </div>
-            <div className="font-display text-2xl font-semibold mt-1">{nextMonth.topic}</div>
+            <div className="font-display text-2xl font-semibold mt-1">{t(nextMonth.topic)}</div>
             {nextRatio > 0 && (
               <div className="h-2 rounded-full mt-3 max-w-sm overflow-hidden" style={{ background: 'rgba(255,255,255,.22)' }}>
                 <div className="h-full rounded-full" style={{ width: `${nextRatio * 100}%`, background: '#f6b867' }} />
@@ -81,19 +80,19 @@ export default function RoutePage() {
             )}
           </div>
           <span className="btn btn-lg" style={{ background: '#fff', color: '#0c5444' }}>
-            {nextRatio > 0 ? 'Davom etish →' : 'Boshlash →'}
+            {nextRatio > 0 ? t('Davom etish →') : t('Boshlash →')}
           </span>
         </Link>
 
         {/* Tezkor bo'limlar */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
           {[
-            { to: `/lang/${lang}/practice-full`, icon: '🔀', title: "Lug'at mashqi", sub: "So'z, tinglash, yozish" },
-            { to: `/lang/${lang}/practice-full?source=mistakes`, icon: '🩹', title: 'Xatolar ustida ishlash', sub: `${mistakes} ta so'z` },
-            { to: `/lang/${lang}/dictionary`, icon: '📖', title: "Lug'at", sub: `${totalWords} so'z · ${totalPhrases} ibora` },
-            { to: `/lang/${lang}/dialogs`, icon: '🎧', title: 'Dialoglar', sub: 'Tinglash va AI vazifa' },
+            { to: `/lang/${lang}/practice-full`, icon: '🔀', title: t("Lug'at mashqi"), sub: t("So'z, tinglash, yozish") },
+            { to: `/lang/${lang}/practice-full?source=mistakes`, icon: '🩹', title: t('Xatolar ustida ishlash'), sub: t("{n} ta so'z", { n: mistakes }) },
+            { to: `/lang/${lang}/dictionary`, icon: '📖', title: t("Lug'at"), sub: t("{a} so'z · {b} ibora", { a: totalWords, b: totalPhrases }) },
+            { to: `/lang/${lang}/dialogs`, icon: '🎧', title: t('Dialoglar'), sub: t('Tinglash va AI vazifa') },
           ].map((a) => (
-            <Link key={a.title} to={a.to} className="card card-hover p-4 flex items-center gap-3">
+            <Link key={a.to} to={a.to} className="card card-hover p-4 flex items-center gap-3">
               <span className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0" style={{ background: 'var(--pine-soft)' }}>
                 {a.icon}
               </span>
@@ -119,16 +118,19 @@ export default function RoutePage() {
                   onClick={() => setOpenModules((o) => ({ ...o, [mod.id]: !isOpen }))}
                   className="w-full text-left p-4 sm:p-5 flex items-center gap-4"
                 >
-                  <span className="w-11 h-11 rounded-2xl flex items-center justify-center font-display text-lg font-bold shrink-0" style={{ background: done === mod.months.length ? 'var(--pine)' : 'var(--gold-soft)', color: done === mod.months.length ? '#fff' : 'var(--gold)' }}>
+                  <span
+                    className="w-11 h-11 rounded-2xl flex items-center justify-center font-display text-lg font-bold shrink-0"
+                    style={{ background: done === mod.months.length ? 'var(--pine)' : 'var(--gold-soft)', color: done === mod.months.length ? '#fff' : 'var(--gold)' }}
+                  >
                     {done === mod.months.length ? '✓' : mi + 1}
                   </span>
                   <div className="flex-1 min-w-0">
                     <div className="font-display text-lg font-semibold" style={{ color: 'var(--ink)' }}>
-                      {mod.title}
+                      {t(mod.title)}
                     </div>
                     <div className="text-xs muted mb-2">
-                      {mod.sub ? `${mod.sub} · ` : ''}
-                      {done}/{mod.months.length} dars
+                      {mod.sub ? `${t(mod.sub)} · ` : ''}
+                      {t('{a}/{b} dars', { a: done, b: mod.months.length })}
                     </div>
                     <ProgressBar value={(done / mod.months.length) * 100} className="max-w-md" />
                   </div>
@@ -145,8 +147,8 @@ export default function RoutePage() {
                       const inner = (
                         <>
                           <div className="flex items-center gap-2 mb-1.5">
-                            <span className="text-[11px] font-bold uppercase tracking-wider faint flex-1">{month.label}</span>
-                            {isNext && !isDone && <span className="badge badge-gold">Hozirgi</span>}
+                            <span className="text-[11px] font-bold uppercase tracking-wider faint flex-1">{t(month.label)}</span>
+                            {isNext && !isDone && <span className="badge badge-gold">{t('Hozirgi')}</span>}
                             <span
                               className="w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0"
                               style={{ background: isDone ? 'var(--pine)' : 'var(--paper-soft)', color: isDone ? '#fff' : 'var(--ink-soft)' }}
@@ -155,12 +157,12 @@ export default function RoutePage() {
                             </span>
                           </div>
                           <div className="font-display font-semibold leading-snug" style={{ color: 'var(--ink)' }}>
-                            {month.topic}
+                            {t(month.topic)}
                           </div>
                           <div className="text-xs muted mt-1">
-                            {(month.vocab || []).length + (month.words || []).length} so'z
-                            {(month.phrases || []).length ? ` · ${month.phrases.length} ibora` : ''}
-                            {month.dialog ? ' · dialog' : ''}
+                            {t("{n} so'z", { n: (month.vocab || []).length + (month.words || []).length })}
+                            {(month.phrases || []).length ? ` · ${t('{n} ibora', { n: month.phrases.length })}` : ''}
+                            {month.dialog ? ` · ${t('dialog')}` : ''}
                           </div>
                           {unlocked && !isDone && ratio > 0 && <ProgressBar value={ratio * 100} className="mt-2.5" />}
                         </>
@@ -175,7 +177,7 @@ export default function RoutePage() {
                           {inner}
                         </Link>
                       ) : (
-                        <div key={month.id} className="card-soft p-4 opacity-55 cursor-not-allowed" title="Avvalgi darsni yakunlang">
+                        <div key={month.id} className="card-soft p-4 opacity-55 cursor-not-allowed" title={t('Avvalgi darsni yakunlang')}>
                           {inner}
                         </div>
                       );
@@ -186,7 +188,7 @@ export default function RoutePage() {
             );
           })}
         </div>
-        <p className="text-xs faint mt-5">Har bir dars oldingisi to'liq yakunlangach (barcha bosqichlar + testdan kamida 60%) ochiladi.</p>
+        <p className="text-xs faint mt-5">{t("Har bir dars oldingisi to'liq yakunlangach (barcha bosqichlar + testdan kamida 60%) ochiladi.")}</p>
       </div>
     </Layout>
   );

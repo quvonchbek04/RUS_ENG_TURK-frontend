@@ -5,6 +5,7 @@ import SpeakButton from '../components/SpeakButton.jsx';
 import { PageHeader, PageLoading } from '../components/ui.jsx';
 import { useContent } from '../lib/hooks.js';
 import { readingHint } from '../lib/translit.js';
+import { t } from '../i18n/index.js';
 
 export default function VerbsPage() {
   const { lang } = useParams();
@@ -27,7 +28,12 @@ export default function VerbsPage() {
       </Layout>
     );
   }
-  if (!data) return <Layout><PageLoading /></Layout>;
+  if (!data)
+    return (
+      <Layout>
+        <PageLoading />
+      </Layout>
+    );
 
   const isEnglish = lang === 'en';
 
@@ -35,12 +41,12 @@ export default function VerbsPage() {
     <Layout>
       <div className="page">
         <PageHeader
-          back={{ to: `/lang/${lang}`, label: data.meta.title }}
-          eyebrow={`${data.meta.flag} Fe'llar`}
-          title={`${isEnglish ? "Noto'g'ri fe'llar" : "Fe'llar jadvali"} · ${data.verbTable.length}`}
-          subtitle={isEnglish ? "V1 · V2 (Past Simple) · V3 (Past Participle) shakllari" : "Eng ko'p ishlatiladigan fe'llar va ularning tarjimasi"}
+          back={{ to: `/lang/${lang}`, label: t(data.meta.title) }}
+          eyebrow={`${data.meta.flag} ${t("Fe'llar")}`}
+          title={`${isEnglish ? t("Noto'g'ri fe'llar") : t("Fe'llar jadvali")} · ${data.verbTable.length}`}
+          subtitle={isEnglish ? t('V1 · V2 (Past Simple) · V3 (Past Participle) shakllari') : t("Eng ko'p ishlatiladigan fe'llar va ularning tarjimasi")}
         />
-        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="🔍 Qidirish…" className="input mb-5" />
+        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('🔍 Qidirish…')} className="input mb-5" />
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
           {filtered.map((row, i) => (
             <div key={i} className="card-soft p-3.5 flex items-center gap-3">
@@ -63,7 +69,7 @@ export default function VerbsPage() {
             </div>
           ))}
         </div>
-        {filtered.length === 0 && <div className="text-center muted py-12">Hech narsa topilmadi.</div>}
+        {filtered.length === 0 && <div className="text-center muted py-12">{t('Hech narsa topilmadi.')}</div>}
       </div>
     </Layout>
   );

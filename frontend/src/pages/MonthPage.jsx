@@ -12,6 +12,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useTutor, useTutorContext } from '../context/TutorContext.jsx';
 import { MEDIA_META } from '../lib/media.js';
 import { readingHint } from '../lib/translit.js';
+import { t } from '../i18n/index.js';
 import {
   flattenMonths,
   getQuizPct,
@@ -25,13 +26,14 @@ import {
   withActivity,
 } from '../lib/lessonProgress.js';
 
+// Matnlar o'zbekcha kalit sifatida saqlanadi va chiqarishda t() bilan o'giriladi.
 const STEPS = [
-  { key: 'grammar', icon: '📐', label: 'Grammatika', done: 'Grammatikani o\'rgandim' },
+  { key: 'grammar', icon: '📐', label: 'Grammatika', done: "Grammatikani o'rgandim" },
   { key: 'vocab', icon: '📚', label: "Lug'at", done: "So'zlarni o'rgandim" },
-  { key: 'dialog', icon: '🎧', label: 'Dialog', done: "Dialogni tingladim" },
+  { key: 'dialog', icon: '🎧', label: 'Dialog', done: 'Dialogni tingladim' },
   { key: 'exercises', icon: '✏️', label: 'Mashqlar', done: 'Mashqlarni bajardim' },
   { key: 'answers', icon: '🗝️', label: 'Javoblar', done: 'Javoblarni tekshirdim' },
-  { key: 'teacher', icon: '🧑‍🏫', label: 'Tavsiya', done: "O'qidim" },
+  { key: 'teacher', icon: '🧑‍🏫', label: 'Tavsiyalar', done: "O'qidim" },
   { key: 'test', icon: '🧪', label: 'Test', done: '' },
 ];
 
@@ -62,20 +64,13 @@ function ExerciseItem({ index, question, answer, savedValue, onSave, lang }) {
         </span>
         <span style={{ color: 'var(--ink)' }}>{question}</span>
       </div>
-      <textarea
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onBlur={() => onSave(value)}
-        placeholder="Javobingizni shu yerga yozing…"
-        rows={2}
-        className="textarea !min-h-[64px] mb-2"
-      />
+      <textarea value={value} onChange={(e) => setValue(e.target.value)} onBlur={() => onSave(value)} placeholder={t('Javobingizni shu yerga yozing…')} rows={2} className="textarea !min-h-[64px] mb-2" />
       <div className="flex flex-wrap items-start gap-2">
         <button type="button" onClick={() => setRevealed((v) => !v)} className="btn btn-ghost btn-sm">
-          {revealed ? '🙈 Yashirish' : "👁 To'g'ri javob"}
+          {revealed ? t('🙈 Yashirish') : t("👁 To'g'ri javob")}
         </button>
         <button type="button" onClick={aiCheck} disabled={checking || !value.trim()} className="btn btn-soft btn-sm">
-          {checking ? <span className="spinner" /> : '🤖'} AI tekshirsin
+          {checking ? <span className="spinner" /> : '🤖'} {t('AI tekshirsin')}
         </button>
       </div>
       {revealed && answer && <div className="alert alert-success mt-2 text-sm">{answer}</div>}
@@ -83,7 +78,11 @@ function ExerciseItem({ index, question, answer, savedValue, onSave, lang }) {
         <div className={`alert mt-2 text-sm ${ai.correct ? 'alert-success' : 'alert-error'}`} style={{ color: 'var(--ink)' }}>
           {ai.correct ? '✅ ' : '❌ '}
           {ai.feedback}
-          {ai.corrected && <div className="mt-1 font-semibold">To'g'ri: {ai.corrected}</div>}
+          {ai.corrected && (
+            <div className="mt-1 font-semibold">
+              {t("To'g'ri:")} {ai.corrected}
+            </div>
+          )}
         </div>
       )}
     </li>
@@ -114,11 +113,11 @@ export default function MonthPage() {
     month
       ? {
           lang,
-          title: `${month.label}: ${month.topic}`,
+          title: `${t(month.label)}: ${t(month.topic)}`,
           text: [
-            month.grammar ? `Grammatika: ${month.grammar.title}. ${month.grammar.text}` : '',
-            `So'zlar: ${(month.vocab || []).map((v) => `${v[0]} — ${v[2]}`).join('; ')}`,
-            month.dialog ? `Dialog: ${month.dialog.lines.map((l) => l[1]).join(' ')}` : '',
+            month.grammar ? `${t('Grammatika')}: ${month.grammar.title}. ${month.grammar.text}` : '',
+            `${t("So'zlar")}: ${(month.vocab || []).map((v) => `${v[0]} — ${v[2]}`).join('; ')}`,
+            month.dialog ? `${t('Dialog')}: ${month.dialog.lines.map((l) => l[1]).join(' ')}` : '',
           ]
             .filter(Boolean)
             .join('\n'),
@@ -181,12 +180,17 @@ export default function MonthPage() {
       </Layout>
     );
   }
-  if (!data || !stepKey) return <Layout><PageLoading /></Layout>;
+  if (!data || !stepKey)
+    return (
+      <Layout>
+        <PageLoading />
+      </Layout>
+    );
   if (!month) {
     return (
       <Layout>
         <div className="page-narrow">
-          <div className="alert alert-error">Dars topilmadi.</div>
+          <div className="alert alert-error">{t('Dars topilmadi.')}</div>
         </div>
       </Layout>
     );
@@ -200,7 +204,7 @@ export default function MonthPage() {
   const prevStep = STEPS[stepIdx - 1];
   const nextStep = STEPS[stepIdx + 1];
   const lessonItems = [
-    ...(month.vocab || []).map(([w, t, m]) => ({ w, t: t !== w ? t : '', m })),
+    ...(month.vocab || []).map(([w, tr, m]) => ({ w, t: tr !== w ? tr : '', m })),
     ...(month.words || []).slice(0, 40).map(([w, m, s, st]) => ({ w, m, s, st })),
   ];
 
@@ -210,12 +214,12 @@ export default function MonthPage() {
         <>
           {month.tasks?.length > 0 && (
             <div className="card-soft p-4 mb-5">
-              <div className="text-[11px] font-bold uppercase tracking-wider muted mb-2">🎯 Dars maqsadlari</div>
+              <div className="text-[11px] font-bold uppercase tracking-wider muted mb-2">{t('🎯 Dars maqsadlari')}</div>
               <ul className="space-y-1.5">
-                {month.tasks.map((t, i) => (
+                {month.tasks.map((task, i) => (
                   <li key={i} className="flex gap-2 text-sm" style={{ color: 'var(--ink)' }}>
                     <span style={{ color: 'var(--gold)' }}>●</span>
-                    {t}
+                    {task}
                   </li>
                 ))}
               </ul>
@@ -265,11 +269,11 @@ export default function MonthPage() {
               ['cards', '🃏 Kartochkalar'],
             ].map(([k, l]) => (
               <button key={k} type="button" className={`chip ${vocabView === k ? 'chip-active' : ''}`} onClick={() => setVocabView(k)}>
-                {l}
+                {t(l)}
               </button>
             ))}
             <Link to={`/lang/${lang}/practice-full?source=lesson&lesson=${monthId}`} className="chip">
-              🔀 Mashq qilish
+              {t('🔀 Mashq qilish')}
             </Link>
           </div>
           {vocabView === 'cards' ? (
@@ -295,7 +299,12 @@ export default function MonthPage() {
             </div>
           )}
           <WordsExplorer words={month.words} phrases={month.phrases} lang={lang} wordCats={data.wordCats} phraseCats={data.phraseCats} />
-          <AiTaskWidget type="text" content={`Bu darsning so'zlari:\n${month.vocab.map(([w, , m]) => `${w} — ${m}`).join('\n')}`} lang={lang} title="So'zlar bo'yicha AI vazifa" />
+          <AiTaskWidget
+            type="text"
+            content={`${t("Bu darsning so'zlari:")}\n${month.vocab.map(([w, , m]) => `${w} — ${m}`).join('\n')}`}
+            lang={lang}
+            title="So'zlar bo'yicha AI vazifa"
+          />
         </>
       );
     }
@@ -331,7 +340,7 @@ export default function MonthPage() {
       return (
         <ol className="space-y-3">
           {month.exercises?.map((ex, i) => (
-            <ExerciseItem key={i} index={i} question={ex} answer={month.answers?.[i]} savedValue={saved[i]} onSave={(t) => saveAnswer(i, t)} lang={lang} />
+            <ExerciseItem key={i} index={i} question={ex} answer={month.answers?.[i]} savedValue={saved[i]} onSave={(text) => saveAnswer(i, text)} lang={lang} />
           ))}
         </ol>
       );
@@ -361,8 +370,8 @@ export default function MonthPage() {
           <div className="card-soft p-4 leading-relaxed text-[15px]" style={{ color: 'var(--ink)' }}>
             {month.teacher}
           </div>
-          <button type="button" className="btn btn-soft mt-4" onClick={() => ask(`"${month.topic}" mavzusi bo'yicha qanday qilib samarali mashq qilsam bo'ladi? Menga reja tuzib ber.`)}>
-            🤖 AI ustozdan shaxsiy reja so'rash
+          <button type="button" className="btn btn-soft mt-4" onClick={() => ask(t('"{topic}" mavzusi bo\'yicha qanday qilib samarali mashq qilsam bo\'ladi? Menga reja tuzib ber.', { topic: t(month.topic) }))}>
+            {t("🤖 AI ustozdan shaxsiy reja so'rash")}
           </button>
         </>
       );
@@ -372,27 +381,27 @@ export default function MonthPage() {
     return (
       <div className="text-center py-4">
         <div className="text-5xl mb-3">{quizPassed ? '🏆' : '🧪'}</div>
-        <h3 className="h2 mb-2">{quizPassed ? 'Test topshirildi!' : 'Yakuniy test'}</h3>
+        <h3 className="h2 mb-2">{quizPassed ? t('Test topshirildi!') : t('Yakuniy test')}</h3>
         <p className="muted max-w-md mx-auto mb-5">
-          Dars so'zlari bo'yicha aralash test (tanlash, tinglash, yozish). Darsni yakunlash uchun kamida {QUIZ_PASS_THRESHOLD}% to'g'ri javob kerak.
+          {t("Dars so'zlari bo'yicha aralash test (tanlash, tinglash, yozish). Darsni yakunlash uchun kamida {n}% to'g'ri javob kerak.", { n: QUIZ_PASS_THRESHOLD })}
           {quizPct !== null && (
             <>
               <br />
-              Oxirgi natija: <b style={{ color: quizPassed ? 'var(--pine)' : 'var(--brick)' }}>{quizPct}%</b>
+              {t('Oxirgi natija:')} <b style={{ color: quizPassed ? 'var(--pine)' : 'var(--brick)' }}>{quizPct}%</b>
             </>
           )}
         </p>
         <div className="flex flex-wrap justify-center gap-2">
           <Link to={`/lang/${lang}/practice/${moduleId}/${monthId}`} className="btn btn-brand btn-lg">
-            {quizPct === null ? 'Testni boshlash →' : '↺ Qayta topshirish'}
+            {quizPct === null ? t('Testni boshlash →') : t('↺ Qayta topshirish')}
           </Link>
           {done && nextLesson && (
             <button type="button" className="btn btn-primary btn-lg" onClick={() => navigate(`/lang/${lang}/month/${nextLesson.moduleId}/${nextLesson.id}`)}>
-              Keyingi dars: {nextLesson.topic} →
+              {t('Keyingi dars: {topic} →', { topic: t(nextLesson.topic) })}
             </button>
           )}
         </div>
-        {done && <div className="alert alert-success mt-6 inline-block">🎉 Dars to'liq yakunlandi — keyingi dars ochildi!</div>}
+        {done && <div className="alert alert-success mt-6 inline-block">{t("🎉 Dars to'liq yakunlandi — keyingi dars ochildi!")}</div>}
       </div>
     );
   }
@@ -401,18 +410,18 @@ export default function MonthPage() {
     <Layout>
       <div className="page" ref={topRef}>
         <Link to={`/lang/${lang}`} className="back-link mb-3">
-          ← {mod.title}
+          ← {t(mod.title)}
         </Link>
 
         <div className="flex flex-wrap items-start gap-4 mb-5">
           <div className="flex-1 min-w-[220px]">
             <div className="eyebrow mb-1">
-              {data.meta.flag} {month.label}
+              {data.meta.flag} {t(month.label)}
             </div>
-            <h1 className="h1">{month.topic}</h1>
+            <h1 className="h1">{t(month.topic)}</h1>
           </div>
           <button type="button" className="btn btn-soft" onClick={() => ask('')}>
-            🤖 Ustozdan so'rash
+            {t("🤖 Ustozdan so'rash")}
           </button>
         </div>
         <div className="flex items-center gap-3 mb-4">
@@ -446,7 +455,7 @@ export default function MonthPage() {
                   {isDone ? '✓' : unlocked ? i + 1 : '🔒'}
                 </span>
                 <span className="text-sm font-bold whitespace-nowrap">
-                  {s.icon} {s.label}
+                  {s.icon} {t(s.label)}
                 </span>
               </button>
             );
@@ -455,7 +464,7 @@ export default function MonthPage() {
 
         {materials.length > 0 && (
           <div className="card-soft p-3 mb-5 flex flex-wrap items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider muted mr-1">📎 Dars materiallari:</span>
+            <span className="text-xs font-bold uppercase tracking-wider muted mr-1">{t('📎 Dars materiallari:')}</span>
             {materials.map((m) => (
               <button key={m.id} type="button" className="chip !py-1.5" onClick={() => setOpenMaterial(m)}>
                 {MEDIA_META[m.kind]?.icon} {m.title}
@@ -467,7 +476,7 @@ export default function MonthPage() {
         <div className="card p-4 sm:p-6 anim-rise" key={stepKey}>
           <div className="flex items-center gap-2 mb-4">
             <span className="text-2xl">{step.icon}</span>
-            <h2 className="h2 flex-1">{step.label}</h2>
+            <h2 className="h2 flex-1">{t(step.label)}</h2>
             <span className="text-xs muted">
               {stepIdx + 1}/{STEPS.length}
             </span>
@@ -481,11 +490,11 @@ export default function MonthPage() {
             <div className="flex gap-2 max-w-[1120px] mx-auto">
               {prevStep && (
                 <button type="button" className="btn btn-ghost btn-lg" onClick={() => goto(prevStep.key)}>
-                  ←<span className="hidden sm:inline"> {prevStep.label}</span>
+                  ←<span className="hidden sm:inline"> {t(prevStep.label)}</span>
                 </button>
               )}
               <button type="button" className="btn btn-brand btn-lg flex-1" onClick={() => completeAndNext(stepKey)}>
-                {reviewFlags[stepKey] ? `Keyingisi: ${nextStep?.label} →` : `✓ ${step.done}, keyingisi →`}
+                {reviewFlags[stepKey] ? t('Keyingisi: {name} →', { name: t(nextStep?.label) }) : t('✓ {done}, keyingisi →', { done: t(step.done) })}
               </button>
             </div>
           </div>

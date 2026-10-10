@@ -5,6 +5,7 @@ import AiTaskWidget from '../components/AiTaskWidget.jsx';
 import { DialogView } from '../components/LessonExtras.jsx';
 import { PageHeader, PageLoading } from '../components/ui.jsx';
 import { useContent } from '../lib/hooks.js';
+import { t } from '../i18n/index.js';
 
 export default function DialogsPage() {
   const { lang } = useParams();
@@ -13,6 +14,7 @@ export default function DialogsPage() {
   const [filter, setFilter] = useState('all');
   const [query, setQuery] = useState('');
 
+  // `sub` o'zbekcha saqlanadi; chiqarishda t() bilan o'giriladi
   const all = useMemo(() => {
     if (!data) return [];
     const list = [];
@@ -29,7 +31,9 @@ export default function DialogsPage() {
     return list;
   }, [data]);
 
-  const filtered = all.filter((d) => (filter === 'all' || d.group === filter) && (!query.trim() || `${d.title} ${d.sub} ${d.lines.map((l) => l[1]).join(' ')}`.toLowerCase().includes(query.trim().toLowerCase())));
+  const filtered = all.filter(
+    (d) => (filter === 'all' || d.group === filter) && (!query.trim() || `${d.title} ${d.sub} ${d.lines.map((l) => l[1]).join(' ')}`.toLowerCase().includes(query.trim().toLowerCase()))
+  );
 
   if (error) {
     return (
@@ -40,7 +44,12 @@ export default function DialogsPage() {
       </Layout>
     );
   }
-  if (!data) return <Layout><PageLoading /></Layout>;
+  if (!data)
+    return (
+      <Layout>
+        <PageLoading />
+      </Layout>
+    );
 
   const counts = { all: all.length, course: all.filter((d) => d.group === 'course').length, extra: all.filter((d) => d.group === 'extra').length, uploaded: all.filter((d) => d.group === 'uploaded').length };
 
@@ -48,10 +57,10 @@ export default function DialogsPage() {
     <Layout>
       <div className="page-narrow">
         <PageHeader
-          back={{ to: `/lang/${lang}`, label: data.meta.title }}
-          eyebrow={`${data.meta.flag} Dialog mashqi`}
-          title={`Barcha dialoglar · ${all.length}`}
-          subtitle="Dialogni ovoz bilan tinglang, har bir gapni takrorlang va AI ustoz beradigan vazifani bajaring."
+          back={{ to: `/lang/${lang}`, label: t(data.meta.title) }}
+          eyebrow={`${data.meta.flag} ${t('Dialog mashqi')}`}
+          title={t('Barcha dialoglar · {n}', { n: all.length })}
+          subtitle={t('Dialogni ovoz bilan tinglang, har bir gapni takrorlang va AI ustoz beradigan vazifani bajaring.')}
         />
         <div className="tabs mb-3">
           {[
@@ -62,12 +71,12 @@ export default function DialogsPage() {
           ].map(([k, l]) =>
             counts[k] || k === 'all' ? (
               <button key={k} type="button" className={`chip ${filter === k ? 'chip-active' : ''}`} onClick={() => setFilter(k)}>
-                {l} · {counts[k]}
+                {t(l)} · {counts[k]}
               </button>
             ) : null
           )}
         </div>
-        <input className="input mb-4" placeholder="🔍 Dialog qidirish…" value={query} onChange={(e) => setQuery(e.target.value)} />
+        <input className="input mb-4" placeholder={t('🔍 Dialog qidirish…')} value={query} onChange={(e) => setQuery(e.target.value)} />
 
         <div className="space-y-3">
           {filtered.map((d, i) => {
@@ -83,7 +92,7 @@ export default function DialogsPage() {
                       {d.title}
                     </div>
                     <div className="text-xs muted truncate">
-                      {d.sub} · {d.lines.length} qator
+                      {t(d.sub)} · {t('{n} qator', { n: d.lines.length })}
                     </div>
                   </div>
                   <span className="muted text-sm">{isOpen ? '▲' : '▼'}</span>
@@ -91,13 +100,13 @@ export default function DialogsPage() {
                 {isOpen && (
                   <div className="px-4 pb-5 border-t pt-4" style={{ borderColor: 'var(--line)' }}>
                     <DialogView lines={d.lines} lang={lang} audioUrl={d.audioUrl} />
-                    <AiTaskWidget type="dialog" content={d.lines.map(([s, l, t]) => `${s}: ${l}${t ? ` (${t})` : ''}`).join('\n')} lang={lang} title="Dialog bo'yicha AI vazifa" />
+                    <AiTaskWidget type="dialog" content={d.lines.map(([s, l, tr]) => `${s}: ${l}${tr ? ` (${tr})` : ''}`).join('\n')} lang={lang} title="Dialog bo'yicha AI vazifa" />
                   </div>
                 )}
               </div>
             );
           })}
-          {filtered.length === 0 && <div className="text-center muted py-12">Dialog topilmadi.</div>}
+          {filtered.length === 0 && <div className="text-center muted py-12">{t('Dialog topilmadi.')}</div>}
         </div>
       </div>
     </Layout>

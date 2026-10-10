@@ -8,14 +8,16 @@ import { useContent } from '../lib/hooks.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { flattenMonths, getMistakeBank, withActivity, withPracticeSession } from '../lib/lessonProgress.js';
 import { MODES, dedupeItems } from '../lib/practice.js';
+import { t } from '../i18n/index.js';
 
 const COUNTS = [10, 20, 30, 50, 100, 0];
 
+// Matnlar o'zbekcha kalit sifatida saqlanadi va chiqarishda t() bilan o'giriladi.
 const SOURCES = [
-  { key: 'all', icon: '🌍', label: "Hamma so'zlar", sub: 'Kurs + 2161 so\'z + qo\'shimcha lug\'at' },
+  { key: 'all', icon: '🌍', label: "Hamma so'zlar", sub: "Kurs + 2161 so'z + qo'shimcha lug'at" },
   { key: 'course', icon: '📘', label: 'Kurs darslari', sub: "Darslardagi asosiy so'zlar" },
   { key: 'lesson', icon: '🎯', label: 'Bitta dars', sub: "Tanlangan dars so'zlari" },
-  { key: 'wordcat', icon: '🗂️', label: 'Mavzu bo\'yicha', sub: "24 mavzu (Word fayldan)" },
+  { key: 'wordcat', icon: '🗂️', label: "Mavzu bo'yicha", sub: "24 mavzu (Word fayldan)" },
   { key: 'phrases', icon: '💬', label: 'Iboralar', sub: '297 ta foydali ibora' },
   { key: 'dict', icon: '📖', label: "Qo'shimcha lug'at", sub: 'Kategoriyalar va yuklanganlar' },
   { key: 'mistakes', icon: '🩹', label: 'Xatolarim', sub: "Avval xato qilgan so'zlar" },
@@ -66,13 +68,14 @@ export default function VocabPracticeFull() {
   const pools = useMemo(() => {
     if (!data) return null;
     const course = [];
-    data.modules.forEach((mod) => mod.months.forEach((m) => (m.vocab || []).forEach(([w, t, mm]) => course.push({ w, t: t !== w ? t : '', m: mm }))));
+    data.modules.forEach((mod) => mod.months.forEach((m) => (m.vocab || []).forEach(([w, tr, mm]) => course.push({ w, t: tr !== w ? tr : '', m: mm }))));
     const wordbank = (data.wordbank || []).map((c) => c.rows.map(([w, m, s, st]) => ({ w, m, s, st })));
     const phrasebank = (data.phrasebank || []).map((c) => c.rows.map(([w, m, s, st]) => ({ w, m, s, st })));
-    const dict = (data.dictExtra || []).map((c) => c.words.map(([w, t, m]) => ({ w, t: t !== w ? t : '', m })));
+    const dict = (data.dictExtra || []).map((c) => c.words.map(([w, tr, m]) => ({ w, t: tr !== w ? tr : '', m })));
     return { course, wordbank, phrasebank, dict };
   }, [data]);
 
+  // `label` — o'zbekcha (progress tarixida shu holda saqlanadi); ekranda t(label) bilan o'giriladi
   const { items, label } = useMemo(() => {
     if (!pools) return { items: [], label: '' };
     switch (source) {
@@ -82,7 +85,11 @@ export default function VocabPracticeFull() {
         const m = flat.find((x) => x.id === lessonId);
         if (!m) return { items: [], label: 'Dars' };
         return {
-          items: [...(m.vocab || []).map(([w, t, mm]) => ({ w, t: t !== w ? t : '', m: mm })), ...(m.words || []).map(([w, mm, s, st]) => ({ w, m: mm, s, st })), ...(m.phrases || []).map(([w, mm, s, st]) => ({ w, m: mm, s, st }))],
+          items: [
+            ...(m.vocab || []).map(([w, tr, mm]) => ({ w, t: tr !== w ? tr : '', m: mm })),
+            ...(m.words || []).map(([w, mm, s, st]) => ({ w, m: mm, s, st })),
+            ...(m.phrases || []).map(([w, mm, s, st]) => ({ w, m: mm, s, st })),
+          ],
           label: `${m.label}: ${m.topic}`,
         };
       }
@@ -144,7 +151,12 @@ export default function VocabPracticeFull() {
       </Layout>
     );
   }
-  if (!data || !pools) return <Layout><PageLoading /></Layout>;
+  if (!data || !pools)
+    return (
+      <Layout>
+        <PageLoading />
+      </Layout>
+    );
 
   if (phase === 'play') {
     return (
@@ -157,7 +169,7 @@ export default function VocabPracticeFull() {
             lang={lang}
             mode={mode}
             count={retryItems ? 0 : count}
-            title={retryItems ? `Xatolar ustida ishlash` : label}
+            title={retryItems ? 'Xatolar ustida ishlash' : label}
             source={retryItems ? 'mistakes' : source}
             label={retryItems ? `Xatolar ustida: ${label}` : label}
             onFinish={onFinish}
@@ -173,7 +185,7 @@ export default function VocabPracticeFull() {
       <Layout>
         <div className="page-narrow">
           <button type="button" className="back-link mb-4" onClick={() => setPhase('setup')}>
-            ← Mashq sozlamalari
+            {t('← Mashq sozlamalari')}
           </button>
           <PracticeResult
             record={result}
@@ -195,16 +207,16 @@ export default function VocabPracticeFull() {
     <Layout>
       <div className="page">
         <PageHeader
-          back={{ to: `/lang/${lang}`, label: data.meta.title }}
-          eyebrow="Lug'at mashqi"
-          title="Mashqni sozlang"
-          subtitle="Manba, savol turi va sonini tanlang. Istalgan payt «To'xtatish» tugmasini bossangiz — natija va xatolaringiz alohida ko'rsatiladi."
+          back={{ to: `/lang/${lang}`, label: t(data.meta.title) }}
+          eyebrow={t("Lug'at mashqi")}
+          title={t('Mashqni sozlang')}
+          subtitle={t("Manba, savol turi va sonini tanlang. Istalgan payt «To'xtatish» tugmasini bossangiz — natija va xatolaringiz alohida ko'rsatiladi.")}
         />
 
         <div className="grid lg:grid-cols-[1.4fr_1fr] gap-6">
           <div className="space-y-6">
             <section>
-              <div className="label">1. So'zlar manbasi</div>
+              <div className="label">{t("1. So'zlar manbasi")}</div>
               <div className="grid sm:grid-cols-2 gap-2.5">
                 {SOURCES.map((s) => {
                   const active = source === s.key;
@@ -224,10 +236,10 @@ export default function VocabPracticeFull() {
                       <span className="text-2xl">{s.icon}</span>
                       <div className="min-w-0">
                         <div className="font-bold text-sm" style={{ color: 'var(--ink)' }}>
-                          {s.label}
+                          {t(s.label)}
                           {s.key === 'mistakes' && <span className="badge badge-brick ml-1.5">{mistakes.length}</span>}
                         </div>
-                        <div className="text-xs muted truncate">{s.sub}</div>
+                        <div className="text-xs muted truncate">{t(s.sub)}</div>
                       </div>
                     </button>
                   );
@@ -238,7 +250,7 @@ export default function VocabPracticeFull() {
                 <select className="select mt-3" value={lessonId} onChange={(e) => setLessonId(e.target.value)}>
                   {flat.map((m) => (
                     <option key={m.id} value={m.id}>
-                      {m.moduleTitle} · {m.label} · {m.topic}
+                      {t(m.moduleTitle)} · {t(m.label)} · {t(m.topic)}
                     </option>
                   ))}
                 </select>
@@ -247,27 +259,27 @@ export default function VocabPracticeFull() {
                 <select className="select mt-3" value={wordCat} onChange={(e) => setWordCat(Number(e.target.value))}>
                   {(data.wordbank || []).map((c, i) => (
                     <option key={i} value={i}>
-                      {i + 1}. {c.title} ({c.rows.length})
+                      {i + 1}. {t(c.title)} ({c.rows.length})
                     </option>
                   ))}
                 </select>
               )}
               {source === 'phrases' && (
                 <select className="select mt-3" value={phraseCat} onChange={(e) => setPhraseCat(Number(e.target.value))}>
-                  <option value={-1}>Barcha iboralar</option>
+                  <option value={-1}>{t('Barcha iboralar')}</option>
                   {(data.phrasebank || []).map((c, i) => (
                     <option key={i} value={i}>
-                      {i + 1}. {c.title} ({c.rows.length})
+                      {i + 1}. {t(c.title)} ({c.rows.length})
                     </option>
                   ))}
                 </select>
               )}
               {source === 'dict' && (
                 <select className="select mt-3" value={dictCat} onChange={(e) => setDictCat(Number(e.target.value))}>
-                  <option value={-1}>Barcha kategoriyalar</option>
+                  <option value={-1}>{t('Barcha kategoriyalar')}</option>
                   {(data.dictExtra || []).map((c, i) => (
                     <option key={i} value={i}>
-                      {c.cat} ({c.words.length})
+                      {t(c.cat)} ({c.words.length})
                     </option>
                   ))}
                 </select>
@@ -275,7 +287,7 @@ export default function VocabPracticeFull() {
             </section>
 
             <section>
-              <div className="label">2. Savol turi</div>
+              <div className="label">{t('2. Savol turi')}</div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                 {Object.entries(MODES).map(([k, m]) => (
                   <button
@@ -296,11 +308,11 @@ export default function VocabPracticeFull() {
             </section>
 
             <section>
-              <div className="label">3. Savollar soni</div>
+              <div className="label">{t('3. Savollar soni')}</div>
               <div className="tabs">
                 {COUNTS.map((c) => (
                   <button key={c} type="button" className={`chip ${count === c ? 'chip-active' : ''}`} onClick={() => setCount(c)}>
-                    {c === 0 ? `Barchasi (${uniqueCount})` : c}
+                    {c === 0 ? t('Barchasi ({n})', { n: uniqueCount }) : c}
                   </button>
                 ))}
               </div>
@@ -309,18 +321,18 @@ export default function VocabPracticeFull() {
 
           <aside className="space-y-4">
             <div className="card p-5 lg:sticky lg:top-6">
-              <div className="eyebrow mb-1">Tanlangan</div>
-              <div className="h2 mb-1">{label}</div>
+              <div className="eyebrow mb-1">{t('Tanlangan')}</div>
+              <div className="h2 mb-1">{t(label)}</div>
               <div className="text-sm muted mb-4">
-                {uniqueCount} ta so'z · {MODES[mode].label} · {count === 0 ? uniqueCount : Math.min(count, uniqueCount)} ta savol
+                {t("{a} ta so'z · {mode} · {b} ta savol", { a: uniqueCount, mode: MODES[mode].label, b: count === 0 ? uniqueCount : Math.min(count, uniqueCount) })}
               </div>
               <button type="button" className="btn btn-brand btn-lg btn-block" disabled={uniqueCount < 2} onClick={start}>
-                ▶ Mashqni boshlash
+                {t('▶ Mashqni boshlash')}
               </button>
-              {uniqueCount < 2 && <div className="help">Bu manbada mashq uchun yetarli so'z yo'q.</div>}
+              {uniqueCount < 2 && <div className="help">{t("Bu manbada mashq uchun yetarli so'z yo'q.")}</div>}
               <div className="divider my-4" />
               <Link to="/results" className="btn btn-ghost btn-block">
-                📊 Natijalar va xatolar tarixi
+                {t('📊 Natijalar va xatolar tarixi')}
               </Link>
             </div>
           </aside>

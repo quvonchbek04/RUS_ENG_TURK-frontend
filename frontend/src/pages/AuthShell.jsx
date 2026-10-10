@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { isSupabaseConfigured } from '../lib/supabase.js';
+import { t } from '../i18n/index.js';
+import { LanguageSwitcher, Rich } from '../i18n/react.jsx';
 
 const FEATURES = [
   ['🇬🇧 🇷🇺 🇹🇷', "Uch til — o'zbek tilida tushuntirish bilan"],
-  ['📘', "A1 dan C1 gacha 33 ta bosqichma-bosqich dars"],
+  ['📘', 'A1 dan C1 gacha 33 ta bosqichma-bosqich dars'],
   ['🗂️', "2161 so'z va 297 ibora — misol gaplar bilan"],
   ['🤖', 'AI ustoz: vazifa beradi, javobingizni tekshiradi'],
 ];
@@ -22,15 +24,12 @@ export default function AuthShell({ eyebrow, title, children, footer }) {
           <span className="font-display text-2xl font-semibold">Til sayohati</span>
         </Link>
         <div className="relative">
-          <div className="font-display text-5xl font-semibold leading-[1.08] mb-5">
-            Har kuni bir bekat —<br />
-            yangi tilga sayohat.
-          </div>
+          <div className="font-display text-5xl font-semibold leading-[1.08] mb-5">{t('Har kuni bir bekat — yangi tilga sayohat.')}</div>
           <div className="space-y-3 max-w-md">
             {FEATURES.map(([icon, text]) => (
               <div key={text} className="flex items-center gap-3 rounded-2xl px-4 py-3" style={{ background: 'rgba(255,255,255,.12)' }}>
                 <span className="text-xl shrink-0">{icon}</span>
-                <span className="text-[15px] font-semibold">{text}</span>
+                <span className="text-[15px] font-semibold">{t(text)}</span>
               </div>
             ))}
           </div>
@@ -44,19 +43,22 @@ export default function AuthShell({ eyebrow, title, children, footer }) {
 
       <div className="flex items-center justify-center px-5 py-10 sm:p-12">
         <div className="w-full max-w-md">
-          <Link to="/" className="lg:hidden flex items-center gap-2.5 mb-8">
-            <img src="/icon.svg" alt="" className="w-10 h-10 rounded-xl" />
-            <span className="font-display text-xl font-semibold" style={{ color: 'var(--ink)' }}>
-              Til sayohati
-            </span>
-          </Link>
+          <div className="flex items-center justify-between gap-3 mb-8">
+            <Link to="/" className="lg:hidden flex items-center gap-2.5">
+              <img src="/icon.svg" alt="" className="w-10 h-10 rounded-xl" />
+              <span className="font-display text-xl font-semibold" style={{ color: 'var(--ink)' }}>
+                Til sayohati
+              </span>
+            </Link>
+            <LanguageSwitcher className="ml-auto" />
+          </div>
           <div className="mb-7">
             <div className="eyebrow mb-2">{eyebrow}</div>
             <h1 className="h1">{title}</h1>
           </div>
           {!isSupabaseConfigured && (
             <div className="alert alert-warn mb-4 text-sm">
-              ⚙️ Supabase ulanmagan: <b>VITE_SUPABASE_URL</b> va <b>VITE_SUPABASE_ANON_KEY</b> o'zgaruvchilarini sozlang (DEPLOY.md ga qarang).
+              <Rich text={t("⚙️ Supabase ulanmagan: **VITE_SUPABASE_URL** va **VITE_SUPABASE_ANON_KEY** o'zgaruvchilarini sozlang (DEPLOY.md ga qarang).")} />
             </div>
           )}
           {children}
@@ -90,7 +92,7 @@ export function PasswordInput({ value, onChange, placeholder = '•••••�
           input.type = input.type === 'password' ? 'text' : 'password';
           e.currentTarget.textContent = input.type === 'password' ? '👁' : '🙈';
         }}
-        aria-label="Parolni ko'rsatish"
+        aria-label={t("Parolni ko'rsatish")}
       >
         👁
       </button>
