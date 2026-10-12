@@ -5,11 +5,13 @@ import { LANG_OPTIONS, PageHeader, StatCard, formatDate } from '../components/ui
 import { api } from '../lib/api.js';
 import CodeField, { useCooldown } from '../components/CodeField.jsx';
 import MyPermissions from '../components/MyPermissions.jsx';
+import { InstallCard } from '../components/InstallApp.jsx';
 import TelegramVerify from '../components/TelegramVerify.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useTheme } from '../lib/hooks.js';
 import { getRemember, setRemember } from '../lib/supabase.js';
-import { getVoicesFor, speakSimple } from '../lib/tts.js';
+import { getVoicesFor, hasVoiceFor, speakSimple } from '../lib/tts.js';
+import { useVoicesVersion } from '../lib/hooks.js';
 import { countCompletedMonths, getStreak } from '../lib/lessonProgress.js';
 import { formatPhone, normalizePhone } from '../lib/identity.js';
 import { ROLE_LABEL } from '../lib/roles.js';
@@ -220,6 +222,7 @@ export default function ProfilePage() {
   const [pwMsg, setPwMsg] = useState(null);
   const [remember, setRem] = useState(getRemember());
   const [, force] = useState(0);
+  useVoicesVersion(); // telefonda ovozlar ro'yxati kech yuklanadi — yuklanganda qayta chiziladi
 
   async function saveName(e) {
     e.preventDefault();
@@ -284,6 +287,7 @@ export default function ProfilePage() {
 
         <div className="grid lg:grid-cols-2 gap-5">
           {isStaff && <MyPermissions user={user} onRefresh={refreshUser} />}
+          <InstallCard />
 
           <div className="card p-5">
             <div className="h2 mb-4">{t("👤 Shaxsiy ma'lumotlar")}</div>
@@ -336,6 +340,11 @@ export default function ProfilePage() {
                         {t('▶ Sinash')}
                       </button>
                     </div>
+                    {hasVoiceFor(l.key) === false && (
+                      <p className="text-xs mb-2 leading-relaxed" style={{ color: 'var(--brick)' }}>
+                        {t("Telefoningizda bu til uchun ovoz topilmadi. Android: Sozlamalar → Til va kiritish → Matnni ovozga aylantirish → Google → Ovoz ma'lumotlarini o'rnatish. iPhone: Sozlamalar → Maxsus imkoniyatlar → Ovozli kontent → Ovozlar.")}
+                      </p>
+                    )}
                     <div className="flex flex-wrap items-center gap-3">
                       <select className="select !w-auto flex-1 min-w-[160px] !py-2 text-sm" value={v.voiceURI || ''} onFocus={() => force((x) => x + 1)} onChange={(e) => setVoice(l.key, { voiceURI: e.target.value || null })}>
                         <option value="">{t('Standart ovoz')}</option>

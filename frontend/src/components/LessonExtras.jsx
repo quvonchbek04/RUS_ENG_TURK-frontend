@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import SpeakButton from './SpeakButton.jsx';
 import { readingHint } from '../lib/translit.js';
-import { getSpeechRecognition, langToBCP47, speakSequence, speakWithEnd } from '../lib/tts.js';
+import { getSpeechRecognition, langToBCP47, speakSequence, speakWithEnd, speechErrorText, stopSpeaking } from '../lib/tts.js';
 import { normalizeAnswer, shuffle } from '../lib/practice.js';
 import { withActivity } from '../lib/lessonProgress.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -81,6 +81,7 @@ function RolePlay({ lines, lang, showTr, onExit }) {
   const [scores, setScores] = useState({});
   const [heard, setHeard] = useState({});
   const [listening, setListening] = useState(false);
+  const [micError, setMicError] = useState('');
   const stopRef = useRef(null);
   const recRef = useRef(null);
   const SpeechRec = getSpeechRecognition();
@@ -115,9 +116,12 @@ function RolePlay({ lines, lang, showTr, onExit }) {
 
   function listen() {
     if (!SpeechRec) return;
+    stopSpeaking(); // telefonda o'qish ovozi mikrofon bilan to'qnashmasin
+    setMicError('');
     const rec = new SpeechRec();
     rec.lang = langToBCP47(lang);
     rec.interimResults = false;
+    rec.continuous = false;
     rec.maxAlternatives = 3;
     rec.onresult = (e) => {
       const alts = Array.from(e.results?.[0] || []).map((a) => a.transcript);
@@ -132,10 +136,18 @@ function RolePlay({ lines, lang, showTr, onExit }) {
       setScores((s) => ({ ...s, [step]: Math.max(0, best.sc) }));
     };
     rec.onend = () => setListening(false);
-    rec.onerror = () => setListening(false);
+    rec.onerror = (e) => {
+      setListening(false);
+      setMicError(speechErrorText(e?.error));
+    };
     recRef.current = rec;
     setListening(true);
-    rec.start();
+    try {
+      rec.start();
+    } catch {
+      setListening(false);
+      setMicError(speechErrorText('audio-capture'));
+    }
   }
 
   function restart(newRole = role) {
@@ -228,6 +240,7 @@ function RolePlay({ lines, lang, showTr, onExit }) {
         })}
       </div>
 
+      {micError && <div className="alert alert-warn text-sm mt-3">{micError}</div>}
       {!finished && step >= 0 && lines[step][0] === role && (
         <div className="flex flex-wrap gap-2 mt-4">
           {SpeechRec && (

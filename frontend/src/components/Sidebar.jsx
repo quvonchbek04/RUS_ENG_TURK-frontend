@@ -6,6 +6,7 @@ import { useCurrentLang, useTheme } from '../lib/hooks.js';
 import { MEDIA_META, MEDIA_ORDER } from '../lib/media.js';
 import { isAdminRole, getStreak } from '../lib/lessonProgress.js';
 import { can } from '../lib/roles.js';
+import { startInstall, useInstallState } from '../lib/install.js';
 import { t } from '../i18n/index.js';
 import { LanguageSwitcher } from '../i18n/react.jsx';
 import { LANG_OPTIONS } from './ui.jsx';
@@ -62,6 +63,7 @@ export default function Sidebar({ collapsed = false, onToggleCollapse, onNavigat
   const [theme, toggleTheme] = useTheme();
   const [counts, setCounts] = useState({});
   const [meta, setMeta] = useState(null);
+  const install = useInstallState();
 
   useEffect(() => {
     api.mediaCounts().then(setCounts).catch(() => {});
@@ -192,6 +194,7 @@ export default function Sidebar({ collapsed = false, onToggleCollapse, onNavigat
       <div className="border-t p-2 space-y-1" style={{ borderColor: 'var(--line)', paddingBottom: mobile ? 'calc(8px + env(safe-area-inset-bottom))' : undefined }}>
         {collapsed ? <LanguageSwitcher variant="cycle" className="mx-auto" /> : <LanguageSwitcher className="px-1 pb-1" />}
         <NavRow icon={theme === 'dark' ? '☀️' : '🌙'} label={theme === 'dark' ? t('Kunduzgi rejim') : t('Tungi rejim')} onClick={toggleTheme} collapsed={collapsed} />
+        {!install.installed && <NavRow icon="📲" label={t('Ilovani yuklab olish')} onClick={startInstall} collapsed={collapsed} />}
         {collapsed ? (
           <NavRow icon="👤" label={t('Profil')} to="/profile" active={is('/profile')} collapsed />
         ) : (

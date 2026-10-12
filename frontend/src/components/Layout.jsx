@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar.jsx';
 import AiTutorPanel from './AiTutorPanel.jsx';
+import VoiceHint from './VoiceHint.jsx';
 import { useCurrentLang } from '../lib/hooks.js';
 import { useTutor } from '../context/TutorContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -151,6 +152,7 @@ export default function Layout({ children, wide = false }) {
 
       <BottomNav onMenu={() => setMobileOpen(true)} />
       <TutorDrawer />
+      <VoiceHint />
       <KeyboardShortcut />
     </div>
   );

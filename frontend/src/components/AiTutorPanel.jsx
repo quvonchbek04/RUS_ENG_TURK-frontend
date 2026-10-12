@@ -4,7 +4,7 @@ import { useCurrentLang } from '../lib/hooks.js';
 import { useTutor } from '../context/TutorContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { readingHint } from '../lib/translit.js';
-import { langToBCP47 } from '../lib/tts.js';
+import { langToBCP47, speechErrorText, stopSpeaking } from '../lib/tts.js';
 import { t } from '../i18n/index.js';
 import { AiText, LANG_OPTIONS } from './ui.jsx';
 
@@ -83,6 +83,7 @@ export default function AiTutorPanel({ compact = false, onClose }) {
   const [status, setStatus] = useState(null);
   const [useContext, setUseContext] = useState(true);
   const [listening, setListening] = useState(false);
+  const [micError, setMicError] = useState('');
   const listRef = useRef(null);
   const inputRef = useRef(null);
   const recRef = useRef(null);
@@ -162,19 +163,30 @@ export default function AiTutorPanel({ compact = false, onClose }) {
       recRef.current?.stop();
       return;
     }
+    stopSpeaking(); // telefonda o'qish ovozi mikrofon bilan to'qnashmasin
+    setMicError('');
     const rec = new SpeechRec();
     rec.lang = langToBCP47(lang);
     rec.interimResults = false;
+    rec.continuous = false;
     rec.maxAlternatives = 1;
     rec.onresult = (e) => {
       const said = e.results?.[0]?.[0]?.transcript || '';
       setInput((v) => (v ? v + ' ' : '') + said);
     };
     rec.onend = () => setListening(false);
-    rec.onerror = () => setListening(false);
+    rec.onerror = (e) => {
+      setListening(false);
+      setMicError(speechErrorText(e?.error));
+    };
     recRef.current = rec;
     setListening(true);
-    rec.start();
+    try {
+      rec.start();
+    } catch {
+      setListening(false);
+      setMicError(speechErrorText('audio-capture'));
+    }
   }
 
   const statusBadge =
@@ -275,6 +287,7 @@ export default function AiTutorPanel({ compact = false, onClose }) {
             </button>
           ))}
         </div>
+        {micError && <div className="alert alert-warn text-xs mb-2">{micError}</div>}
         <div className="flex items-end gap-2">
           <textarea
             ref={inputRef}

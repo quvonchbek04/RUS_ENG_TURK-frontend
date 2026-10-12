@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import TtsReader from './TtsReader.jsx';
 import SpeakButton from './SpeakButton.jsx';
@@ -8,12 +9,44 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { readingHint } from '../lib/translit.js';
 import { t } from '../i18n/index.js';
 
-/** Bitta materialni turiga qarab ko'rsatadi (modal ichida yoki sahifada). */
-export default function MediaViewer({ item, onEnded, autoPlay = false }) {
+/** Bitta materialni turiga qarab ko'rsatadi (modal ichida yoki sahifada).
+ *  onPrev / onNext — pleylistda oldingi/keyingi (telefon qulfi ekranidagi boshqaruv tugmalari uchun). */
+export default function MediaViewer({ item, onEnded, autoPlay = false, onPrev, onNext }) {
   const { progress, updateProgress } = useAuth();
   const lang = item.lang === 'all' ? 'en' : item.lang;
   const voice = progress.voiceSettings?.[lang] || { rate: 0.9, voiceURI: null };
   const text = item.content?.text || '';
+  const mediaRef = useRef(null);
+  const isMedia = (item.kind === 'audio' || item.kind === 'video') && !!item.fileUrl;
+
+  // Pleylistda keyingi treklar telefonda ham o'zi boshlanishi uchun BIR XIL element qayta ishlatiladi (key yo'q):
+  // iPhone/Android yangi yaratilgan elementni foydalanuvchi bosmagan holda ijro etishga ruxsat bermaydi.
+  useEffect(() => {
+    const el = mediaRef.current;
+    if (!el || !isMedia || !autoPlay) return;
+    const p = el.play?.();
+    if (p && p.catch) p.catch(() => {}); // brauzer ruxsat bermasa — foydalanuvchi ▶ bosadi
+  }, [item.id, isMedia, autoPlay]);
+
+  // Telefon qulfi ekrani va bildirishnomada trek nomi va ⏮ ⏭ tugmalari (Media Session API)
+  useEffect(() => {
+    if (!isMedia || typeof navigator === 'undefined' || !('mediaSession' in navigator)) return undefined;
+    try {
+      navigator.mediaSession.metadata = new window.MediaMetadata({ title: item.title || '', artist: 'Til sayohati', album: item.kind === 'video' ? 'Video' : 'Audio' });
+      navigator.mediaSession.setActionHandler('previoustrack', onPrev || null);
+      navigator.mediaSession.setActionHandler('nexttrack', onNext || null);
+    } catch {
+      /* ba'zi brauzerlar qo'llab-quvvatlamaydi */
+    }
+    return () => {
+      try {
+        navigator.mediaSession.setActionHandler('previoustrack', null);
+        navigator.mediaSession.setActionHandler('nexttrack', null);
+      } catch {
+        /* e'tiborsiz */
+      }
+    };
+  }, [isMedia, item.id, item.title, item.kind, onPrev, onNext]);
 
   function setVoice(patch) {
     updateProgress((prev) => {
@@ -28,10 +61,10 @@ export default function MediaViewer({ item, onEnded, autoPlay = false }) {
       {item.description && <p className="muted mb-3">{item.description}</p>}
 
       {item.kind === 'audio' && item.fileUrl && (
-        <audio key={item.id} controls autoPlay={autoPlay} preload="metadata" src={item.fileUrl} onEnded={onEnded} className="w-full mb-4" />
+        <audio ref={mediaRef} controls autoPlay={autoPlay} preload="metadata" src={item.fileUrl} onEnded={onEnded} className="w-full mb-4" />
       )}
       {item.kind === 'video' && item.fileUrl && (
-        <video key={item.id} controls autoPlay={autoPlay} playsInline preload="metadata" src={item.fileUrl} onEnded={onEnded} className="w-full rounded-2xl mb-4 bg-black max-h-[70vh]" />
+        <video ref={mediaRef} controls autoPlay={autoPlay} playsInline preload="metadata" src={item.fileUrl} onEnded={onEnded} className="w-full rounded-2xl mb-4 bg-black max-h-[70vh]" />
       )}
       {item.kind === 'image' && item.fileUrl && <img src={item.fileUrl} alt={item.title} className="w-full rounded-2xl mb-4 object-contain max-h-[75vh]" />}
       {item.kind === 'news' && item.fileUrl && <img src={item.fileUrl} alt="" className="w-full rounded-2xl mb-4 object-cover max-h-80" />}

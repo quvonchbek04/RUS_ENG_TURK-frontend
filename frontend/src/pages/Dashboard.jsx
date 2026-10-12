@@ -16,6 +16,7 @@ import {
 } from '../lib/lessonProgress.js';
 import { AiText, ProgressBar, StatCard, formatDate } from '../components/ui.jsx';
 import { resultPct } from '../components/PracticeResult.jsx';
+import { InstallBanner } from '../components/InstallApp.jsx';
 import { getLang, getLocale, t } from '../i18n/index.js';
 
 const UZ_DAY_NAMES = ['Ya', 'Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh'];
@@ -70,6 +71,7 @@ export default function Dashboard() {
   return (
     <Layout>
       <div className="page-wide">
+        <InstallBanner />
         {/* Hero */}
         <div className="hero-card p-6 sm:p-9 mb-6">
           <div className="grid lg:grid-cols-[1.4fr_1fr] gap-6 items-center">

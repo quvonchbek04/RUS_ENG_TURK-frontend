@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { isSupabaseConfigured } from '../lib/supabase.js';
+import { InstallLink } from '../components/InstallApp.jsx';
 import { t } from '../i18n/index.js';
 import { LanguageSwitcher, Rich } from '../i18n/react.jsx';
 
@@ -63,6 +64,7 @@ export default function AuthShell({ eyebrow, title, children, footer }) {
           )}
           {children}
           {footer && <div className="mt-6 text-sm muted">{footer}</div>}
+          <InstallLink />
         </div>
       </div>
     </div>

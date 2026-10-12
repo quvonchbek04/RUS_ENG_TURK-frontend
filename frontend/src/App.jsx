@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext.jsx';
 import { TutorProvider } from './context/TutorContext.jsx';
 import { I18nProvider, LangBoundary } from './i18n/react.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import { InstallModal } from './components/InstallApp.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import ResetPassword from './pages/ResetPassword.jsx';
@@ -41,6 +42,7 @@ export default function App() {
         <TutorProvider>
           <BrowserRouter>
             <LangBoundary>
+              <InstallModal />
               <Suspense fallback={<Fallback />}>
                 <Routes>
                   <Route path="/login" element={<Login />} />

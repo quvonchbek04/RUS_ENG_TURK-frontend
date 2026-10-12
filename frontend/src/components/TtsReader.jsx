@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { buildWordTimings, getVoicesFor, isSpeechSupported, langToBCP47 } from '../lib/tts.js';
+import { buildWordTimings, getVoicesFor, hasVoiceFor, isSpeechSupported, speakChunks, stopSpeaking } from '../lib/tts.js';
+import { useVoicesVersion } from '../lib/hooks.js';
 import { t } from '../i18n/index.js';
 
 function escapeHtml(str) {
@@ -30,9 +31,14 @@ export default function TtsReader({ text, lang, rate, voiceURI, onRateChange, on
   const elapsedBeforePauseRef = useRef(0);
   const playStartTsRef = useRef(0);
   const rafRef = useRef(null);
+  const playingRef = useRef(false);
+  const stopRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [finished, setFinished] = useState(false);
-  const voices = useMemo(() => getVoicesFor(lang), [lang, isPlaying]);
+  const [failed, setFailed] = useState(false);
+  const voicesVersion = useVoicesVersion();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const voices = useMemo(() => getVoicesFor(lang), [lang, voicesVersion]);
 
   const html = useMemo(() => buildWordSpansHtml(text || ''), [text]);
 
@@ -67,18 +73,29 @@ export default function TtsReader({ text, lang, rate, voiceURI, onRateChange, on
     if (current && current.scrollIntoView) {
       current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
-    if (elapsed < totalMsRef.current) {
-      rafRef.current = requestAnimationFrame(tick);
-    }
+    // Ovoz o'qilayotgan ekan, taymer to'xtamaydi (har bir gap boshlanganda vaqt haqiqiy o'rnga moslab turiladi)
+    if (playingRef.current) rafRef.current = requestAnimationFrame(tick);
   }
 
-  function getRemainingText(elapsedMs) {
-    for (let i = 0; i < timingsRef.current.length; i++) {
-      if (timingsRef.current[i].end > elapsedMs) {
-        return text.slice(spansRef.current[i].dataset.start);
-      }
+  /** Matndagi belgi indeksiga to'g'ri keladigan taxminiy vaqt (ms). */
+  function timeAtChar(index) {
+    for (let i = 0; i < spansRef.current.length; i++) {
+      if (parseInt(spansRef.current[i].dataset.start, 10) >= index) return timingsRef.current[i]?.start ?? 0;
     }
-    return '';
+    return totalMsRef.current;
+  }
+
+  /** O'tgan vaqtga to'g'ri keladigan matn belgisi indeksi (davom ettirish uchun). */
+  function charAtElapsed(elapsedMs) {
+    for (let i = 0; i < timingsRef.current.length; i++) {
+      if (timingsRef.current[i].end > elapsedMs) return parseInt(spansRef.current[i].dataset.start, 10);
+    }
+    return text.length;
+  }
+
+  function halt() {
+    playingRef.current = false;
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
   }
 
   function start(resume) {
@@ -86,8 +103,7 @@ export default function TtsReader({ text, lang, rate, voiceURI, onRateChange, on
       alert(t("Kechirasiz, bu brauzer ovozli o'qishni qo'llab-quvvatlamaydi."));
       return;
     }
-    window.speechSynthesis.cancel();
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    halt();
 
     if (!resume) {
       spansRef.current.forEach((s) => s.classList.remove('read', 'current'));
@@ -100,61 +116,60 @@ export default function TtsReader({ text, lang, rate, voiceURI, onRateChange, on
       elapsedBeforePauseRef.current = 0;
     }
 
-    const chunk = resume ? getRemainingText(elapsedBeforePauseRef.current) : text;
-    if (resume && !chunk.trim()) {
+    const from = resume ? charAtElapsed(elapsedBeforePauseRef.current) : 0;
+    if (resume && !text.slice(from).trim()) {
       start(false);
       return;
     }
 
-    const u = new SpeechSynthesisUtterance(chunk);
-    u.lang = langToBCP47(lang);
-    u.rate = rate || 0.9;
-    if (voiceURI) {
-      const v = (window.speechSynthesis.getVoices() || []).find((x) => x.voiceURI === voiceURI);
-      if (v) u.voice = v;
-    }
-    u.onend = () => {
-      setIsPlaying(false);
-      setFinished(true);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      spansRef.current.forEach((s) => {
-        s.classList.remove('current');
-        s.classList.add('read');
-      });
-    };
-    u.onerror = () => {
-      setIsPlaying(false);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-
     setFinished(false);
+    setFailed(false);
     setIsPlaying(true);
+    playingRef.current = true;
     playStartTsRef.current = Date.now();
-    window.speechSynthesis.speak(u);
+    // Matn gaplarga bo'lib o'qiladi (telefonda uzun matn bitta bo'lak bo'lsa, o'rtada to'xtab qoladi)
+    stopRef.current = speakChunks(text, lang, {
+      rate: rate || 0.9,
+      voiceURI,
+      startAt: from,
+      onChunk: (startIdx) => {
+        // Ajratib ko'rsatish haqiqiy o'qilayotgan gapga moslab turiladi
+        elapsedBeforePauseRef.current = timeAtChar(startIdx);
+        playStartTsRef.current = Date.now();
+      },
+      onEnd: () => {
+        halt();
+        setIsPlaying(false);
+        setFinished(true);
+        spansRef.current.forEach((s) => {
+          s.classList.remove('current');
+          s.classList.add('read');
+        });
+      },
+      onError: () => {
+        halt();
+        setIsPlaying(false);
+        setFailed(true);
+      },
+    });
     rafRef.current = requestAnimationFrame(tick);
   }
 
   function pause() {
-    try {
-      window.speechSynthesis.cancel();
-    } catch {
-      /* noop */
-    }
+    stopRef.current?.();
     elapsedBeforePauseRef.current += Date.now() - playStartTsRef.current;
     setIsPlaying(false);
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    halt();
   }
 
   function stop() {
-    try {
-      window.speechSynthesis.cancel();
-    } catch {
-      /* noop */
-    }
+    stopRef.current?.();
+    stopRef.current = null;
+    stopSpeaking();
     setIsPlaying(false);
     setFinished(false);
     elapsedBeforePauseRef.current = 0;
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    halt();
     spansRef.current.forEach((s) => s.classList.remove('read', 'current'));
   }
 
@@ -162,6 +177,8 @@ export default function TtsReader({ text, lang, rate, voiceURI, onRateChange, on
     if (isPlaying) pause();
     else start(!finished && elapsedBeforePauseRef.current > 0);
   }
+
+  const noVoice = hasVoiceFor(lang) === false;
 
   return (
     <div>
@@ -205,6 +222,9 @@ export default function TtsReader({ text, lang, rate, voiceURI, onRateChange, on
           </select>
         )}
       </div>
+
+      {noVoice && <div className="alert alert-warn text-sm mb-3">{t("Telefoningizda bu til uchun ovoz o'rnatilmagan, shuning uchun o'qish noto'g'ri chiqishi mumkin. Profil → Talaffuz ovozi bo'limida ko'rsatma bor.")}</div>}
+      {failed && <div className="alert alert-warn text-sm mb-3">{t("Ovozli o'qish boshlanmadi. Ekranga bir marta bosib, qayta urinib ko'ring yoki telefoningiz ovozi (ovoz balandligi, «Ovozsiz» rejimi) ni tekshiring.")}</div>}
 
       <div
         ref={containerRef}

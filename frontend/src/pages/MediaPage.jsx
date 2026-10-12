@@ -211,6 +211,8 @@ export default function MediaPage() {
                   <MediaViewer
                     item={nowPlaying}
                     autoPlay={current > 0}
+                    onPrev={current > 0 ? () => setCurrent((c) => Math.max(0, c - 1)) : undefined}
+                    onNext={current + 1 < list.length ? () => setCurrent((c) => Math.min(list.length - 1, c + 1)) : undefined}
                     onEnded={() => {
                       markDone(nowPlaying);
                       if (continuous && current + 1 < list.length) setCurrent((c) => c + 1);

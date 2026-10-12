@@ -1,8 +1,19 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { api } from './api.js';
+import { onVoicesChanged, primeVoices } from './tts.js';
 
 const LAST_LANG_KEY = 'til_last_lang';
+
+/** Telefonda ovozlar ro'yxati kech yuklanadi — yuklanganda komponent qayta chiziladi (qaytargan raqam har safar oshadi). */
+export function useVoicesVersion() {
+  const [version, setVersion] = useState(0);
+  useEffect(() => {
+    primeVoices();
+    return onVoicesChanged(() => setVersion((v) => v + 1));
+  }, []);
+  return version;
+}
 
 /** Joriy til: URL'dan (/lang/en/...) yoki oxirgi tanlangan tildan; standart — ingliz tili. */
 export function useCurrentLang() {
