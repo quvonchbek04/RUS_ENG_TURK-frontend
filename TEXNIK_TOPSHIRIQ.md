@@ -166,6 +166,17 @@ sahifalarni tez ochadi. Foydalanuvchi progressi bitta `progress.state` (jsonb) m
 | F-7.7 | Kalit bo'lmasa «oddiy rejim»: shablon vazifalar, namunaga solishtirib tekshiruv, chatda lug'atdan so'z qidirish |
 | F-7.8 | O'quvchi uchun kunlik so'rovlar limiti (standart 150, 0 = cheksiz); adminlarga cheklov yo'q |
 
+### 3.7a. Telefon: ilova sifatida o'rnatish va ovoz
+| № | Talab |
+|---|---|
+| F-7a.1 | **Ilovani yuklab olish:** saytda «📲 Ilovani yuklab olish» tugmasi (chap menyu, Profil kartasi, bosh sahifadagi taklif — faqat telefonda va ✕ bilan yopiladi, kirish sahifalari pastida). Brauzer `beforeinstallprompt` bersa (Android Chrome) — tugma to'g'ridan-to'g'ri o'rnatish oynasini ochadi (WebAPK); bermasa — platformaga mos ko'rsatmali oyna (iPhone Safari: Ulashish → Bosh ekranga qo'shish; Android: ⋮ menyusi; ilova ichidagi brauzer: Chrome/Safari'da oching; kompyuter). O'rnatilgach (`appinstalled` yoki `display-mode: standalone`) tugmalar yashiriladi |
+| F-7a.2 | **PWA talablari:** `manifest.webmanifest` (`id`, `start_url`, `scope`, `display: standalone`, `orientation: any`, oddiy va **maskable** ikonkalar 192/512, `shortcuts`); `sw.js` service worker — navigatsiya: tarmoq birinchi (oflayn bo'lsa keshdagi qobiq), `/assets/*`: kesh birinchi (HTML javob keshlanmaydi), `/content/*` va shriftlar: stale-while-revalidate; Supabase, POST va Range (audio/video) so'rovlariga tegilmaydi; versiya (`VERSION`) oshirilsa eski keshlar o'chadi. `netlify.toml`: `sw.js` va manifest uchun `no-cache` |
+| F-7a.3 | **Ixtiyoriy `.apk`:** `frontend/public/til-sayohati.apk` fayli joylansa (PWABuilder/Bubblewrap orqali yaratilgan, imzolangan), «Ilovani yuklab olish» oynasida Android uchun «📥 APK faylni yuklab olish» havolasi o'zi paydo bo'ladi (fayl mavjudligi HEAD so'rovi va Content-Type bilan tekshiriladi). Netlify faylni `application/vnd.android.package-archive` va `attachment` sifatida beradi |
+| F-7a.4 | **Ovozli o'qish (TTS) telefonda ishonchli:** matn gaplarga (≤ 180 belgi) bo'linib ketma-ket o'qiladi; o'qilayotgan obyektlar tugamaguncha xotirada ushlanadi (Chrome GC xatosi); qotib qolgan bo'lak taymer (watchdog) bilan o'tkazib yuboriladi; `cancel()` dan keyin qisqa kutish (Android); ovozlar ro'yxati kech yuklanishi (`voiceschanged`) hisobga olingan, mahalliy ovozlar afzal; iOS'da birinchi bosishda ovoz «ochiladi» (avtomatik o'qish uchun); so'zlarni ajratib ko'rsatish haqiqiy o'qilayotgan gapga moslab turiladi |
+| F-7a.5 | **Ovoz yo'q bo'lsa:** telefonda tanlangan til uchun ovoz o'rnatilmagan bo'lsa, pastda ko'rsatma chiqadi (Android/iPhone yo'li alohida), Profil → Talaffuz ovozi va matn o'qish sahifasida ham ogohlantirish bor |
+| F-7a.6 | **Mikrofon (ovozni tanish):** o'qish ovozi mikrofonni yoqishdan oldin to'xtatiladi; xatolar tushunarli xabarga aylantiriladi (ruxsat berilmagan, ovoz eshitilmadi, mikrofon band, internet yo'q, til qo'llab-quvvatlanmaydi); iPhone Safari'da ovozni tanish bo'lmasa, tugma ko'rsatilmaydi |
+| F-7a.7 | **Media pleylist:** audio/video elementi keyingi trekda qayta ishlatiladi (telefon avtomatik ijroga ruxsat berishi uchun); Media Session: qulf ekrani va bildirishnomada trek nomi, ⏮ ⏭ tugmalari |
+
 ### 3.8. Admin panel
 | № | Talab |
 |---|---|
@@ -361,6 +372,12 @@ Batafsil: `DEPLOY.md`. Qisqacha:
 | T-13 | Turk tili lug'at sahifasi | 2159 so'z va 297 ibora, mavzular bo'yicha |
 | T-14 | Telefonda (375 px) barcha sahifalar | Gorizontal aylantirish yo'q, pastki menyu ishlaydi, tugmalar qulay |
 | T-15 | O'quvchi admin sahifasiga kiradi (`/admin`) | «Ruxsat yo'q» |
+| T-16 | Android Chrome'da saytni ochib «📲 Ilovani yuklab olish» ni bosish | Brauzerning o'rnatish oynasi chiqadi; o'rnatilgach ilova ro'yxatda va bosh ekranda, brauzer panelisiz ochiladi; tugmalar yo'qoladi |
+| T-16a | iPhone Safari'da shu tugmani bosish; Telegram ichidagi brauzerda bosish | Mos ko'rsatmali oyna (Ulashish → Bosh ekranga qo'shish; «Chrome/Safari'da oching») |
+| T-17 | Telefonda uzun matnni (500+ so'z) «Ovoz bilan o'qish», pauza va davom ettirish | Oxirigacha uzilmasdan o'qiydi; yoritilgan so'z o'qilayotgan gapga mos; pauzadan keyin shu joydan davom etadi |
+| T-17a | Telefonda tanlangan til ovozi o'rnatilmagan holatda talaffuz tugmasini bosish | Pastda ovozni o'rnatish ko'rsatmasi chiqadi; Profilda ham ogohlantirish |
+| T-17b | Rolli o'qishda 🎙 ni bosish: mikrofon ruxsatini rad etish / jim turish | «Mikrofonga ruxsat berilmagan…» / «Ovoz eshitilmadi…» xabari; ilova qotib qolmaydi |
+| T-17c | Musiqa pleylistida «Ketma-ket ijro»: telefon ekrani qulflangan holatda treklar almashishi | Keyingi trek o'zi boshlanadi; qulf ekranida ⏮ ⏭ tugmalari |
 
 ---
 

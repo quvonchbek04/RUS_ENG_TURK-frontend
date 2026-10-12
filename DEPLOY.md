@@ -133,6 +133,40 @@ git push -u origin main
    pastida va Profil → Sozlamalarda. Menyular, tugmalar, xabarlar va AI ustoz javoblari tanlangan tilda chiqadi; dars
    materiallaridagi tushuntirishlar (grammatika matnlari, o'zbekcha tarjimalar) o'zbek tilida qoladi.
 
+## 4A. Telefonga ilova sifatida o'rnatish va APK
+
+**Saytning o'zida «📲 Ilovani yuklab olish» tugmasi bor** (chap menyuda, Profilda, bosh sahifada telefon uchun taklif sifatida,
+kirish sahifasi pastida). Bosilganda:
+- **Android (Chrome):** brauzerning «Ilovani o'rnatish» oynasi chiqadi → «O'rnatish». Chrome buni haqiqiy ilova (WebAPK) qilib
+  o'rnatadi: ilovalar ro'yxatida va bosh ekranda o'z belgisi bo'ladi, brauzer panelisiz to'liq ekranda ochiladi, oflayn ham ishga tushadi.
+- **iPhone (Safari):** Apple o'rnatish tugmasini bermaydi, shuning uchun ko'rsatmali oyna chiqadi (Ulashish ⬆️ → «Bosh ekranga qo'shish»).
+- **Telegram / Instagram ichidagi brauzer** o'rnatishni qo'llab-quvvatlamaydi — oyna "Chrome (Safari) da oching" deb eslatadi.
+
+Buning uchun sayt tayyorlangan: `manifest.webmanifest` (nomi, belgilar — oddiy va maskable, qisqa yo'llar), `sw.js` (service worker:
+ilova qobig'i va darslar kontentini keshlaydi; Supabase, kirish va audio/video'ga tegmaydi). Yangi versiya chiqarganda `sw.js` dagi
+`VERSION` ni oshirsangiz, telefonlardagi eski kesh tozalanadi.
+
+**Alohida `.apk` fayl kerak bo'lsa** (Play Market'siz tarqatish uchun) — bepul, 5 daqiqa, dasturlash shart emas:
+1. https://www.pwabuilder.com ni oching, sayt manzilingizni (`https://….netlify.app`) kiriting → **Start**.
+2. **Package for stores → Android → Generate package**. Paket nomi sifatida masalan `app.netlify.tilsayohati` kiriting (Netlify manzilingizga mos).
+   Yuklab olingan zip ichida `.apk` fayl, **imzo kaliti (`signing.keystore`) va parollari** bor — kalitni yo'qotmang (keyingi yangilanishlar shu kalit bilan imzolanadi).
+3. APK faylni `til-sayohati.apk` deb nomlab, GitHub'da `frontend/public/` papkasiga yuklang (Add file → Upload files). Netlify qayta quradi — shundan keyin
+   «Ilovani yuklab olish» oynasida Android uchun **«📥 APK faylni yuklab olish»** tugmasi o'zi paydo bo'ladi (fayl bo'lmasa, tugma ko'rinmaydi).
+4. APK brauzer panelisiz (to'liq ekran) ochilishi uchun PWABuilder bergan `assetlinks.json` ni GitHub'da `frontend/public/.well-known/assetlinks.json`
+   yo'liga **«Create new file»** orqali yarating (nuqta bilan boshlanadigan papkani «Upload» o'tkazib yuborishi mumkin). Bu bo'lmasa ham ilova ishlaydi,
+   faqat tepada manzil satri ko'rinib turadi.
+5. Telefonda APK'ni ochganda Android «noma'lum manba»ni yoqishni so'rashi mumkin — bu oddiy holat (Play Market'dan tashqari o'rnatish).
+
+## 4B. Telefonda ovoz (o'qish va mikrofon)
+
+- Matnni ovoz bilan o'qish, talaffuz tugmalari va dialog — **telefonning o'zidagi ovozli dvigatel** (Android: Google «Matnni ovozga aylantirish»,
+  iPhone: tizim ovozlari) orqali ishlaydi. Kerakli til ovozi telefonda yo'q bo'lsa, sayt buni o'zi aytadi va yo'l ko'rsatadi
+  (Android: Sozlamalar → Til va kiritish → Matnni ovozga aylantirish → Google → Ovoz ma'lumotlarini o'rnatish; iPhone: Sozlamalar → Maxsus imkoniyatlar → Ovozli kontent → Ovozlar).
+- Uzun matn gaplarga bo'lib o'qiladi (telefonda bitta uzun bo'lak o'rtada to'xtab qolardi), o'qilayotgan so'zlar ajratib ko'rsatiladi.
+- Mikrofon (rolli o'qish, AI ustozga ovoz bilan yozish) Android Chrome'da ishlaydi; iPhone Safari'da ovozni tanish yo'q (faqat o'qish ishlaydi).
+  Mikrofon xatolari (ruxsat berilmagan, ovoz eshitilmadi, internet yo'q) tushunarli xabar bilan ko'rsatiladi.
+- Musiqa/video pleylistida keyingi trek telefonda ham o'zi boshlanadi; qulf ekranida trek nomi va ⏮ ⏭ tugmalari ko'rinadi.
+
 ## 5. (Ixtiyoriy) Funksiyalarni avtomatik joylash
 
 `.github/workflows/deploy-functions.yml` — GitHub Secrets'ga `SUPABASE_ACCESS_TOKEN` va
@@ -168,6 +202,8 @@ node scripts/build-content.mjs
 | Raqam yozilganda kod Telegramga darhol kelmayapti | Raqam botda hali tasdiqlanmagan — foydalanuvchi bir marta botni havola orqali ochib, *Raqamni ulashish* ni bosishi kerak (Telegram bot birinchi bo'lib yoza olmaydi). Bot bloklangan bo'lsa ham shunday |
 | Telefon bilan kirib bo'lmayapti (email bilan esa kiradi) | `admin` funksiyasi joylanmagan yoki `0006_email_phone_login.sql` ishga tushirilmagan |
 | "Juda ko'p noto'g'ri urinish" | 15 daqiqada 10 marta noto'g'ri parol — 15 daqiqa kuting yoki admin parolni tiklasin |
+| «Ilovani yuklab olish» bosilganda faqat ko'rsatma chiqadi, o'rnatish oynasi chiqmayapti | Brauzer o'rnatishni taklif qilmagan: Android'da Chrome bo'lishi, sayt `https` bilan ochilgan va manifest/`sw.js` joylangan bo'lishi kerak (Netlify'da avtomatik). Telegram/Instagram ichidagi brauzerda emas, Chrome'da oching. Ilova allaqachon o'rnatilgan bo'lsa, tugma yo'qoladi |
+| Telefonda ovoz chiqmayapti / noto'g'ri tilda o'qiyapti | Telefonda shu til ovozi o'rnatilmagan (4B-band): sayt ko'rsatma chiqaradi. Telefon «Ovozsiz» rejimida emasligini va ovoz balandligini tekshiring; iPhone'da ekranga bir marta bosing |
 | Fayl yuklanmayapti, "bucket topilmadi" | `setup_full.sql` (yoki `0005_v2_platform.sql`) ishga tushirilmagan |
 | AI "Oddiy rejim" deb turibdi | Admin panelda faol API kalit yo'q yoki provayder "AI o'chiq" ga qo'yilgan |
 | Kalit sinovida 429 xato | Bepul limit tugagan — ertaga tiklanadi yoki yana bir kalit qo'shing |

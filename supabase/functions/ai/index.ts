@@ -16,6 +16,9 @@
 //
 // Eslatma: fayl ATAYLAB nisbiy importlarsiz — Dashboard orqali ham joylashtiriladi.
 
+// DIQQAT: matnlardagi barcha maxsus belgilar (kirill, emoji, tirnoqlar va h.k.) \uXXXX ko'rinishida yozilgan - fayl faqat ASCII.
+// Shu sababli uni Notepad/PowerShell/brauzerda ochib ko'chirsangiz ham buzilmaydi. \uXXXX qismlarini o'zgartirmang.
+
 import { createClient } from "npm:@supabase/supabase-js@2";
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 
@@ -289,7 +292,7 @@ function extractJson(raw: string): Record<string, unknown> | null {
 // PROMPTLAR
 // ---------------------------------------------------------------------------
 // Sayt (interfeys) tili — AI ustoz tushuntirishlarni shu tilda yozadi (standart: o'zbek)
-const UI_LANG_NAMES: Record<string, string> = { uz: "o'zbek tili", ru: "rus tili (Русский)", en: "ingliz tili (English)", tr: "turk tili (Türkçe)" };
+const UI_LANG_NAMES: Record<string, string> = { uz: "o'zbek tili", ru: "rus tili (\u0420\u0443\u0441\u0441\u043A\u0438\u0439)", en: "ingliz tili (English)", tr: "turk tili (T\u00FCrk\u00E7e)" };
 
 function tutorSystem(lang: string, cfg: AiConfig, extra = "", ui = "uz"): string {
   const L = LANG_NAMES[lang] || "chet tili";
@@ -298,14 +301,14 @@ function tutorSystem(lang: string, cfg: AiConfig, extra = "", ui = "uz"): string
     "Qoidalar:",
     "- Tushuntirishlarni o'zbek tilida (lotin yozuvida), sodda va aniq yoz.",
     `- ${L}dagi har bir misolga qavs ichida o'zbekcha tarjima ber.`,
-    lang === "ru" ? "- Rus so'zlari yoniga kerak bo'lsa lotincha o'qilishini ham yoz (masalan: спасибо — spasibo)." : "",
+    lang === "ru" ? "- Rus so'zlari yoniga kerak bo'lsa lotincha o'qilishini ham yoz (masalan: \u0441\u043F\u0430\u0441\u0438\u0431\u043E \u2014 spasibo)." : "",
     "- Xatolarni muloyim tuzat va nima uchun xato ekanini 1-2 gapda tushuntir.",
     "- Javob ixcham bo'lsin: odatda 3-10 qator. Ro'yxat uchun \"- \", ajratish uchun **qalin** ishlat; boshqa markdown (jadval, sarlavha #) ishlatma.",
     "- O'rinli bo'lsa, oxirida o'quvchiga bitta kichik mashq yoki savol taklif qil.",
     "- Til o'rganishga aloqasi yo'q savollarga juda qisqa javob berib, mavzuga qaytar.",
     cfg.tutorStyle ? `Administrator ko'rsatmasi: ${cfg.tutorStyle}` : "",
     ui !== "uz"
-      ? `MUHIM: o'quvchining sayt tili — ${UI_LANG_NAMES[ui] || ui}. Yuqoridagi "o'zbek tilida / o'zbekcha" degan qoidalarni shu tilga almashtir: ` +
+      ? `MUHIM: o'quvchining sayt tili \u2014 ${UI_LANG_NAMES[ui] || ui}. Yuqoridagi "o'zbek tilida / o'zbekcha" degan qoidalarni shu tilga almashtir: ` +
         `barcha tushuntirish, tarjima, maslahat va savollarni FAQAT ${UI_LANG_NAMES[ui] || ui}da yoz (o'zbek tilida yozma). JSON javoblarning kalit nomlari o'zgarmaydi.`
       : "",
     extra,
@@ -324,7 +327,7 @@ const TASK_KINDS: Record<string, string> = {
 
 function pickSentence(text: string): string {
   const parts = (text || "")
-    .split(/(?<=[.!?…])\s+|\n+/)
+    .split(/(?<=[.!?\u2026])\s+|\n+/)
     .map((s) => s.trim())
     .filter((s) => s.length > 12 && s.length < 220);
   if (!parts.length) return (text || "").slice(0, 140);
@@ -362,29 +365,29 @@ const MOCK_TEXT: Record<string, {
     hint: 'Javobingizni pastdagi maydonga yozing va "Tekshirish" tugmasini bosing.',
     note: " (Oddiy tekshiruv rejimi: to'liq AI baholash uchun administrator API kalit qo'shishi kerak.)",
     good: "Yaxshi! Javobingiz namunaga yaqin.",
-    far: "Javobingiz namunadan ancha farq qiladi — namunani ko'rib chiqing.",
-    short: "Javob juda qisqa — kengroq yozib ko'ring.",
+    far: "Javobingiz namunadan ancha farq qiladi \u2014 namunani ko'rib chiqing.",
+    short: "Javob juda qisqa \u2014 kengroq yozib ko'ring.",
     oneSentence: "Kamida bitta to'liq gap bilan javob bering.",
     accepted: "Javobingiz qabul qilindi. Davom eting!",
-    chat: "Hozircha AI ustoz to'liq rejimda ishlamayapti (administrator hali API kalit qo'shmagan). Shunga qaramay, men lug'atdan so'z qidirib bera olaman — so'zni yozing yoki pastdagi tezkor tugmalardan foydalaning.",
+    chat: "Hozircha AI ustoz to'liq rejimda ishlamayapti (administrator hali API kalit qo'shmagan). Shunga qaramay, men lug'atdan so'z qidirib bera olaman \u2014 so'zni yozing yoki pastdagi tezkor tugmalardan foydalaning.",
   },
   ru: {
-    langIn: { ru: "на русском языке", en: "на английском языке", tr: "на турецком языке" },
-    translate: (s) => `Переведите следующее предложение на русский язык: "${s}"`,
-    explain: (s) => `Кратко объясните смысл этого предложения своими словами: "${s}"`,
-    words: (s) => `Выделите в предложении не менее 3 слов и напишите их значение: "${s}"`,
-    similar: (L, s) => `Составьте похожее предложение о себе ${L}: "${s}"`,
-    continueDlg: (L) => `Продолжите этот диалог, написав ещё 2 реплики (${L}).`,
-    rewrite: (s) => `Перепишите эту реплику из диалога иначе, но с тем же смыслом: "${s}"`,
-    reply: (L) => `Что бы вы ответили, если бы были вторым участником разговора? (напишите ${L})`,
-    hint: 'Напишите ответ в поле ниже и нажмите «Проверить».',
-    note: " (Простой режим проверки: для полной оценки ИИ администратор должен добавить API-ключ.)",
-    good: "Хорошо! Ваш ответ близок к образцу.",
-    far: "Ваш ответ заметно отличается от образца — посмотрите образец.",
-    short: "Ответ слишком короткий — напишите подробнее.",
-    oneSentence: "Ответьте хотя бы одним полным предложением.",
-    accepted: "Ваш ответ принят. Продолжайте!",
-    chat: "Пока ИИ-учитель работает не в полном режиме (администратор ещё не добавил API-ключ). Тем не менее я могу найти слово в словаре — напишите слово или воспользуйтесь быстрыми кнопками ниже.",
+    langIn: { ru: "\u043D\u0430 \u0440\u0443\u0441\u0441\u043A\u043E\u043C \u044F\u0437\u044B\u043A\u0435", en: "\u043D\u0430 \u0430\u043D\u0433\u043B\u0438\u0439\u0441\u043A\u043E\u043C \u044F\u0437\u044B\u043A\u0435", tr: "\u043D\u0430 \u0442\u0443\u0440\u0435\u0446\u043A\u043E\u043C \u044F\u0437\u044B\u043A\u0435" },
+    translate: (s) => `\u041F\u0435\u0440\u0435\u0432\u0435\u0434\u0438\u0442\u0435 \u0441\u043B\u0435\u0434\u0443\u044E\u0449\u0435\u0435 \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u0435 \u043D\u0430 \u0440\u0443\u0441\u0441\u043A\u0438\u0439 \u044F\u0437\u044B\u043A: "${s}"`,
+    explain: (s) => `\u041A\u0440\u0430\u0442\u043A\u043E \u043E\u0431\u044A\u044F\u0441\u043D\u0438\u0442\u0435 \u0441\u043C\u044B\u0441\u043B \u044D\u0442\u043E\u0433\u043E \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u044F \u0441\u0432\u043E\u0438\u043C\u0438 \u0441\u043B\u043E\u0432\u0430\u043C\u0438: "${s}"`,
+    words: (s) => `\u0412\u044B\u0434\u0435\u043B\u0438\u0442\u0435 \u0432 \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u0438 \u043D\u0435 \u043C\u0435\u043D\u0435\u0435 3 \u0441\u043B\u043E\u0432 \u0438 \u043D\u0430\u043F\u0438\u0448\u0438\u0442\u0435 \u0438\u0445 \u0437\u043D\u0430\u0447\u0435\u043D\u0438\u0435: "${s}"`,
+    similar: (L, s) => `\u0421\u043E\u0441\u0442\u0430\u0432\u044C\u0442\u0435 \u043F\u043E\u0445\u043E\u0436\u0435\u0435 \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u0435 \u043E \u0441\u0435\u0431\u0435 ${L}: "${s}"`,
+    continueDlg: (L) => `\u041F\u0440\u043E\u0434\u043E\u043B\u0436\u0438\u0442\u0435 \u044D\u0442\u043E\u0442 \u0434\u0438\u0430\u043B\u043E\u0433, \u043D\u0430\u043F\u0438\u0441\u0430\u0432 \u0435\u0449\u0451 2 \u0440\u0435\u043F\u043B\u0438\u043A\u0438 (${L}).`,
+    rewrite: (s) => `\u041F\u0435\u0440\u0435\u043F\u0438\u0448\u0438\u0442\u0435 \u044D\u0442\u0443 \u0440\u0435\u043F\u043B\u0438\u043A\u0443 \u0438\u0437 \u0434\u0438\u0430\u043B\u043E\u0433\u0430 \u0438\u043D\u0430\u0447\u0435, \u043D\u043E \u0441 \u0442\u0435\u043C \u0436\u0435 \u0441\u043C\u044B\u0441\u043B\u043E\u043C: "${s}"`,
+    reply: (L) => `\u0427\u0442\u043E \u0431\u044B \u0432\u044B \u043E\u0442\u0432\u0435\u0442\u0438\u043B\u0438, \u0435\u0441\u043B\u0438 \u0431\u044B \u0431\u044B\u043B\u0438 \u0432\u0442\u043E\u0440\u044B\u043C \u0443\u0447\u0430\u0441\u0442\u043D\u0438\u043A\u043E\u043C \u0440\u0430\u0437\u0433\u043E\u0432\u043E\u0440\u0430? (\u043D\u0430\u043F\u0438\u0448\u0438\u0442\u0435 ${L})`,
+    hint: '\u041D\u0430\u043F\u0438\u0448\u0438\u0442\u0435 \u043E\u0442\u0432\u0435\u0442 \u0432 \u043F\u043E\u043B\u0435 \u043D\u0438\u0436\u0435 \u0438 \u043D\u0430\u0436\u043C\u0438\u0442\u0435 \u00AB\u041F\u0440\u043E\u0432\u0435\u0440\u0438\u0442\u044C\u00BB.',
+    note: " (\u041F\u0440\u043E\u0441\u0442\u043E\u0439 \u0440\u0435\u0436\u0438\u043C \u043F\u0440\u043E\u0432\u0435\u0440\u043A\u0438: \u0434\u043B\u044F \u043F\u043E\u043B\u043D\u043E\u0439 \u043E\u0446\u0435\u043D\u043A\u0438 \u0418\u0418 \u0430\u0434\u043C\u0438\u043D\u0438\u0441\u0442\u0440\u0430\u0442\u043E\u0440 \u0434\u043E\u043B\u0436\u0435\u043D \u0434\u043E\u0431\u0430\u0432\u0438\u0442\u044C API-\u043A\u043B\u044E\u0447.)",
+    good: "\u0425\u043E\u0440\u043E\u0448\u043E! \u0412\u0430\u0448 \u043E\u0442\u0432\u0435\u0442 \u0431\u043B\u0438\u0437\u043E\u043A \u043A \u043E\u0431\u0440\u0430\u0437\u0446\u0443.",
+    far: "\u0412\u0430\u0448 \u043E\u0442\u0432\u0435\u0442 \u0437\u0430\u043C\u0435\u0442\u043D\u043E \u043E\u0442\u043B\u0438\u0447\u0430\u0435\u0442\u0441\u044F \u043E\u0442 \u043E\u0431\u0440\u0430\u0437\u0446\u0430 \u2014 \u043F\u043E\u0441\u043C\u043E\u0442\u0440\u0438\u0442\u0435 \u043E\u0431\u0440\u0430\u0437\u0435\u0446.",
+    short: "\u041E\u0442\u0432\u0435\u0442 \u0441\u043B\u0438\u0448\u043A\u043E\u043C \u043A\u043E\u0440\u043E\u0442\u043A\u0438\u0439 \u2014 \u043D\u0430\u043F\u0438\u0448\u0438\u0442\u0435 \u043F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435.",
+    oneSentence: "\u041E\u0442\u0432\u0435\u0442\u044C\u0442\u0435 \u0445\u043E\u0442\u044F \u0431\u044B \u043E\u0434\u043D\u0438\u043C \u043F\u043E\u043B\u043D\u044B\u043C \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u0435\u043C.",
+    accepted: "\u0412\u0430\u0448 \u043E\u0442\u0432\u0435\u0442 \u043F\u0440\u0438\u043D\u044F\u0442. \u041F\u0440\u043E\u0434\u043E\u043B\u0436\u0430\u0439\u0442\u0435!",
+    chat: "\u041F\u043E\u043A\u0430 \u0418\u0418-\u0443\u0447\u0438\u0442\u0435\u043B\u044C \u0440\u0430\u0431\u043E\u0442\u0430\u0435\u0442 \u043D\u0435 \u0432 \u043F\u043E\u043B\u043D\u043E\u043C \u0440\u0435\u0436\u0438\u043C\u0435 (\u0430\u0434\u043C\u0438\u043D\u0438\u0441\u0442\u0440\u0430\u0442\u043E\u0440 \u0435\u0449\u0451 \u043D\u0435 \u0434\u043E\u0431\u0430\u0432\u0438\u043B API-\u043A\u043B\u044E\u0447). \u0422\u0435\u043C \u043D\u0435 \u043C\u0435\u043D\u0435\u0435 \u044F \u043C\u043E\u0433\u0443 \u043D\u0430\u0439\u0442\u0438 \u0441\u043B\u043E\u0432\u043E \u0432 \u0441\u043B\u043E\u0432\u0430\u0440\u0435 \u2014 \u043D\u0430\u043F\u0438\u0448\u0438\u0442\u0435 \u0441\u043B\u043E\u0432\u043E \u0438\u043B\u0438 \u0432\u043E\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0439\u0442\u0435\u0441\u044C \u0431\u044B\u0441\u0442\u0440\u044B\u043C\u0438 \u043A\u043D\u043E\u043F\u043A\u0430\u043C\u0438 \u043D\u0438\u0436\u0435.",
   },
   en: {
     langIn: { ru: "in Russian", en: "in English", tr: "in Turkish" },
@@ -395,32 +398,32 @@ const MOCK_TEXT: Record<string, {
     continueDlg: (L) => `Continue this dialogue by writing 2 more lines (${L}).`,
     rewrite: (s) => `Rewrite this line of the dialogue differently but with the same meaning: "${s}"`,
     reply: (L) => `What would you say if you were the second person in the conversation? (write ${L})`,
-    hint: 'Write your answer in the field below and press “Check”.',
+    hint: 'Write your answer in the field below and press \u201CCheck\u201D.',
     note: " (Basic checking mode: the administrator needs to add an API key for full AI scoring.)",
     good: "Good! Your answer is close to the sample.",
-    far: "Your answer differs a lot from the sample — have a look at the sample.",
-    short: "The answer is too short — try to write more.",
+    far: "Your answer differs a lot from the sample \u2014 have a look at the sample.",
+    short: "The answer is too short \u2014 try to write more.",
     oneSentence: "Please answer with at least one complete sentence.",
     accepted: "Your answer was accepted. Keep going!",
-    chat: "The AI tutor is not running in full mode yet (the administrator hasn't added an API key). I can still look words up in the dictionary — type a word or use the quick buttons below.",
+    chat: "The AI tutor is not running in full mode yet (the administrator hasn't added an API key). I can still look words up in the dictionary \u2014 type a word or use the quick buttons below.",
   },
   tr: {
-    langIn: { ru: "Rusça olarak", en: "İngilizce olarak", tr: "Türkçe olarak" },
-    translate: (s) => `Aşağıdaki cümleyi Türkçeye çevirin: "${s}"`,
-    explain: (s) => `Bu cümlenin anlamını kendi sözlerinizle kısaca açıklayın: "${s}"`,
-    words: (s) => `Cümleden en az 3 kelime seçip anlamlarını yazın: "${s}"`,
-    similar: (L, s) => `Buna benzer, kendinizle ilgili bir cümle kurun (${L}): "${s}"`,
-    continueDlg: (L) => `Bu diyaloğu 2 cümle daha yazarak sürdürün (${L}).`,
-    rewrite: (s) => `Diyalogdaki bu cümleyi farklı ama aynı anlamda yeniden yazın: "${s}"`,
-    reply: (L) => `Konuşmadaki ikinci kişi olsaydınız ne cevap verirdiniz? (${L} yazın)`,
-    hint: 'Cevabınızı aşağıdaki alana yazın ve «Kontrol et» düğmesine basın.',
-    note: " (Basit kontrol modu: tam YZ puanlaması için yöneticinin bir API anahtarı eklemesi gerekir.)",
-    good: "İyi! Cevabınız örneğe yakın.",
-    far: "Cevabınız örnekten oldukça farklı — örneğe bakın.",
-    short: "Cevap çok kısa — daha ayrıntılı yazmayı deneyin.",
-    oneSentence: "En az bir tam cümleyle cevap verin.",
-    accepted: "Cevabınız kabul edildi. Devam edin!",
-    chat: "YZ öğretmen henüz tam modda çalışmıyor (yönetici henüz API anahtarı eklemedi). Yine de sözlükte kelime arayabilirim — bir kelime yazın veya aşağıdaki hızlı düğmeleri kullanın.",
+    langIn: { ru: "Rus\u00E7a olarak", en: "\u0130ngilizce olarak", tr: "T\u00FCrk\u00E7e olarak" },
+    translate: (s) => `A\u015Fa\u011F\u0131daki c\u00FCmleyi T\u00FCrk\u00E7eye \u00E7evirin: "${s}"`,
+    explain: (s) => `Bu c\u00FCmlenin anlam\u0131n\u0131 kendi s\u00F6zlerinizle k\u0131saca a\u00E7\u0131klay\u0131n: "${s}"`,
+    words: (s) => `C\u00FCmleden en az 3 kelime se\u00E7ip anlamlar\u0131n\u0131 yaz\u0131n: "${s}"`,
+    similar: (L, s) => `Buna benzer, kendinizle ilgili bir c\u00FCmle kurun (${L}): "${s}"`,
+    continueDlg: (L) => `Bu diyalo\u011Fu 2 c\u00FCmle daha yazarak s\u00FCrd\u00FCr\u00FCn (${L}).`,
+    rewrite: (s) => `Diyalogdaki bu c\u00FCmleyi farkl\u0131 ama ayn\u0131 anlamda yeniden yaz\u0131n: "${s}"`,
+    reply: (L) => `Konu\u015Fmadaki ikinci ki\u015Fi olsayd\u0131n\u0131z ne cevap verirdiniz? (${L} yaz\u0131n)`,
+    hint: 'Cevab\u0131n\u0131z\u0131 a\u015Fa\u011F\u0131daki alana yaz\u0131n ve \u00ABKontrol et\u00BB d\u00FC\u011Fmesine bas\u0131n.',
+    note: " (Basit kontrol modu: tam YZ puanlamas\u0131 i\u00E7in y\u00F6neticinin bir API anahtar\u0131 eklemesi gerekir.)",
+    good: "\u0130yi! Cevab\u0131n\u0131z \u00F6rne\u011Fe yak\u0131n.",
+    far: "Cevab\u0131n\u0131z \u00F6rnekten olduk\u00E7a farkl\u0131 \u2014 \u00F6rne\u011Fe bak\u0131n.",
+    short: "Cevap \u00E7ok k\u0131sa \u2014 daha ayr\u0131nt\u0131l\u0131 yazmay\u0131 deneyin.",
+    oneSentence: "En az bir tam c\u00FCmleyle cevap verin.",
+    accepted: "Cevab\u0131n\u0131z kabul edildi. Devam edin!",
+    chat: "YZ \u00F6\u011Fretmen hen\u00FCz tam modda \u00E7al\u0131\u015Fm\u0131yor (y\u00F6netici hen\u00FCz API anahtar\u0131 eklemedi). Yine de s\u00F6zl\u00FCkte kelime arayabilirim \u2014 bir kelime yaz\u0131n veya a\u015Fa\u011F\u0131daki h\u0131zl\u0131 d\u00FC\u011Fmeleri kullan\u0131n.",
   },
 };
 
@@ -666,7 +669,7 @@ Deno.serve(async (req) => {
       if (limited) return limited;
       const ctx = body.context && typeof body.context === "object" ? body.context : null;
       const extra = ctx
-        ? `\nO'quvchi hozir shu material ustida ishlayapti — savollar shunga tegishli bo'lishi mumkin:\nMavzu: ${String(ctx.title || "").slice(0, 200)}\n"""${String(ctx.text || "").slice(0, 2500)}"""`
+        ? `\nO'quvchi hozir shu material ustida ishlayapti \u2014 savollar shunga tegishli bo'lishi mumkin:\nMavzu: ${String(ctx.title || "").slice(0, 200)}\n"""${String(ctx.text || "").slice(0, 2500)}"""`
         : "";
       try {
         const reply = await runAi(admin, cfg, { system: tutorSystem(lang, cfg, extra, ui), messages: history, temperature: 0.7 });

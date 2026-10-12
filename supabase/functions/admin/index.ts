@@ -14,6 +14,9 @@
 // Eslatma: fayl ATAYLAB hech qanday nisbiy importga ega emas — Supabase
 // Dashboard'dagi muharrir orqali (CLI'siz) joylashtirilganda ham ishlaydi.
 
+// DIQQAT: matnlardagi barcha maxsus belgilar (kirill, emoji, tirnoqlar va h.k.) \uXXXX ko'rinishida yozilgan - fayl faqat ASCII.
+// Shu sababli uni Notepad/PowerShell/brauzerda ochib ko'chirsangiz ham buzilmaydi. \uXXXX qismlarini o'zgartirmang.
+
 import { createClient } from "npm:@supabase/supabase-js@2";
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2";
 
@@ -104,7 +107,7 @@ function resolveIdentifier(input: string) {
 
 function maskKey(v: string) {
   if (!v) return "";
-  return v.length <= 12 ? "••••" + v.slice(-3) : `${v.slice(0, 6)}••••${v.slice(-4)}`;
+  return v.length <= 12 ? "\u2022\u2022\u2022\u2022" + v.slice(-3) : `${v.slice(0, 6)}\u2022\u2022\u2022\u2022${v.slice(-4)}`;
 }
 
 // deno-lint-ignore no-explicit-any
@@ -247,7 +250,7 @@ const tgActive = (c: SignupCfg) => c.phoneTelegram && tgReady(c);
 const tgRegActive = (c: SignupCfg) => c.telegram && tgReady(c);
 
 function maskPhone(d: string): string {
-  return d.length > 5 ? `+${d.slice(0, 3)} ${"•".repeat(d.length - 5)}${d.slice(-2)}` : `+${d}`;
+  return d.length > 5 ? `+${d.slice(0, 3)} ${"\u2022".repeat(d.length - 5)}${d.slice(-2)}` : `+${d}`;
 }
 
 function randomToken(bytes = 18): string {
@@ -286,67 +289,66 @@ async function tgCall(token: string, method: string, payload: Record<string, unk
 // Bot xabarlari foydalanuvchining Telegram tilida (uz / ru / en / tr)
 const TG_TEXT: Record<string, Record<string, string>> = {
   uz: {
-    welcome: "👋 Salom! Men «Til sayohati» saytida ro'yxatdan o'tish va telefon raqamini tasdiqlashga yordam beradigan botman.\n\nSaytdagi ro'yxatdan o'tish sahifasida «Telegram bot orqali ro'yxatdan o'tish» yoki «Telegramni ochish» tugmasini bosing — havola meni shu yerga olib keladi.",
-    verified: "✅ Raqamingiz tasdiqlandi!\n\nEndi saytga qayting — ro'yxatdan o'tish shu yerda davom etadi (ism va parol kiritasiz).",
-    codeOnly: "🔐 «Til sayohati» tasdiqlash kodi: <code>{code}</code>\n\nKodni saytga kiriting. U 10 daqiqa amal qiladi. Agar siz so'ramagan bo'lsangiz, e'tibor bermang va kodni hech kimga bermang.",
-    resetCode: "🔑 «Til sayohati» parolni tiklash kodi: <code>{code}</code>\n\nKodni saytga kiriting. U 10 daqiqa amal qiladi. Agar siz so'ramagan bo'lsangiz, e'tibor bermang va kodni hech kimga bermang.",
-    expired: "⌛ Havola eskirgan yoki noto'g'ri. Saytga qaytib, «Qaytadan boshlash» yoki «Telegramni ochish» tugmasini qayta bosing.",
-    askContact: "📱 Raqamingizni tasdiqlash uchun pastdagi «Raqamni ulashish» tugmasini bosing.",
-    share: "📱 Raqamni ulashish",
+    welcome: "\uD83D\uDC4B Salom! Men \u00ABTil sayohati\u00BB saytida ro'yxatdan o'tish va telefon raqamini tasdiqlashga yordam beradigan botman.\n\nSaytdagi ro'yxatdan o'tish sahifasida \u00ABTelegram bot orqali ro'yxatdan o'tish\u00BB yoki \u00ABTelegramni ochish\u00BB tugmasini bosing \u2014 havola meni shu yerga olib keladi.",
+    verified: "\u2705 Raqamingiz tasdiqlandi!\n\nEndi saytga qayting \u2014 ro'yxatdan o'tish shu yerda davom etadi (ism va parol kiritasiz).",
+    codeOnly: "\uD83D\uDD10 \u00ABTil sayohati\u00BB tasdiqlash kodi: <code>{code}</code>\n\nKodni saytga kiriting. U 10 daqiqa amal qiladi. Agar siz so'ramagan bo'lsangiz, e'tibor bermang va kodni hech kimga bermang.",
+    resetCode: "\uD83D\uDD11 \u00ABTil sayohati\u00BB parolni tiklash kodi: <code>{code}</code>\n\nKodni saytga kiriting. U 10 daqiqa amal qiladi. Agar siz so'ramagan bo'lsangiz, e'tibor bermang va kodni hech kimga bermang.",
+    expired: "\u231B Havola eskirgan yoki noto'g'ri. Saytga qaytib, \u00ABQaytadan boshlash\u00BB yoki \u00ABTelegramni ochish\u00BB tugmasini qayta bosing.",
+    askContact: "\uD83D\uDCF1 Raqamingizni tasdiqlash uchun pastdagi \u00ABRaqamni ulashish\u00BB tugmasini bosing.",
+    share: "\uD83D\uDCF1 Raqamni ulashish",
     ownOnly: "Iltimos, faqat o'zingizning raqamingizni (pastdagi tugma orqali) ulashing.",
-    mismatch: "❌ Ulashilgan raqam saytda kiritilgan raqamga ({phone}) mos kelmadi. Saytda to'g'ri raqamni kiriting va qayta urinib ko'ring.",
-    noRequest: "Faol so'rov topilmadi. Saytda «Telegramni ochish» tugmasini bosib, havola orqali keling.",
-    code: "✅ Raqamingiz tasdiqlandi!\n\nTasdiqlash kodi: <code>{code}</code>\n\nKodni saytga kiriting. U 10 daqiqa amal qiladi. Kodni hech kimga bermang.",
-    help: "Kod olish uchun saytdagi «Telegramni ochish» tugmasidan foydalaning.",
+    mismatch: "\u274C Ulashilgan raqam saytda kiritilgan raqamga ({phone}) mos kelmadi. Saytda to'g'ri raqamni kiriting va qayta urinib ko'ring.",
+    noRequest: "Faol so'rov topilmadi. Saytda \u00ABTelegramni ochish\u00BB tugmasini bosib, havola orqali keling.",
+    code: "\u2705 Raqamingiz tasdiqlandi!\n\nTasdiqlash kodi: <code>{code}</code>\n\nKodni saytga kiriting. U 10 daqiqa amal qiladi. Kodni hech kimga bermang.",
+    help: "Kod olish uchun saytdagi \u00ABTelegramni ochish\u00BB tugmasidan foydalaning.",
   },
   ru: {
-    welcome: "👋 Здравствуйте! Я бот, который помогает с регистрацией и подтверждением номера телефона на сайте «Til sayohati».\n\nНа странице регистрации нажмите «Регистрация через Telegram-бота» или «Открыть Telegram» — ссылка приведёт вас сюда.",
-    verified: "✅ Номер подтверждён!\n\nТеперь вернитесь на сайт — регистрация продолжится там (введёте имя и пароль).",
-    codeOnly: "🔐 Код подтверждения «Til sayohati»: <code>{code}</code>\n\nВведите код на сайте. Он действует 10 минут. Если вы его не запрашивали, проигнорируйте сообщение и никому не сообщайте код.",
-    resetCode: "🔑 Код для восстановления пароля «Til sayohati»: <code>{code}</code>\n\nВведите код на сайте. Он действует 10 минут. Если вы его не запрашивали, проигнорируйте сообщение и никому не сообщайте код.",
-    expired: "⌛ Ссылка устарела или неверна. Вернитесь на сайт и снова нажмите «Начать заново» или «Открыть Telegram».",
-    askContact: "📱 Чтобы подтвердить номер, нажмите кнопку «Поделиться номером» ниже.",
-    share: "📱 Поделиться номером",
-    ownOnly: "Пожалуйста, поделитесь только своим номером (кнопкой ниже).",
-    mismatch: "❌ Номер не совпадает с номером, указанным на сайте ({phone}). Укажите на сайте правильный номер и попробуйте снова.",
-    noRequest: "Активный запрос не найден. Нажмите на сайте «Открыть Telegram» и перейдите по ссылке.",
-    code: "✅ Номер подтверждён!\n\nКод подтверждения: <code>{code}</code>\n\nВведите код на сайте. Он действует 10 минут. Никому не сообщайте код.",
-    help: "Чтобы получить код, используйте кнопку «Открыть Telegram» на сайте.",
+    welcome: "\uD83D\uDC4B \u0417\u0434\u0440\u0430\u0432\u0441\u0442\u0432\u0443\u0439\u0442\u0435! \u042F \u0431\u043E\u0442, \u043A\u043E\u0442\u043E\u0440\u044B\u0439 \u043F\u043E\u043C\u043E\u0433\u0430\u0435\u0442 \u0441 \u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u0435\u0439 \u0438 \u043F\u043E\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043D\u0438\u0435\u043C \u043D\u043E\u043C\u0435\u0440\u0430 \u0442\u0435\u043B\u0435\u0444\u043E\u043D\u0430 \u043D\u0430 \u0441\u0430\u0439\u0442\u0435 \u00ABTil sayohati\u00BB.\n\n\u041D\u0430 \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u0435 \u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u0438 \u043D\u0430\u0436\u043C\u0438\u0442\u0435 \u00AB\u0420\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u044F \u0447\u0435\u0440\u0435\u0437 Telegram-\u0431\u043E\u0442\u0430\u00BB \u0438\u043B\u0438 \u00AB\u041E\u0442\u043A\u0440\u044B\u0442\u044C Telegram\u00BB \u2014 \u0441\u0441\u044B\u043B\u043A\u0430 \u043F\u0440\u0438\u0432\u0435\u0434\u0451\u0442 \u0432\u0430\u0441 \u0441\u044E\u0434\u0430.",
+    verified: "\u2705 \u041D\u043E\u043C\u0435\u0440 \u043F\u043E\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0451\u043D!\n\n\u0422\u0435\u043F\u0435\u0440\u044C \u0432\u0435\u0440\u043D\u0438\u0442\u0435\u0441\u044C \u043D\u0430 \u0441\u0430\u0439\u0442 \u2014 \u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u044F \u043F\u0440\u043E\u0434\u043E\u043B\u0436\u0438\u0442\u0441\u044F \u0442\u0430\u043C (\u0432\u0432\u0435\u0434\u0451\u0442\u0435 \u0438\u043C\u044F \u0438 \u043F\u0430\u0440\u043E\u043B\u044C).",
+    codeOnly: "\uD83D\uDD10 \u041A\u043E\u0434 \u043F\u043E\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043D\u0438\u044F \u00ABTil sayohati\u00BB: <code>{code}</code>\n\n\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043A\u043E\u0434 \u043D\u0430 \u0441\u0430\u0439\u0442\u0435. \u041E\u043D \u0434\u0435\u0439\u0441\u0442\u0432\u0443\u0435\u0442 10 \u043C\u0438\u043D\u0443\u0442. \u0415\u0441\u043B\u0438 \u0432\u044B \u0435\u0433\u043E \u043D\u0435 \u0437\u0430\u043F\u0440\u0430\u0448\u0438\u0432\u0430\u043B\u0438, \u043F\u0440\u043E\u0438\u0433\u043D\u043E\u0440\u0438\u0440\u0443\u0439\u0442\u0435 \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0435 \u0438 \u043D\u0438\u043A\u043E\u043C\u0443 \u043D\u0435 \u0441\u043E\u043E\u0431\u0449\u0430\u0439\u0442\u0435 \u043A\u043E\u0434.",
+    resetCode: "\uD83D\uDD11 \u041A\u043E\u0434 \u0434\u043B\u044F \u0432\u043E\u0441\u0441\u0442\u0430\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u044F \u043F\u0430\u0440\u043E\u043B\u044F \u00ABTil sayohati\u00BB: <code>{code}</code>\n\n\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043A\u043E\u0434 \u043D\u0430 \u0441\u0430\u0439\u0442\u0435. \u041E\u043D \u0434\u0435\u0439\u0441\u0442\u0432\u0443\u0435\u0442 10 \u043C\u0438\u043D\u0443\u0442. \u0415\u0441\u043B\u0438 \u0432\u044B \u0435\u0433\u043E \u043D\u0435 \u0437\u0430\u043F\u0440\u0430\u0448\u0438\u0432\u0430\u043B\u0438, \u043F\u0440\u043E\u0438\u0433\u043D\u043E\u0440\u0438\u0440\u0443\u0439\u0442\u0435 \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0435 \u0438 \u043D\u0438\u043A\u043E\u043C\u0443 \u043D\u0435 \u0441\u043E\u043E\u0431\u0449\u0430\u0439\u0442\u0435 \u043A\u043E\u0434.",
+    expired: "\u231B \u0421\u0441\u044B\u043B\u043A\u0430 \u0443\u0441\u0442\u0430\u0440\u0435\u043B\u0430 \u0438\u043B\u0438 \u043D\u0435\u0432\u0435\u0440\u043D\u0430. \u0412\u0435\u0440\u043D\u0438\u0442\u0435\u0441\u044C \u043D\u0430 \u0441\u0430\u0439\u0442 \u0438 \u0441\u043D\u043E\u0432\u0430 \u043D\u0430\u0436\u043C\u0438\u0442\u0435 \u00AB\u041D\u0430\u0447\u0430\u0442\u044C \u0437\u0430\u043D\u043E\u0432\u043E\u00BB \u0438\u043B\u0438 \u00AB\u041E\u0442\u043A\u0440\u044B\u0442\u044C Telegram\u00BB.",
+    askContact: "\uD83D\uDCF1 \u0427\u0442\u043E\u0431\u044B \u043F\u043E\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u044C \u043D\u043E\u043C\u0435\u0440, \u043D\u0430\u0436\u043C\u0438\u0442\u0435 \u043A\u043D\u043E\u043F\u043A\u0443 \u00AB\u041F\u043E\u0434\u0435\u043B\u0438\u0442\u044C\u0441\u044F \u043D\u043E\u043C\u0435\u0440\u043E\u043C\u00BB \u043D\u0438\u0436\u0435.",
+    share: "\uD83D\uDCF1 \u041F\u043E\u0434\u0435\u043B\u0438\u0442\u044C\u0441\u044F \u043D\u043E\u043C\u0435\u0440\u043E\u043C",
+    ownOnly: "\u041F\u043E\u0436\u0430\u043B\u0443\u0439\u0441\u0442\u0430, \u043F\u043E\u0434\u0435\u043B\u0438\u0442\u0435\u0441\u044C \u0442\u043E\u043B\u044C\u043A\u043E \u0441\u0432\u043E\u0438\u043C \u043D\u043E\u043C\u0435\u0440\u043E\u043C (\u043A\u043D\u043E\u043F\u043A\u043E\u0439 \u043D\u0438\u0436\u0435).",
+    mismatch: "\u274C \u041D\u043E\u043C\u0435\u0440 \u043D\u0435 \u0441\u043E\u0432\u043F\u0430\u0434\u0430\u0435\u0442 \u0441 \u043D\u043E\u043C\u0435\u0440\u043E\u043C, \u0443\u043A\u0430\u0437\u0430\u043D\u043D\u044B\u043C \u043D\u0430 \u0441\u0430\u0439\u0442\u0435 ({phone}). \u0423\u043A\u0430\u0436\u0438\u0442\u0435 \u043D\u0430 \u0441\u0430\u0439\u0442\u0435 \u043F\u0440\u0430\u0432\u0438\u043B\u044C\u043D\u044B\u0439 \u043D\u043E\u043C\u0435\u0440 \u0438 \u043F\u043E\u043F\u0440\u043E\u0431\u0443\u0439\u0442\u0435 \u0441\u043D\u043E\u0432\u0430.",
+    noRequest: "\u0410\u043A\u0442\u0438\u0432\u043D\u044B\u0439 \u0437\u0430\u043F\u0440\u043E\u0441 \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D. \u041D\u0430\u0436\u043C\u0438\u0442\u0435 \u043D\u0430 \u0441\u0430\u0439\u0442\u0435 \u00AB\u041E\u0442\u043A\u0440\u044B\u0442\u044C Telegram\u00BB \u0438 \u043F\u0435\u0440\u0435\u0439\u0434\u0438\u0442\u0435 \u043F\u043E \u0441\u0441\u044B\u043B\u043A\u0435.",
+    code: "\u2705 \u041D\u043E\u043C\u0435\u0440 \u043F\u043E\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0451\u043D!\n\n\u041A\u043E\u0434 \u043F\u043E\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043D\u0438\u044F: <code>{code}</code>\n\n\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043A\u043E\u0434 \u043D\u0430 \u0441\u0430\u0439\u0442\u0435. \u041E\u043D \u0434\u0435\u0439\u0441\u0442\u0432\u0443\u0435\u0442 10 \u043C\u0438\u043D\u0443\u0442. \u041D\u0438\u043A\u043E\u043C\u0443 \u043D\u0435 \u0441\u043E\u043E\u0431\u0449\u0430\u0439\u0442\u0435 \u043A\u043E\u0434.",
+    help: "\u0427\u0442\u043E\u0431\u044B \u043F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u043A\u043E\u0434, \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0439\u0442\u0435 \u043A\u043D\u043E\u043F\u043A\u0443 \u00AB\u041E\u0442\u043A\u0440\u044B\u0442\u044C Telegram\u00BB \u043D\u0430 \u0441\u0430\u0439\u0442\u0435.",
   },
   en: {
-    welcome: "👋 Hello! I'm the bot that helps with sign-up and phone verification on the “Til sayohati” website.\n\nOn the sign-up page press “Sign up with the Telegram bot” or “Open Telegram” — the link will bring you here.",
-    verified: "✅ Your number is verified!\n\nNow go back to the website — sign-up continues there (you'll enter a name and a password).",
-    codeOnly: "🔐 “Til sayohati” verification code: <code>{code}</code>\n\nEnter the code on the website. It is valid for 10 minutes. If you didn't request it, ignore this message and never share the code.",
-    resetCode: "🔑 “Til sayohati” password recovery code: <code>{code}</code>\n\nEnter the code on the website. It is valid for 10 minutes. If you didn't request it, ignore this message and never share the code.",
-    expired: "⌛ This link has expired or is invalid. Go back to the website and press “Start over” or “Open Telegram” again.",
-    askContact: "📱 To verify your number, press the “Share number” button below.",
-    share: "📱 Share number",
+    welcome: "\uD83D\uDC4B Hello! I'm the bot that helps with sign-up and phone verification on the \u201CTil sayohati\u201D website.\n\nOn the sign-up page press \u201CSign up with the Telegram bot\u201D or \u201COpen Telegram\u201D \u2014 the link will bring you here.",
+    verified: "\u2705 Your number is verified!\n\nNow go back to the website \u2014 sign-up continues there (you'll enter a name and a password).",
+    codeOnly: "\uD83D\uDD10 \u201CTil sayohati\u201D verification code: <code>{code}</code>\n\nEnter the code on the website. It is valid for 10 minutes. If you didn't request it, ignore this message and never share the code.",
+    resetCode: "\uD83D\uDD11 \u201CTil sayohati\u201D password recovery code: <code>{code}</code>\n\nEnter the code on the website. It is valid for 10 minutes. If you didn't request it, ignore this message and never share the code.",
+    expired: "\u231B This link has expired or is invalid. Go back to the website and press \u201CStart over\u201D or \u201COpen Telegram\u201D again.",
+    askContact: "\uD83D\uDCF1 To verify your number, press the \u201CShare number\u201D button below.",
+    share: "\uD83D\uDCF1 Share number",
     ownOnly: "Please share only your own number (with the button below).",
-    mismatch: "❌ The shared number doesn't match the number entered on the website ({phone}). Enter the correct number on the website and try again.",
-    noRequest: "No active request found. Press “Open Telegram” on the website and come here via the link.",
-    code: "✅ Your number is verified!\n\nVerification code: <code>{code}</code>\n\nEnter the code on the website. It is valid for 10 minutes. Never share it with anyone.",
-    help: "To get a code, use the “Open Telegram” button on the website.",
+    mismatch: "\u274C The shared number doesn't match the number entered on the website ({phone}). Enter the correct number on the website and try again.",
+    noRequest: "No active request found. Press \u201COpen Telegram\u201D on the website and come here via the link.",
+    code: "\u2705 Your number is verified!\n\nVerification code: <code>{code}</code>\n\nEnter the code on the website. It is valid for 10 minutes. Never share it with anyone.",
+    help: "To get a code, use the \u201COpen Telegram\u201D button on the website.",
   },
   tr: {
-    welcome: "👋 Merhaba! Ben «Til sayohati» sitesinde kayıt ve telefon doğrulamaya yardım eden botum.\n\nKayıt sayfasında «Telegram botuyla kayıt ol» veya «Telegram'ı aç» düğmesine basın — bağlantı sizi buraya getirecek.",
-    verified: "✅ Numaranız doğrulandı!\n\nŞimdi siteye dönün — kayıt orada devam eder (ad ve parola girersiniz).",
-    codeOnly: "🔐 «Til sayohati» doğrulama kodu: <code>{code}</code>\n\nKodu sitede girin. 10 dakika geçerlidir. Siz istemediyseniz bu mesajı yok sayın ve kodu kimseyle paylaşmayın.",
-    resetCode: "🔑 «Til sayohati» parola kurtarma kodu: <code>{code}</code>\n\nKodu sitede girin. 10 dakika geçerlidir. Siz istemediyseniz bu mesajı yok sayın ve kodu kimseyle paylaşmayın.",
-    expired: "⌛ Bağlantının süresi dolmuş veya geçersiz. Siteye dönüp «Baştan başla» veya «Telegram'ı aç» düğmesine yeniden basın.",
-    askContact: "📱 Numaranızı doğrulamak için aşağıdaki «Numarayı paylaş» düğmesine basın.",
-    share: "📱 Numarayı paylaş",
-    ownOnly: "Lütfen yalnızca kendi numaranızı (aşağıdaki düğmeyle) paylaşın.",
-    mismatch: "❌ Paylaşılan numara sitede girilen numarayla ({phone}) eşleşmedi. Sitede doğru numarayı girip tekrar deneyin.",
-    noRequest: "Etkin istek bulunamadı. Sitede «Telegram'ı aç» düğmesine basıp bağlantıyla gelin.",
-    code: "✅ Numaranız doğrulandı!\n\nDoğrulama kodu: <code>{code}</code>\n\nKodu sitede girin. 10 dakika geçerlidir. Kodu kimseyle paylaşmayın.",
-    help: "Kod almak için sitedeki «Telegram'ı aç» düğmesini kullanın.",
+    welcome: "\uD83D\uDC4B Merhaba! Ben \u00ABTil sayohati\u00BB sitesinde kay\u0131t ve telefon do\u011Frulamaya yard\u0131m eden botum.\n\nKay\u0131t sayfas\u0131nda \u00ABTelegram botuyla kay\u0131t ol\u00BB veya \u00ABTelegram'\u0131 a\u00E7\u00BB d\u00FC\u011Fmesine bas\u0131n \u2014 ba\u011Flant\u0131 sizi buraya getirecek.",
+    verified: "\u2705 Numaran\u0131z do\u011Fruland\u0131!\n\n\u015Eimdi siteye d\u00F6n\u00FCn \u2014 kay\u0131t orada devam eder (ad ve parola girersiniz).",
+    codeOnly: "\uD83D\uDD10 \u00ABTil sayohati\u00BB do\u011Frulama kodu: <code>{code}</code>\n\nKodu sitede girin. 10 dakika ge\u00E7erlidir. Siz istemediyseniz bu mesaj\u0131 yok say\u0131n ve kodu kimseyle payla\u015Fmay\u0131n.",
+    resetCode: "\uD83D\uDD11 \u00ABTil sayohati\u00BB parola kurtarma kodu: <code>{code}</code>\n\nKodu sitede girin. 10 dakika ge\u00E7erlidir. Siz istemediyseniz bu mesaj\u0131 yok say\u0131n ve kodu kimseyle payla\u015Fmay\u0131n.",
+    expired: "\u231B Ba\u011Flant\u0131n\u0131n s\u00FCresi dolmu\u015F veya ge\u00E7ersiz. Siteye d\u00F6n\u00FCp \u00ABBa\u015Ftan ba\u015Fla\u00BB veya \u00ABTelegram'\u0131 a\u00E7\u00BB d\u00FC\u011Fmesine yeniden bas\u0131n.",
+    askContact: "\uD83D\uDCF1 Numaran\u0131z\u0131 do\u011Frulamak i\u00E7in a\u015Fa\u011F\u0131daki \u00ABNumaray\u0131 payla\u015F\u00BB d\u00FC\u011Fmesine bas\u0131n.",
+    share: "\uD83D\uDCF1 Numaray\u0131 payla\u015F",
+    ownOnly: "L\u00FCtfen yaln\u0131zca kendi numaran\u0131z\u0131 (a\u015Fa\u011F\u0131daki d\u00FC\u011Fmeyle) payla\u015F\u0131n.",
+    mismatch: "\u274C Payla\u015F\u0131lan numara sitede girilen numarayla ({phone}) e\u015Fle\u015Fmedi. Sitede do\u011Fru numaray\u0131 girip tekrar deneyin.",
+    noRequest: "Etkin istek bulunamad\u0131. Sitede \u00ABTelegram'\u0131 a\u00E7\u00BB d\u00FC\u011Fmesine bas\u0131p ba\u011Flant\u0131yla gelin.",
+    code: "\u2705 Numaran\u0131z do\u011Fruland\u0131!\n\nDo\u011Frulama kodu: <code>{code}</code>\n\nKodu sitede girin. 10 dakika ge\u00E7erlidir. Kodu kimseyle payla\u015Fmay\u0131n.",
+    help: "Kod almak i\u00E7in sitedeki \u00ABTelegram'\u0131 a\u00E7\u00BB d\u00FC\u011Fmesini kullan\u0131n.",
   },
 };
 
-function tgLangOf(code?: string): string {
-  const c = String(code || "").slice(0, 2).toLowerCase();
-  return TG_TEXT[c] ? c : "uz";
-}
+// Bot FAQAT o'zbek tilida javob beradi (foydalanuvchining Telegram tilidan va sayt tilidan qat'i nazar).
+// TG_TEXT dagi boshqa tillar ishlatilmaydi.
+const BOT_L = TG_TEXT.uz;
 
 /** Telegram'dan kelgan yangilanishni qayta ishlaydi: /start <token> → kontakt so'rash → kontakt mos bo'lsa kod yuborish. */
 // deno-lint-ignore no-explicit-any
@@ -355,7 +357,7 @@ async function processTgUpdate(admin: Admin, cfg: SignupCfg, update: any) {
   if (!msg?.chat || msg.chat.type !== "private" || !msg.from || msg.from.is_bot) return;
   const chatId = msg.chat.id as number;
   const fromId = msg.from.id as number;
-  const L = TG_TEXT[tgLangOf(msg.from.language_code)];
+  const L = BOT_L;
   const send = (text: string, markup?: unknown) =>
     tgCall(cfg.tgToken, "sendMessage", { chat_id: chatId, text, parse_mode: "HTML", ...(markup ? { reply_markup: markup } : {}) });
 
@@ -400,7 +402,7 @@ async function processTgUpdate(admin: Admin, cfg: SignupCfg, update: any) {
       return;
     }
     // Raqam egasi tasdiqlandi — keyingi safar (raqam yozilganda) kod to'g'ridan-to'g'ri shu chatga yuboriladi
-    await admin.from("tg_contacts").upsert({ phone: d, tg_user_id: fromId, chat_id: chatId, lang: tgLangOf(msg.from.language_code), updated_at: new Date().toISOString() });
+    await admin.from("tg_contacts").upsert({ phone: d, tg_user_id: fromId, chat_id: chatId, lang: "uz", updated_at: new Date().toISOString() });
     // Telegram orqali ro'yxatdan o'tish: raqam kontaktdan olinadi, kod kerak emas — sayt holatni so'rab turadi
     if (row.purpose === "register-tg") {
       await admin
@@ -434,7 +436,7 @@ async function processTgUpdate(admin: Admin, cfg: SignupCfg, update: any) {
 /** Raqam avval bot orqali tasdiqlangan bo'lsa (tg_contacts) — kodni DARHOL shu Telegram chatiga yuboradi va so'rov tokenini qaytaradi.
  *  Bog'lanmagan bo'lsa yoki yuborib bo'lmasa (bot bloklangan) — null (foydalanuvchi bot havolasi orqali o'tadi). */
 async function sendCodeToLinked(admin: Admin, cfg: SignupCfg, phone: string, purpose: string, userId: string | null): Promise<string | null> {
-  const { data: c } = await admin.from("tg_contacts").select("tg_user_id, chat_id, lang").eq("phone", phone).maybeSingle();
+  const { data: c } = await admin.from("tg_contacts").select("tg_user_id, chat_id").eq("phone", phone).maybeSingle();
   if (!c) return null;
   const token = randomToken(18);
   const code = randomCode();
@@ -452,7 +454,7 @@ async function sendCodeToLinked(admin: Admin, cfg: SignupCfg, phone: string, pur
     expires_at: new Date(Date.now() + CODE_TTL_MS).toISOString(),
   });
   if (error) return null;
-  const L = TG_TEXT[tgLangOf(c.lang as string)];
+  const L = BOT_L;
   try {
     await tgCall(cfg.tgToken, "sendMessage", { chat_id: c.chat_id, text: (purpose === "reset" ? L.resetCode : L.codeOnly).replace("{code}", code), parse_mode: "HTML" });
   } catch (e) {
@@ -477,7 +479,7 @@ async function verifyTg(admin: Admin, token: string, phone: string, code: unknow
     return "Telegram kodining muddati tugagan. Qaytadan boshlang.";
   }
   if (row.status !== "code_sent" || !row.code_hash) {
-    return "Avval Telegram botda raqamingizni tasdiqlang: havola orqali botni oching va «Raqamni ulashish» tugmasini bosing.";
+    return "Avval Telegram botda raqamingizni tasdiqlang: havola orqali botni oching va \u00ABRaqamni ulashish\u00BB tugmasini bosing.";
   }
   if (((row.attempts as number) || 0) >= CODE_MAX_ATTEMPTS) {
     await drop();
@@ -506,15 +508,15 @@ function publicSignup(c: SignupCfg, mailReady: boolean) {
 
 function codeMail(code: string, purpose: string) {
   const what = purpose === "reset" ? "Parolni tiklash" : purpose === "change-email" ? "Emailni o'zgartirish" : "Ro'yxatdan o'tish";
-  const subject = `${code} — Til sayohati tasdiqlash kodi`;
+  const subject = `${code} \u2014 Til sayohati tasdiqlash kodi`;
   const html =
     `<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#16201c">` +
-    `<div style="font-size:20px;font-weight:700;color:#0f5f4d">🎫 Til sayohati</div>` +
+    `<div style="font-size:20px;font-weight:700;color:#0f5f4d">\uD83C\uDFAB Til sayohati</div>` +
     `<p style="font-size:15px;margin:18px 0 12px">${what} uchun tasdiqlash kodi:</p>` +
     `<div style="font-size:34px;font-weight:700;letter-spacing:8px;background:#e2f1eb;color:#0f5f4d;padding:16px 20px;border-radius:12px;text-align:center">${code}</div>` +
     `<p style="font-size:13px;color:#5d6a64;line-height:1.5;margin-top:16px">Kod 10 daqiqa amal qiladi. Uni hech kimga bermang. ` +
     `Agar bu so'rovni siz yubormagan bo'lsangiz, xatni e'tiborsiz qoldiring.</p></div>`;
-  const text = `Til sayohati — ${what}\n\nTasdiqlash kodi: ${code}\n\nKod 10 daqiqa amal qiladi. Uni hech kimga bermang.`;
+  const text = `Til sayohati \u2014 ${what}\n\nTasdiqlash kodi: ${code}\n\nKod 10 daqiqa amal qiladi. Uni hech kimga bermang.`;
   return { subject, html, text };
 }
 
@@ -744,7 +746,7 @@ async function handlePublic(action: string, body: Record<string, unknown>, req: 
         return json({ error: "Telegram tasdiqlash so'rovi topilmadi. Qaytadan boshlang.", tgError: true }, 400);
       }
       if (row.status !== "verified" || !row.phone) {
-        return json({ error: "Avval Telegram botda raqamingizni tasdiqlang: botni oching va «Raqamni ulashish» tugmasini bosing.", tgError: true }, 400);
+        return json({ error: "Avval Telegram botda raqamingizni tasdiqlang: botni oching va \u00ABRaqamni ulashish\u00BB tugmasini bosing.", tgError: true }, 400);
       }
       phoneDigits = String(row.phone);
       phone = "+" + phoneDigits;
@@ -772,7 +774,7 @@ async function handlePublic(action: string, body: Record<string, unknown>, req: 
     } else {
       // Oddiy usul: ism + login + parol (tasdiqlashsiz)
       if (!/^[a-zA-Z0-9_.-]{3,40}$/.test(loginName)) {
-        return json({ error: "Login 3–40 belgidan iborat bo'lsin: lotin harflari, raqamlar, _ . - belgilari" }, 400);
+        return json({ error: "Login 3\u201340 belgidan iborat bo'lsin: lotin harflari, raqamlar, _ . - belgilari" }, 400);
       }
       const { data: used } = await admin.from("profiles").select("id").ilike("username", loginName.replace(/[\\%_]/g, (ch) => "\\" + ch)).limit(1);
       if (used?.length) return json({ error: "Bu login band. Boshqa login tanlang." }, 400);
@@ -987,7 +989,7 @@ Deno.serve(async (req) => {
       if (body.email !== undefined) {
         const e = String(body.email || "").trim().toLowerCase();
         if (!e) {
-          if (hasRealEmail) return json({ error: "Emailni o'chirib bo'lmaydi — faqat boshqasiga almashtirish mumkin" }, 400);
+          if (hasRealEmail) return json({ error: "Emailni o'chirib bo'lmaydi \u2014 faqat boshqasiga almashtirish mumkin" }, 400);
         } else {
           if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) || e.endsWith("@" + SYNTH_DOMAIN)) {
             return json({ error: "Email manzili noto'g'ri" }, 400);
@@ -1399,7 +1401,7 @@ Deno.serve(async (req) => {
         );
         return json(await signupSnapshot());
       }
-      if (!/^\d{6,14}:[A-Za-z0-9_-]{30,}$/.test(token)) return json({ error: "Bot tokeni noto'g'ri ko'rinishda (namuna: 123456789:AAH…). @BotFather bergan tokenni to'liq nusxalang." }, 400);
+      if (!/^\d{6,14}:[A-Za-z0-9_-]{30,}$/.test(token)) return json({ error: "Bot tokeni noto'g'ri ko'rinishda (namuna: 123456789:AAH\u2026). @BotFather bergan tokenni to'liq nusxalang." }, 400);
       let me: { username?: string };
       try {
         me = await tgCall(token, "getMe", {});
